@@ -1,0 +1,6 @@
+Notes:
+Discounts amount stored as string with % or $, $ would be difference of reduction.
+
+package for fuzzy search? (rapidfuzz lib)
+
+composite PK for cart (sku, customer_id) and composite PK for order (sku, order_number)
