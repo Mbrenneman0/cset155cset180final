@@ -46,6 +46,11 @@ class Conn:
 
         def get_columns(self, column_names:list[str]):
 
+        def create_row(self, data:dict):
+            columns = ', '.join(data.keys())
+            values = ', '.join(['%s'] * len(data))
+            query = f"INSERT INTO {table_name} ({columns}) VALUES ({values})"
+
     
 
     self.tables = {}
@@ -104,5 +109,12 @@ class Conn:
             print(e)
 
     def delete_row(self, table_name:str, pk_value:any):
+        table = self._get_table(table_name)
+        table.delete_row
 
-    
+    # AIDEN DEV GENERICS
+    def create_row(self, table_name:str, data:dict):
+        table = self._get_table(table_name)
+        table.create_row(data)
+    # AIDEN DEV END
+        
