@@ -44,7 +44,15 @@ class Conn:
 
         def get_all(self):
 
-        def get_columns(self, column_names:list[str]):
+        def get_column_names():
+
+        def select_columns(self, column_names:list[str]):
+
+        def delete_row():
+
+        def update_row():
+
+        def get_row():
 
         def create_row(self, data:dict):
             columns = ', '.join(data.keys())
@@ -110,11 +118,9 @@ class Conn:
 
     def delete_row(self, table_name:str, pk_value:any):
         table = self._get_table(table_name)
-        table.delete_row
-
-    # AIDEN DEV GENERICS
+        table.delete_row(pk_value)
+      
     def create_row(self, table_name:str, data:dict):
         table = self._get_table(table_name)
         table.create_row(data)
-    # AIDEN DEV END
-        
+
