@@ -2,20 +2,20 @@ use ecommDB;
 
 INSERT INTO users (name, username, password, email) VALUES
 -- Admins
-('Admin One', 'admin1', 'pass', 'admin1@mail.com'),
-('Admin Two', 'admin2', 'pass', 'admin2@mail.com'),
+('Admin One', 'admin1', 'pass', 'admin1@mail.com', 'Admin'),
+('Admin Two', 'admin2', 'pass', 'admin2@mail.com', 'Admin'),
 
 -- Customers
-('Alice Smith', 'cust1', 'pass', 'alice@mail.com'),
-('Bob Jones', 'cust2', 'pass', 'bob@mail.com'),
-('Charlie Brown', 'cust3', 'pass', 'charlie@mail.com'),
-('Diana Prince', 'cust4', 'pass', 'diana@mail.com'),
-('Ethan Hunt', 'cust5', 'pass', 'ethan@mail.com'),
+('Alice Smith', 'cust1', 'pass', 'alice@mail.com', 'Customer'),
+('Bob Jones', 'cust2', 'pass', 'bob@mail.com', 'Customer'),
+('Charlie Brown', 'cust3', 'pass', 'charlie@mail.com', 'Customer'),
+('Diana Prince', 'cust4', 'pass', 'diana@mail.com', 'Customer'),
+('Ethan Hunt', 'cust5', 'pass', 'ethan@mail.com', 'Customer'),
 
 -- Vendors
-('Vendor A', 'vendor1', 'pass', 'vendor1@mail.com'),
-('Vendor B', 'vendor2', 'pass', 'vendor2@mail.com'),
-('Vendor C', 'vendor3', 'pass', 'vendor3@mail.com');
+('Vendor A', 'vendor1', 'pass', 'vendor1@mail.com', 'Vender'),
+('Vendor B', 'vendor2', 'pass', 'vendor2@mail.com', 'Vender'),
+('Vendor C', 'vendor3', 'pass', 'vendor3@mail.com', 'Vender');
 
 INSERT INTO product VALUES
 ('SKU001', 1, 50, 'Laptop', 'Black', '15in', 'Gaming laptop', 1200.00, '1 year', FALSE),
