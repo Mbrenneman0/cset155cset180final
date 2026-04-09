@@ -117,4 +117,6 @@ class Conn:
         table = self._get_table(table_name)
         table.delete_row(pk_value)
 
+    def add_row(self, table_name:str, data:dict):
+        
     
