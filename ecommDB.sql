@@ -12,6 +12,7 @@ CREATE TABLE users(
 
 CREATE TABLE product(
 	sku VARCHAR(12) PRIMARY KEY,
+    vender_id INT NOT NULL,
     qty INT NOT NULL,
     title VARCHAR(255) NOT NULL,
     color VARCHAR(255) NOT NULL,
@@ -19,7 +20,8 @@ CREATE TABLE product(
     description VARCHAR(2048) NOT NULL,
     unit_price DECIMAL(12,2) NOT NULL,
     warranty_period VARCHAR(255),
-    is_removed BOOLEAN NOT NULL DEFAULT FALSE
+    is_removed BOOLEAN NOT NULL DEFAULT FALSE,
+    FOREIGN KEY (vender_id) REFERENCES users(user_id)
 );
 
 CREATE TABLE prod_imgs(
