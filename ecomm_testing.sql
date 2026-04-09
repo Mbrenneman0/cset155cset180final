@@ -101,3 +101,29 @@ INSERT INTO message (chat_id, user_id, content, msg_time) VALUES
 (1, 3, 'My product arrived damaged', NOW()),
 (1, 1, 'We are reviewing your complaint', NOW()),
 (2, 4, 'Order is late', NOW());
+
+
+
+
+SELECT * FROM users;
+SELECT * FROM product;
+SELECT * FROM prod_imgs;
+SELECT * FROM discount;
+SELECT * FROM cart;
+SELECT * FROM orders;
+SELECT * FROM order_items;
+SELECT * FROM review;
+SELECT * FROM complaint;
+SELECT * FROM chat;
+SELECT * FROM message;
+
+
+-- CREATE 
+    
+-- READ 
+
+-- UPDATE 
+
+-- DELETE 
+
+

@@ -48,13 +48,16 @@ class Conn:
 
         def select_columns(self, column_names:list[str]):
 
-        def add_row():
-
         def delete_row():
 
         def update_row():
 
         def get_row():
+
+        def create_row(self, data:dict):
+            columns = ', '.join(data.keys())
+            values = ', '.join(['%s'] * len(data))
+            query = f"INSERT INTO {table_name} ({columns}) VALUES ({values})"
 
     
 
@@ -116,7 +119,8 @@ class Conn:
     def delete_row(self, table_name:str, pk_value:any):
         table = self._get_table(table_name)
         table.delete_row(pk_value)
+      
+    def create_row(self, table_name:str, data:dict):
+        table = self._get_table(table_name)
+        table.create_row(data)
 
-    def add_row(self, table_name:str, data:dict):
-        
-    
