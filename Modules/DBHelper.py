@@ -44,7 +44,17 @@ class Conn:
 
         def get_all(self):
 
-        def get_columns(self, column_names:list[str]):
+        def get_column_names():
+
+        def select_columns(self, column_names:list[str]):
+
+        def add_row():
+
+        def delete_row():
+
+        def update_row():
+
+        def get_row():
 
     
 
@@ -104,5 +114,7 @@ class Conn:
             print(e)
 
     def delete_row(self, table_name:str, pk_value:any):
+        table = self._get_table(table_name)
+        table.delete_row(pk_value)
 
     
