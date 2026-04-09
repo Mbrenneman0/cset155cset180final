@@ -3,24 +3,6 @@ import os
 from pathlib import Path
 
 class Conn:
-    def __init__(self, login:str,
-                 password:str,
-                 server:str,
-                 db_name:str,
-                 schema_path:str ='scripts/sql/schema.sql'):
-        self.login = login
-        self.password = password
-        self.server = server
-        self.db_name = db_name
-        base_dir = Path.cwd()
-        self.schema_path = os.path.join(base_dir, schema_path)
-
-        if not self._db_exists():
-            self._create_db()
-
-        connection_str = f"mysql://{self.login}:{self.password}@{self.server}/{self.db_name}"
-        engine = create_engine(connection_str, echo=True, connect_args={"local_infile":1})
-        self.conn = engine.connect()
 
     class Table:
         def __init__(self, table_name:str, conn:Connection):
@@ -94,14 +76,30 @@ class Conn:
             query = f"INSERT INTO {self.table_name} ({columns}) VALUES ({values})"
             self.conn.execute(text(query))
 
-    
+    def __init__(self, login:str,
+                 password:str,
+                 server:str,
+                 db_name:str,
+                 schema_path:str ='scripts/sql/schema.sql'):
+        self.login = login
+        self.password = password
+        self.server = server
+        self.db_name = db_name
+        base_dir = Path.cwd()
+        self.schema_path = os.path.join(base_dir, schema_path)
 
-    self.tables = {}
+        if not self._db_exists():
+            self._create_db()
 
-    query = "SHOW TABLES"
-    rslt = self.conn.execute(text(query))
-    for table_name in rslt.all():
-        self.tables[table_name] = Table(table_name, self.conn)
+        connection_str = f"mysql://{self.login}:{self.password}@{self.server}/{self.db_name}"
+        engine = create_engine(connection_str, echo=True, connect_args={"local_infile":1})
+        self.conn = engine.connect()
+
+        self.tables = {}
+        query = "SHOW TABLES"
+        rslt = self.conn.execute(text(query))
+        for table_name in rslt.all():
+            self.tables[table_name] = Table(table_name, self.conn)
 
     
     def _db_exists(self) -> bool:
