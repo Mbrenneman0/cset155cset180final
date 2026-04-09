@@ -1,3 +1,4 @@
+DROP DATABASE ecommDB;
 CREATE DATABASE ecommDB;
 USE ecommDB;
 
@@ -41,7 +42,7 @@ CREATE TABLE cart(
     sku VARCHAR(12) NOT NULL,
     qty INT NOT NULL,
     PRIMARY KEY (user_id, sku),
-    FOREIGN KEY (user_id) REFERENCES user(user_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
     FOREIGN KEY (sku) REFERENCES product(sku)
 );
 
@@ -49,6 +50,7 @@ CREATE TABLE orders(
 	order_num INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
     order_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    status VARCHAR(50) NOT NULL DEFAULT 'pending',
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
@@ -59,7 +61,7 @@ CREATE TABLE order_items(
     unit_price DECIMAL(12,2) NOT NULL,
     warranty_period VARCHAR(20),
     PRIMARY KEY (order_num, sku),
-    FOREIGN KEY (order_num) REFERENCES customer_order(order_num),
+    FOREIGN KEY (order_num) REFERENCES orders(order_num),
     FOREIGN KEY (sku) REFERENCES product(sku)
 );
 
@@ -81,7 +83,7 @@ CREATE TABLE complaint(
     comp_time DATETIME NOT NULL,
     type VARCHAR(8) NOT NULL,
     is_accepted BOOLEAN,
-    FOREIGN KEY (order_num) REFERENCES customer_order(order_num)
+    FOREIGN KEY (order_num) REFERENCES orders(order_num)
 );
 
 CREATE TABLE chat(
