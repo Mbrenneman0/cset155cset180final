@@ -2,7 +2,7 @@ from sqlalchemy import create_engine, Connection, text
 import os
 from pathlib import Path
 
-class Conn():
+class Conn:
     def __init__(self, login:str,
                  password:str,
                  server:str,
@@ -21,6 +21,40 @@ class Conn():
         connection_str = f"mysql://{self.login}:{self.password}@{self.server}/{self.db_name}"
         engine = create_engine(connection_str, echo=True, connect_args={"local_infile":1})
         self.conn = engine.connect()
+
+    class Table:
+        def __init__(self, table_name:str, conn:Connection):
+            self.table_name = table_name
+            self.conn = conn
+            if _exists():
+                self._load_columns()
+
+        def _exists(self) -> bool:
+            query = "SHOW TABLES"
+            rslt = self.conn.execute(text(query))
+            return self.table_name in rslt.all()
+
+        def _load_columns(self):
+            query = f"""SHOW COLUMNS FROM {self.table_name}"""
+            rslt = self.conn.execute(text(query))
+            self.columns = list(rslt.all())
+
+        def get_table_name(self, table_name_str):
+            return self.table_name
+
+        def get_all(self):
+
+        def get_columns(self, column_names:list[str]):
+
+    
+
+    self.tables = {}
+
+    query = "SHOW TABLES"
+    rslt = self.conn.execute(text(query))
+    for table_name in rslt.all():
+        self.tables[table_name] = Table(table_name, self.conn)
+
     
     def _db_exists(self) -> bool:
         connection_str = f"mysql://{self.login}:{self.password}@{self.server}"
@@ -58,5 +92,17 @@ class Conn():
                     if "CREATE DATABASE" not in statement.upper() and "USE" not in statement.upper():
                         conn.execute(text(statement))
 
+    def _get_table(self, table_name:str) -> Table:
+        for table in self.tables:
+            if table_name in table.get_table_name(table_name):
+                return table
+
+    def query(self, query:str, data:dict={}):
+        try:
+            self.conn.execute(text(query, data))
+        except Exception as e:
+            print(e)
+
+    def delete_row(self, table_name:str, pk_value:any):
 
     
