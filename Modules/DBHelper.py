@@ -54,8 +54,7 @@ class Conn:
         def get_all(self):
 
         def get_column_names():
-
-
+          
         def select_columns(self, column_names:list[str]):
 
         def delete_row(self, pk_value:any):
@@ -76,15 +75,24 @@ class Conn:
                     SET {set_txt}
                     WHERE {self.primary_key} = {pk_value}"""
             self.conn.execute(text(query))
-            
-            
 
-        def get_row():
+        def get_row(self, pk_value):
+            query = f"SELECT * FROM {self.table_name} WHERE {pk_value} = {pk_value}"
+            self.conn.execute(text(query))
 
+        def get_rows(self, condition):
+            if condition == '':
+                query = f"SELECT * FROM {self.table_name}"
+                self.conn.execute(text(query))
+            else:
+                query = f"SELECT * FROM {self.table_name} WHERE {condition}"
+                self.conn.execute(text(query))
+            
         def create_row(self, data:dict):
             columns = ', '.join(data.keys())
             values = ', '.join(['%s'] * len(data))
-            query = f"INSERT INTO {table_name} ({columns}) VALUES ({values})"
+            query = f"INSERT INTO {self.table_name} ({columns}) VALUES ({values})"
+            self.conn.execute(text(query))
 
     
 
@@ -151,5 +159,12 @@ class Conn:
         table = self._get_table(table_name)
         table.create_row(data)
 
+    def get_row(self, table_name:str, pk_value:any):
+        table = self._get_table(table_name)
+        table.get_row(pk_value)
+
+    def get_rows(self, table_name:str, condition:str = ''):
+        table = self._get_table(table_name)
+        table.get_row(condition)
     
 
