@@ -26,8 +26,9 @@ class Conn:
         def __init__(self, table_name:str, conn:Connection):
             self.table_name = table_name
             self.conn = conn
-            if _exists():
+            if self._exists():
                 self._load_columns()
+                self._set_primarykey()
 
         def _exists(self) -> bool:
             query = "SHOW TABLES"
@@ -39,6 +40,14 @@ class Conn:
             rslt = self.conn.execute(text(query))
             self.columns = list(rslt.all())
 
+        def _set_primarykey(self):
+            query = f"""SELECT COLUMN_NAME
+                    FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+                    WHERE  TABLE_NAME = '{self.table_name}'
+                    AND CONSTRAINT_NAME = 'PRIMARY'"""
+            rslt = self.conn.execute(text(query))
+            self.primary_key = rslt.first()
+
         def get_table_name(self, table_name_str):
             return self.table_name
 
@@ -46,11 +55,29 @@ class Conn:
 
         def get_column_names():
 
+
         def select_columns(self, column_names:list[str]):
 
-        def delete_row():
+        def delete_row(self, pk_value:any):
+            if type(pk_value) == str:
+                pk_value = f"'{pk_value}'"
+            query = f"DELETE FROM {self.table_name} WHERE {self.primary_key} = {pk_value}"
+            self.conn.execute(text(query))
 
-        def update_row():
+        def update_row(self, pk_value:any, data:dict):
+            if type(pk_value) == str:
+                pk_value = f"'{pk_value}'"
+            columns = data.keys()
+            items = []
+            for column in columns:
+                items.append(f"{column} = {data[column]}")
+            set_txt = ', '.join(items)
+            query = f"""UPDATE {self.table_name}
+                    SET {set_txt}
+                    WHERE {self.primary_key} = {pk_value}"""
+            self.conn.execute(text(query))
+            
+            
 
         def get_row():
 
@@ -123,4 +150,6 @@ class Conn:
     def create_row(self, table_name:str, data:dict):
         table = self._get_table(table_name)
         table.create_row(data)
+
+    
 
