@@ -51,7 +51,8 @@ CREATE TABLE orders(
     user_id INT NOT NULL,
     order_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     status VARCHAR(50) NOT NULL DEFAULT 'pending',
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    CONSTRAINT order_status_value CHECK(status IN ('Pending','Confirmed','Picked Up','Shipped'))
 );
 
 CREATE TABLE order_items(
