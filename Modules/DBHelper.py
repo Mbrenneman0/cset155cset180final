@@ -28,16 +28,23 @@ class Conn:
                     WHERE  TABLE_NAME = '{self.table_name}'
                     AND CONSTRAINT_NAME = 'PRIMARY'"""
             rslt = self.conn.execute(text(query))
-            self.primary_key = rslt.first()
+            self.primary_key = rslt.scalar()
 
         def get_table_name(self, table_name_str):
             return self.table_name
 
-        def get_all(self):
+        def get_all(self) -> list[dict]:
+            query = f"""SELECT * FROM {self.table_name}"""
+            rslt = self.conn.execute(text(query))
+            output = [dict(row) for row in rslt.mappings().all()]
+            return output
 
-        def get_column_names():
+        def get_column_names(self) -> list[str]:
+            query = f"SHOW COLUMNS FROM {self.table_name}"
+            rslt = self.conn.execute(text(query))
+            return rslt.scalars().all()
           
-        def select_columns(self, column_names:list[str]):
+        def select_columns(self, column_names:list[str]) -> list:
 
         def delete_row(self, pk_value:any):
             if type(pk_value) == str:
