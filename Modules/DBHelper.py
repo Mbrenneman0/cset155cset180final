@@ -44,7 +44,12 @@ class Conn:
             rslt = self.conn.execute(text(query))
             return rslt.scalars().all()
           
-        def select_columns(self, column_names:list[str]) -> list:
+        def select_columns(self, column_names:list[str]) -> list[dict]:
+            columns_list = ', '.join(column_names)
+            query = f"""SELECT {columns_list} FROM {self.table_name}"""
+            rslt = self.conn.execute(text(query))
+            output = [dict(row) for row in rslt.mappings().all()]
+            return output
 
         def delete_row(self, pk_value:any):
             if type(pk_value) == str:
