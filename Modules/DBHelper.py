@@ -8,14 +8,15 @@ class Conn:
         def __init__(self, table_name:str, conn:Connection):
             self.table_name = table_name
             self.conn = conn
-            if self._exists():
+            self.exists = self._exists()
+            if self.exists:
                 self._load_columns()
                 self._set_primarykey()
 
         def _exists(self) -> bool:
             query = "SHOW TABLES"
             rslt = self.conn.execute(text(query))
-            return self.table_name in rslt.all()
+            return self.table_name in [row[0] for row in rslt.all()]
 
         def _load_columns(self):
             query = f"""SHOW COLUMNS FROM {self.table_name}"""
@@ -28,8 +29,8 @@ class Conn:
                     WHERE  TABLE_NAME = '{self.table_name}'
                     AND CONSTRAINT_NAME = 'PRIMARY'"""
             rslt = self.conn.execute(text(query))
-            self.primary_key = rslt.first()
-        # AIDEN_DEV
+            self.primary_key = rslt.scalar()
+            
         def _set_foreignkeys(self):
             query = f"""SELECT COLUMN_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME
                     FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
@@ -39,17 +40,25 @@ class Conn:
             self.foreign_keys = {row.COLUMN_NAME: {row.REFERENCED_TABLE_NAME: row.REFERENCED_COLUMN_NAME} for row in rslt}
 
         def get_foreign_key(self, fk_name = ''):
-            
-        # AIDEN_DEV
+            return
 
-        def get_table_name(self, table_name_str):
-            return self.table_name
+        def get_all(self) -> list[dict]:
+            query = f"""SELECT * FROM {self.table_name}"""
+            rslt = self.conn.execute(text(query))
+            output = [dict(row) for row in rslt.mappings().all()]
+            return output
 
-        def get_all(self):
-
-        def get_column_names():
+        def get_column_names(self) -> list[str]:
+            query = f"SHOW COLUMNS FROM {self.table_name}"
+            rslt = self.conn.execute(text(query))
+            return rslt.scalars().all()
           
-        def select_columns(self, column_names:list[str]):
+        def select_columns(self, column_names:list[str]) -> list[dict]:
+            columns_list = ', '.join(column_names)
+            query = f"""SELECT {columns_list} FROM {self.table_name}"""
+            rslt = self.conn.execute(text(query))
+            output = [dict(row) for row in rslt.mappings().all()]
+            return output
 
         def delete_row(self, pk_value:any):
             if type(pk_value) == str:
@@ -57,39 +66,38 @@ class Conn:
             query = f"DELETE FROM {self.table_name} WHERE {self.primary_key} = {pk_value}"
             self.conn.execute(text(query))
 
-        def update_row(self, pk_value:any, data:dict):
-            if type(pk_value) == str:
-                pk_value = f"'{pk_value}'"
-            columns = data.keys()
-            items = []
-            for column in columns:
-                items.append(f"{column} = {data[column]}")
-            set_txt = ', '.join(items)
+        def update_row(self, pk_value, data: dict):
+            set_txt = ', '.join([f"{col} = :{col}" for col in data.keys()])
             query = f"""UPDATE {self.table_name}
                     SET {set_txt}
-                    WHERE {self.primary_key} = {pk_value}"""
-            self.conn.execute(text(query))
+                    WHERE {self.primary_key} = :pk
+                    """
+            params = dict(data)
+            params["pk"] = pk_value
+            self.conn.execute(text(query), params)
 
         def get_row(self, pk_value, join_tables):
             if join_tables == []:
                 query = f"SELECT * FROM {self.table_name} WHERE {pk_value} = {pk_value}"
             else:
                 query = f"SELECT * FROM {self.table_name} WHERE {pk_value} = {pk_value} "
-            self.conn.execute(text(query))
+            rslt = self.conn.execute(text(query))
+            return rslt.all()
 
         def get_rows(self, condition, join_tables):
             if condition == '':
                 query = f"SELECT * FROM {self.table_name}"
-                self.conn.execute(text(query))
+                rslt = self.conn.execute(text(query))
             else:
                 query = f"SELECT * FROM {self.table_name} WHERE {condition}"
-                self.conn.execute(text(query))
+                rslt = self.conn.execute(text(query))
+            return rslt.all()    
             
-        def create_row(self, data:dict):
+        def create_row(self, data: dict):
             columns = ', '.join(data.keys())
-            values = ', '.join(['%s'] * len(data))
-            query = f"INSERT INTO {self.table_name} ({columns}) VALUES ({values})"
-            self.conn.execute(text(query))
+            placeholders = ', '.join([f":{key}" for key in data.keys()])
+            query = f"INSERT INTO {self.table_name} ({columns}) VALUES ({placeholders})"
+            self.conn.execute(text(query), data)
 
     def __init__(self, login:str,
                  password:str,
@@ -113,8 +121,9 @@ class Conn:
         self.tables = {}
         query = "SHOW TABLES"
         rslt = self.conn.execute(text(query))
-        for table_name in rslt.all():
-            self.tables[table_name] = Table(table_name, self.conn)
+        for row in rslt.all():
+            table_name = row[0]
+            self.tables[table_name] = Conn.Table(table_name, self.conn)
 
     
     def _db_exists(self) -> bool:
@@ -154,13 +163,11 @@ class Conn:
                         conn.execute(text(statement))
 
     def _get_table(self, table_name:str) -> Table:
-        for table in self.tables:
-            if table_name in table.get_table_name(table_name):
-                return table
+                return self.tables.get(table_name)
 
     def query(self, query:str, data:dict={}):
         try:
-            self.conn.execute(text(query, data))
+            self.conn.execute(text(query), data)
         except Exception as e:
             print(e)
 
