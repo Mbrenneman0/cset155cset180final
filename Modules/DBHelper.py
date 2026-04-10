@@ -39,9 +39,6 @@ class Conn:
             rslt = self.conn.execute(text(query))
             self.foreign_keys = {row.COLUMN_NAME: {row.REFERENCED_TABLE_NAME: row.REFERENCED_COLUMN_NAME} for row in rslt}
 
-        def get_foreign_key(self, fk_name = ''):
-            return
-
         def get_all(self) -> list[dict]:
             query = f"""SELECT * FROM {self.table_name}"""
             rslt = self.conn.execute(text(query))
@@ -77,18 +74,21 @@ class Conn:
             self.conn.execute(text(query), params)
 
         def get_row(self, pk_value, join_tables):
-            if join_tables == []:
+            if join_tables is None:
                 query = f"SELECT * FROM {self.table_name} WHERE {pk_value} = {pk_value}"
             else:
-                query = f"SELECT * FROM {self.table_name} WHERE {pk_value} = {pk_value} "
+                tables = [_get_table(table) for table in join_tables]
+                query = f"SELECT * FROM {self.table_name} JOIN {pk_value} = {pk_value} "
             rslt = self.conn.execute(text(query))
-            return rslt.all()
+            return rslt.fetchone()
 
         def get_rows(self, condition, join_tables):
-            if condition == '':
+            if condition is None:
                 query = f"SELECT * FROM {self.table_name}"
                 rslt = self.conn.execute(text(query))
-            else:
+            elif join_tables is None:
+                return
+            else:   
                 query = f"SELECT * FROM {self.table_name} WHERE {condition}"
                 rslt = self.conn.execute(text(query))
             return rslt.all()    
@@ -179,11 +179,11 @@ class Conn:
         table = self._get_table(table_name)
         table.create_row(data)
 
-    def get_row(self, table_name:str, pk_value:any, join_tables:list = []):
+    def get_row(self, table_name:str, pk_value:any, join_tables:list = None):
         table = self._get_table(table_name)
         table.get_row(pk_value, join_tables)
 
-    def get_rows(self, table_name:str, condition:str = '', join_tables:list = []):
+    def get_rows(self, table_name:str, condition:str = None, join_tables:list = None):
         table = self._get_table(table_name)
         table.get_row(condition, join_tables)
     
