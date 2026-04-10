@@ -118,12 +118,7 @@ SELECT * FROM chat;
 SELECT * FROM message;
 
 
--- CREATE 
-    
--- READ 
+INSERT INTO users (name, username, password, email) VALUES ('test', 'aaaa', 'pass', 'alice@mail.com', 'Customer')
 
--- UPDATE 
-
--- DELETE 
 
 

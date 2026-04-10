@@ -29,6 +29,18 @@ class Conn:
                     AND CONSTRAINT_NAME = 'PRIMARY'"""
             rslt = self.conn.execute(text(query))
             self.primary_key = rslt.first()
+        # AIDEN_DEV
+        def _set_foreignkeys(self):
+            query = f"""SELECT COLUMN_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME
+                    FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+                    WHERE TABLE_NAME = '{self.table_name}'
+                    AND TABLE_SCHEMA = DATABASE() AND REFERENCED_TABLE_NAME IS NOT NULL"""
+            rslt = self.conn.execute(text(query))
+            self.foreign_keys = {row.COLUMN_NAME: {row.REFERENCED_TABLE_NAME: row.REFERENCED_COLUMN_NAME} for row in rslt}
+
+        def get_foreign_key(self, fk_name = ''):
+            
+        # AIDEN_DEV
 
         def get_table_name(self, table_name_str):
             return self.table_name
@@ -58,11 +70,14 @@ class Conn:
                     WHERE {self.primary_key} = {pk_value}"""
             self.conn.execute(text(query))
 
-        def get_row(self, pk_value):
-            query = f"SELECT * FROM {self.table_name} WHERE {pk_value} = {pk_value}"
+        def get_row(self, pk_value, join_tables):
+            if join_tables == []:
+                query = f"SELECT * FROM {self.table_name} WHERE {pk_value} = {pk_value}"
+            else:
+                query = f"SELECT * FROM {self.table_name} WHERE {pk_value} = {pk_value} "
             self.conn.execute(text(query))
 
-        def get_rows(self, condition):
+        def get_rows(self, condition, join_tables):
             if condition == '':
                 query = f"SELECT * FROM {self.table_name}"
                 self.conn.execute(text(query))
@@ -157,12 +172,12 @@ class Conn:
         table = self._get_table(table_name)
         table.create_row(data)
 
-    def get_row(self, table_name:str, pk_value:any):
+    def get_row(self, table_name:str, pk_value:any, join_tables:list = []):
         table = self._get_table(table_name)
-        table.get_row(pk_value)
+        table.get_row(pk_value, join_tables)
 
-    def get_rows(self, table_name:str, condition:str = ''):
+    def get_rows(self, table_name:str, condition:str = '', join_tables:list = []):
         table = self._get_table(table_name)
-        table.get_row(condition)
+        table.get_row(condition, join_tables)
     
 
