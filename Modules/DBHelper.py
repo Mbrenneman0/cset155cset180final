@@ -72,6 +72,7 @@ class Conn:
             params = dict(data)
             params["pk"] = pk_value
             self.conn.execute(text(query), params)
+            self.conn.commit()
 
         def get_row(self, pk_value):
             query = f"SELECT * FROM {self.table_name} WHERE {self.primary_key} = {pk_value}"
