@@ -38,6 +38,14 @@ class Conn:
                 "table_name": self.table_name
             })
             self.primary_key = rslt.scalar()
+            
+        def _set_foreignkeys(self):
+            query = f"""SELECT COLUMN_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME
+                    FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+                    WHERE TABLE_NAME = '{self.table_name}'
+                    AND TABLE_SCHEMA = DATABASE() AND REFERENCED_TABLE_NAME IS NOT NULL"""
+            rslt = self.conn.execute(text(query))
+            self.foreign_keys = {row.COLUMN_NAME: {row.REFERENCED_TABLE_NAME: row.REFERENCED_COLUMN_NAME} for row in rslt}
 
         def get_all(self) -> list[dict]:
             query = f"""SELECT * FROM {self.table_name}"""
@@ -73,16 +81,22 @@ class Conn:
             params["pk"] = pk_value
             self.conn.execute(text(query), params)
 
-        def get_row(self, pk_value):
-            query = f"SELECT * FROM {self.table_name} WHERE {self.primary_key} = {pk_value}"
+        def get_row(self, pk_value, join_tables):
+            if join_tables is None:
+                query = f"SELECT * FROM {self.table_name} WHERE {pk_value} = {pk_value}"
+            else:
+                tables = [_get_table(table) for table in join_tables]
+                query = f"SELECT * FROM {self.table_name} JOIN {pk_value} = {pk_value} "
             rslt = self.conn.execute(text(query))
             return rslt.fetchone()
 
-        def get_rows(self, condition):
-            if condition == '':
+        def get_rows(self, condition, join_tables):
+            if condition is None:
                 query = f"SELECT * FROM {self.table_name}"
                 rslt = self.conn.execute(text(query))
-            else:
+            elif join_tables is None:
+                return
+            else:   
                 query = f"SELECT * FROM {self.table_name} WHERE {condition}"
                 rslt = self.conn.execute(text(query))
             return rslt.all()    
@@ -178,12 +192,14 @@ class Conn:
         table = self._get_table(table_name)
         table.create_row(data)
 
-    def get_row(self, table_name:str, pk_value:any):
+    def get_row(self, table_name:str, pk_value:any, join_tables:list = None):
         table = self._get_table(table_name)
+        table.get_row(pk_value, join_tables)
         return table.get_row(pk_value)
 
-    def get_rows(self, table_name:str, condition:str = ''):
+    def get_rows(self, table_name:str, condition:str = None, join_tables:list = None):
         table = self._get_table(table_name)
+        table.get_row(condition, join_tables)
         return table.get_rows(condition)
     
 
