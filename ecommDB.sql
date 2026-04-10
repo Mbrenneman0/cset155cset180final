@@ -22,13 +22,13 @@ CREATE TABLE product(
     unit_price DECIMAL(12,2) NOT NULL,
     warranty_period VARCHAR(255),
     is_removed BOOLEAN NOT NULL DEFAULT FALSE,
-    FOREIGN KEY (vender_id) REFERENCES users(user_id)
+    FOREIGN KEY (vender_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE prod_imgs(
 	sku VARCHAR(12) NOT NULL,
     img_url VARCHAR(1024),
-    FOREIGN KEY (sku) REFERENCES product(sku)
+    FOREIGN KEY (sku) REFERENCES product(sku) ON DELETE CASCADE
 );
 
 CREATE TABLE discount(
@@ -37,7 +37,7 @@ CREATE TABLE discount(
     start_date DATETIME NOT NULL,
     end_date DATETIME NOT NULL,
 		CHECK (end_date > start_date),
-    FOREIGN KEY (sku) REFERENCES product(sku)
+    FOREIGN KEY (sku) REFERENCES product(sku) ON DELETE CASCADE
 );
 
 CREATE TABLE cart(
@@ -45,8 +45,8 @@ CREATE TABLE cart(
     sku VARCHAR(12) NOT NULL,
     qty INT NOT NULL,
     PRIMARY KEY (user_id, sku),
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (sku) REFERENCES product(sku)
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (sku) REFERENCES product(sku) ON DELETE CASCADE
 );
 
 CREATE TABLE orders(
@@ -54,7 +54,7 @@ CREATE TABLE orders(
     user_id INT NOT NULL,
     order_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     status VARCHAR(50) NOT NULL DEFAULT 'Pending',
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     CONSTRAINT order_status_value CHECK(status IN ('Pending','Confirmed','Picked Up','Shipped'))
 );
 
@@ -65,8 +65,8 @@ CREATE TABLE order_items(
     unit_price DECIMAL(12,2) NOT NULL,
     warranty_period VARCHAR(20),
     PRIMARY KEY (order_num, sku),
-    FOREIGN KEY (order_num) REFERENCES orders(order_num),
-    FOREIGN KEY (sku) REFERENCES product(sku)
+    FOREIGN KEY (order_num) REFERENCES orders(order_num) ON DELETE CASCADE,
+    FOREIGN KEY (sku) REFERENCES product(sku) ON DELETE CASCADE
 );
 
 CREATE TABLE review(
@@ -77,8 +77,8 @@ CREATE TABLE review(
     content VARCHAR(2048) NOT NULL,
     rvw_time DATETIME NOT NULL,
     PRIMARY KEY (user_id, sku),
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (sku) REFERENCES product(sku)
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (sku) REFERENCES product(sku) ON DELETE CASCADE
 );
 
 CREATE TABLE complaint(
@@ -87,7 +87,7 @@ CREATE TABLE complaint(
     comp_time DATETIME NOT NULL,
     type VARCHAR(8) NOT NULL,
     is_accepted BOOLEAN,
-    FOREIGN KEY (order_num) REFERENCES orders(order_num)
+    FOREIGN KEY (order_num) REFERENCES orders(order_num) ON DELETE CASCADE
 );
 
 CREATE TABLE chat(
@@ -95,9 +95,9 @@ CREATE TABLE chat(
     complaint_id INT NOT NULL,
     customer_id INT NOT NULL,
     support_id INT NOT NULL,
-    FOREIGN KEY (complaint_id) REFERENCES complaint(complaint_id),
-    FOREIGN KEY (customer_id) REFERENCES users(user_id),
-    FOREIGN KEY (support_id) REFERENCES users(user_id)
+    FOREIGN KEY (complaint_id) REFERENCES complaint(complaint_id) ON DELETE CASCADE,
+    FOREIGN KEY (customer_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (support_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE message(

@@ -80,6 +80,7 @@ class Conn:
             params = dict(data)
             params["pk"] = pk_value
             self.conn.execute(text(query), params)
+            self.conn.commit()
 
         def get_row(self, pk_value, join_tables):
             if join_tables is None:
