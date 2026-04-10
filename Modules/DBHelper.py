@@ -5,8 +5,9 @@ from pathlib import Path
 class Conn:
 
     class Table:
-        def __init__(self, table_name:str, conn:Connection):
+        def __init__(self, table_name:str, db_name:str, conn:Connection):
             self.table_name = table_name
+            self.db_name = db_name
             self.conn = conn
             self.exists = self._exists()
             if self.exists:
@@ -24,11 +25,18 @@ class Conn:
             self.columns = list(rslt.all())
 
         def _set_primarykey(self):
-            query = f"""SELECT COLUMN_NAME
-                    FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
-                    WHERE  TABLE_NAME = '{self.table_name}'
-                    AND CONSTRAINT_NAME = 'PRIMARY'"""
-            rslt = self.conn.execute(text(query))
+            query = text("""
+                SELECT COLUMN_NAME
+                FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+                WHERE TABLE_SCHEMA = :db_name
+                  AND TABLE_NAME = :table_name
+                  AND CONSTRAINT_NAME = 'PRIMARY'
+                ORDER BY ORDINAL_POSITION
+            """)
+            rslt = self.conn.execute(query, {
+                "db_name": self.db_name,
+                "table_name": self.table_name
+            })
             self.primary_key = rslt.scalar()
 
         def get_all(self) -> list[dict]:
@@ -68,7 +76,7 @@ class Conn:
         def get_row(self, pk_value):
             query = f"SELECT * FROM {self.table_name} WHERE {self.primary_key} = {pk_value}"
             rslt = self.conn.execute(text(query))
-            return rslt.all()
+            return rslt.fetchone()
 
         def get_rows(self, condition):
             if condition == '':
@@ -109,7 +117,7 @@ class Conn:
         rslt = self.conn.execute(text(query))
         for row in rslt.all():
             table_name = row[0]
-            self.tables[table_name] = Conn.Table(table_name, self.conn)
+            self.tables[table_name] = Conn.Table(table_name, self.db_name, self.conn)
 
     
     def _db_exists(self) -> bool:
@@ -145,7 +153,12 @@ class Conn:
             statements = [statement.strip() for statement in sql.split(';') if statement.strip()]
             with conn.begin():
                 for statement in statements:
-                    if "CREATE DATABASE" not in statement.upper() and "USE" not in statement.upper():
+                    conditions = [
+                        "CREATE DATABASE" not in statement.upper(),
+                        "USE " not in statement.upper(),
+                        "DROP DATABASE" not in statement.upper()
+                    ]
+                    if all(conditions):
                         conn.execute(text(statement))
 
     def _get_table(self, table_name:str) -> Table:
@@ -167,10 +180,10 @@ class Conn:
 
     def get_row(self, table_name:str, pk_value:any):
         table = self._get_table(table_name)
-        table.get_row(pk_value)
+        return table.get_row(pk_value)
 
     def get_rows(self, table_name:str, condition:str = ''):
         table = self._get_table(table_name)
-        table.get_rows(condition)
+        return table.get_rows(condition)
     
 
