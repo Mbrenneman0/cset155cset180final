@@ -5,7 +5,8 @@ from pathlib import Path
 class Conn:
 
     class Table:
-        def __init__(self, table_name:str, db_name:str, conn:Connection):
+        def __init__(self, parent, table_name:str, db_name:str, conn:Connection):
+            self.parent = parent
             self.table_name = table_name
             self.db_name = db_name
             self.conn = conn
@@ -13,6 +14,7 @@ class Conn:
             if self.exists:
                 self._load_columns()
                 self._set_primarykey()
+                self._set_foreignkeys()
 
         def _exists(self) -> bool:
             query = "SHOW TABLES"
@@ -45,7 +47,32 @@ class Conn:
                     WHERE TABLE_NAME = '{self.table_name}'
                     AND TABLE_SCHEMA = DATABASE() AND REFERENCED_TABLE_NAME IS NOT NULL"""
             rslt = self.conn.execute(text(query))
-            self.foreign_keys = {row.COLUMN_NAME: {row.REFERENCED_TABLE_NAME: row.REFERENCED_COLUMN_NAME} for row in rslt}
+            self.foreign_keys = {row.COLUMN_NAME: {{'table': row.REFERENCED_TABLE_NAME}: {'column': row.REFERENCED_COLUMN_NAME}} for row in rslt}
+
+        def _build_joins(self, base_table, join_tables):
+            joins = []
+            base = base_table
+
+            for join_name in join_tables:
+                join_table = self._get_table(join_name)
+
+                for fk_col, ref in join_table.foreign_keys.items():
+                    if ref['table'] == base.table_name:
+                        joins.append(
+                            f"JOIN {join_table.table_name} "
+                            f"ON {join_table.table_name}.{fk_col} = "
+                            f"{base.table_name}.{ref['column']}"
+                        )
+                        break
+                for fk_col, ref in base.foreign_keys.items():
+                    if ref['table'] == join_table.table_name:
+                        joins.append(
+                            f"JOIN {join_table.table_name} "
+                            f"ON {join_table.table_name}.{fk_col} = "
+                            f"{join_table.table_name}.{ref['column']}"
+                        )
+                        break
+            return " ".join(joins)
 
         def get_all(self) -> list[dict]:
             query = f"""SELECT * FROM {self.table_name}"""
@@ -82,23 +109,26 @@ class Conn:
             self.conn.execute(text(query), params)
 
         def get_row(self, pk_value, join_tables):
+            base = self
             if join_tables is None:
-                query = f"SELECT * FROM {self.table_name} WHERE {pk_value} = {pk_value}"
+                query = f"SELECT * FROM {self.table_name}"
             else:
-                tables = [_get_table(table) for table in join_tables]
-                query = f"SELECT * FROM {self.table_name} JOIN {pk_value} = {pk_value} "
+                join_sql = self._build_joins(base, join_tables)
+                query = f"SELECT * FROM {self.table_name} {join_sql}"
+            query += f" WHERE {pk_value} = {pk_value}"
             rslt = self.conn.execute(text(query))
-            return rslt.fetchone()
+            return rslt.fetchone()  
 
         def get_rows(self, condition, join_tables):
-            if condition is None:
+            base = self
+            if join_tables is None:
                 query = f"SELECT * FROM {self.table_name}"
-                rslt = self.conn.execute(text(query))
-            elif join_tables is None:
-                return
-            else:   
-                query = f"SELECT * FROM {self.table_name} WHERE {condition}"
-                rslt = self.conn.execute(text(query))
+            else:
+                join_sql = self._build_joins(base, join_tables)
+                query = f"SELECT * FROM {self.table_name} {join_sql}"
+            if condition:
+                query += f" WHERE {condition}"
+            rslt = self.conn.execute(text(query))
             return rslt.all()    
             
         def create_row(self, data: dict):
@@ -131,7 +161,7 @@ class Conn:
         rslt = self.conn.execute(text(query))
         for row in rslt.all():
             table_name = row[0]
-            self.tables[table_name] = Conn.Table(table_name, self.db_name, self.conn)
+            self.tables[table_name] = Conn.Table(self, table_name, self.db_name, self.conn)
 
     
     def _db_exists(self) -> bool:
