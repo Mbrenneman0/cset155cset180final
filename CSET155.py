@@ -65,7 +65,7 @@ for i in range(len(column_names)):
 
 # Delete: 
 print("Delte row:")
-conn.delete_row("users", 5)
+conn.delete_row("users", 3)
 
 column_names = conn._get_table("users").get_column_names()
 results = conn.get_rows("users")
