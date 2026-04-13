@@ -112,11 +112,10 @@ class Conn:
         def get_row(self, pk_value, join_tables):
             base = self
             if join_tables is None:
-                query = f"SELECT * FROM {self.table_name}"
+                query = f"SELECT * FROM {self.table_name} WHERE {self.primary_key} = {pk_value}"
             else:
-                join_sql = self._build_joins(base, join_tables)
-                query = f"SELECT * FROM {self.table_name} {join_sql}"
-            query += f" WHERE {pk_value} = {pk_value}"
+                tables = [_get_table(table) for table in join_tables]
+                query = f"SELECT * FROM {self.table_name} JOIN {self.primary_key} = {pk_value} "
             rslt = self.conn.execute(text(query))
             return rslt.fetchone()  
 
@@ -225,12 +224,12 @@ class Conn:
 
     def get_row(self, table_name:str, pk_value:any, join_tables:list = None):
         table = self._get_table(table_name)
-        table.get_row(pk_value, join_tables)
-        return table.get_row(pk_value)
+        rslt = table.get_row(pk_value, join_tables)
+        return rslt
 
     def get_rows(self, table_name:str, condition:str = None, join_tables:list = None):
         table = self._get_table(table_name)
-        table.get_row(condition, join_tables)
-        return table.get_rows(condition)
+        rslt = table.get_rows(condition, join_tables)
+        return rslt
     
 
