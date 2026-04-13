@@ -97,6 +97,7 @@ class Conn:
                 pk_value = f"'{pk_value}'"
             query = f"DELETE FROM {self.table_name} WHERE {self.primary_key} = {pk_value}"
             self.conn.execute(text(query))
+            self.conn.commit()
 
         def update_row(self, pk_value, data: dict):
             set_txt = ', '.join([f"{col} = :{col}" for col in data.keys()])

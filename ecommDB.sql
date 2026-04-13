@@ -9,7 +9,7 @@ CREATE TABLE users(
     password VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     role VARCHAR(50) NOT NULL
-);
+) ENGINE = InnoDB;
 
 CREATE TABLE product(
 	sku VARCHAR(12) PRIMARY KEY,
@@ -23,13 +23,13 @@ CREATE TABLE product(
     warranty_period VARCHAR(255),
     is_removed BOOLEAN NOT NULL DEFAULT FALSE,
     FOREIGN KEY (vender_id) REFERENCES users(user_id) ON DELETE CASCADE
-);
+) ENGINE = InnoDB;
 
 CREATE TABLE prod_imgs(
 	sku VARCHAR(12) NOT NULL,
     img_url VARCHAR(1024),
     FOREIGN KEY (sku) REFERENCES product(sku) ON DELETE CASCADE
-);
+) ENGINE = InnoDB;
 
 CREATE TABLE discount(
 	sku VARCHAR(12) NOT NULL,
@@ -38,7 +38,7 @@ CREATE TABLE discount(
     end_date DATETIME NOT NULL,
 		CHECK (end_date > start_date),
     FOREIGN KEY (sku) REFERENCES product(sku) ON DELETE CASCADE
-);
+) ENGINE = InnoDB;
 
 CREATE TABLE cart(
 	user_id INT NOT NULL,
@@ -47,7 +47,7 @@ CREATE TABLE cart(
     PRIMARY KEY (user_id, sku),
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (sku) REFERENCES product(sku) ON DELETE CASCADE
-);
+) ENGINE = InnoDB;
 
 CREATE TABLE orders(
 	order_num INT PRIMARY KEY AUTO_INCREMENT,
@@ -56,7 +56,7 @@ CREATE TABLE orders(
     status VARCHAR(50) NOT NULL DEFAULT 'Pending',
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     CONSTRAINT order_status_value CHECK(status IN ('Pending','Confirmed','Picked Up','Shipped'))
-);
+) ENGINE = InnoDB;
 
 CREATE TABLE order_items(
 	order_num INT NOT NULL,
@@ -67,7 +67,7 @@ CREATE TABLE order_items(
     PRIMARY KEY (order_num, sku),
     FOREIGN KEY (order_num) REFERENCES orders(order_num) ON DELETE CASCADE,
     FOREIGN KEY (sku) REFERENCES product(sku) ON DELETE CASCADE
-);
+) ENGINE = InnoDB;
 
 CREATE TABLE review(
 	user_id INT NOT NULL,
@@ -79,7 +79,7 @@ CREATE TABLE review(
     PRIMARY KEY (user_id, sku),
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (sku) REFERENCES product(sku) ON DELETE CASCADE
-);
+) ENGINE = InnoDB;
 
 CREATE TABLE complaint(
 	complaint_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -88,7 +88,7 @@ CREATE TABLE complaint(
     type VARCHAR(8) NOT NULL,
     is_accepted BOOLEAN,
     FOREIGN KEY (order_num) REFERENCES orders(order_num) ON DELETE CASCADE
-);
+) ENGINE = InnoDB;
 
 CREATE TABLE chat(
 	chat_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -98,7 +98,7 @@ CREATE TABLE chat(
     FOREIGN KEY (complaint_id) REFERENCES complaint(complaint_id) ON DELETE CASCADE,
     FOREIGN KEY (customer_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (support_id) REFERENCES users(user_id) ON DELETE CASCADE
-);
+) ENGINE = InnoDB;
 
 CREATE TABLE message(
 	msg_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -106,7 +106,7 @@ CREATE TABLE message(
     user_id INT NOT NULL,
     content VARCHAR(2048) NOT NULL,
     msg_time DATETIME NOT NULL
-);
+) ENGINE = InnoDB;
 
 -- example data:
 
