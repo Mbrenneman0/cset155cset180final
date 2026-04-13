@@ -49,29 +49,44 @@ class Conn:
             rslt = self.conn.execute(text(query))
             self.foreign_keys = {row.COLUMN_NAME: {'table': row.REFERENCED_TABLE_NAME, 'column': row.REFERENCED_COLUMN_NAME} for row in rslt}
 
-        def _build_joins(self, base_table, join_tables):
+        def _build_joins(self, join_tables):
             joins = []
-            base = base_table
+            base = {self.table_name : self}
 
             for join_name in join_tables:
-                join_table = self._get_table(join_name)
+                join_table = self.parent._get_table(join_name)
+                found = False
 
-                for fk_col, ref in join_table.foreign_keys.items():
-                    if ref['table'] == base.table_name:
-                        joins.append(
-                            f"JOIN {join_table.table_name} "
-                            f"ON {join_table.table_name}.{fk_col} = "
-                            f"{base.table_name}.{ref['column']}"
-                        )
+                for existing_name, existing_table in base.items():
+
+                    for fk_col, ref in join_table.foreign_keys.items():
+                        if ref['table'] == base.table_name:
+                                joins.append(
+                                    f"JOIN {join_table.table_name} "
+                                    f"ON {join_table.table_name}.{fk_col} = "
+                                    f"{base.table_name}.{ref['column']}"
+                                )
+                                found = True
+                                break
+                    if found:
                         break
-                for fk_col, ref in base.foreign_keys.items():
-                    if ref['table'] == join_table.table_name:
-                        joins.append(
-                            f"JOIN {join_table.table_name} "
-                            f"ON {join_table.table_name}.{fk_col} = "
-                            f"{join_table.table_name}.{ref['column']}"
-                        )
+
+                    for fk_col, ref in existing_table.foreign_keys.items():
+                        if ref['table'] == join_table.table_name:
+                            joins.append(
+                                f"JOIN {join_table.table_name} "
+                                f"ON {existing_table.table_name}.{fk_col} = "
+                                f"{join_table.table_name}.{ref['column']}"
+                            )
+                            found = True
+                            break
+                    if found:
                         break
+                    
+                if not found:
+                    raise ValueError(f"Could not join {join_name} to current query")
+                base[join_name] = join_table
+
             return " ".join(joins)
 
         def get_all(self) -> list[dict]:
@@ -115,7 +130,7 @@ class Conn:
             if join_tables is None:
                 query = f"SELECT * FROM {self.table_name} WHERE {self.primary_key} = {pk_value}"
             else:
-                join_sql = self._build_joins(base, join_tables)
+                join_sql = self._build_joins(join_tables.insert(0, base))
                 query = f"SELECT * FROM {self.table_name} {join_sql}"
             rslt = self.conn.execute(text(query))
             row = rslt.fetchone()
@@ -126,7 +141,7 @@ class Conn:
             if join_tables is None:
                 query = f"SELECT * FROM {self.table_name}"
             else:
-                join_sql = self._build_joins(base, join_tables)
+                join_sql = self._build_joins(join_tables.insert(0, base))
                 query = f"SELECT * FROM {self.table_name} {join_sql}"
             if condition:
                 query += f" WHERE {condition}"
