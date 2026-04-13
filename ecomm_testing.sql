@@ -135,7 +135,7 @@ show create table product;
 
 INSERT INTO users (name, username, password, email) VALUES ('test', 'aaaa', 'pass', 'alice@mail.com', 'Customer');
 
-SELECT * FROM users as u natural join product as p natural join prod_imgs;
+SELECT * FROM users as u join product as p on u.user_id = p.vender_id join prod_imgs as i on p.sku = i.sku;
 
 
 
