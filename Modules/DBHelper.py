@@ -47,7 +47,7 @@ class Conn:
                     WHERE TABLE_NAME = '{self.table_name}'
                     AND TABLE_SCHEMA = DATABASE() AND REFERENCED_TABLE_NAME IS NOT NULL"""
             rslt = self.conn.execute(text(query))
-            self.foreign_keys = {row.COLUMN_NAME: {{'table': row.REFERENCED_TABLE_NAME}: {'column': row.REFERENCED_COLUMN_NAME}} for row in rslt}
+            self.foreign_keys = {row.COLUMN_NAME: {'table': row.REFERENCED_TABLE_NAME, 'column': row.REFERENCED_COLUMN_NAME} for row in rslt}
 
         def _build_joins(self, base_table, join_tables):
             joins = []
@@ -114,10 +114,11 @@ class Conn:
             if join_tables is None:
                 query = f"SELECT * FROM {self.table_name} WHERE {self.primary_key} = {pk_value}"
             else:
-                tables = [_get_table(table) for table in join_tables]
-                query = f"SELECT * FROM {self.table_name} JOIN {self.primary_key} = {pk_value} "
+                join_sql = self._build_joins(base, join_tables)
+                query = f"SELECT * FROM {self.table_name} {join_sql}"
             rslt = self.conn.execute(text(query))
-            return rslt.fetchone()  
+            row = rslt.fetchone()
+            return list(row) if row else None  
 
         def get_rows(self, condition, join_tables):
             base = self
@@ -129,13 +130,14 @@ class Conn:
             if condition:
                 query += f" WHERE {condition}"
             rslt = self.conn.execute(text(query))
-            return rslt.all()    
+            return [list(row) for row in rslt.all()]    
             
         def create_row(self, data: dict):
             columns = ', '.join(data.keys())
             placeholders = ', '.join([f":{key}" for key in data.keys()])
             query = f"INSERT INTO {self.table_name} ({columns}) VALUES ({placeholders})"
             self.conn.execute(text(query), data)
+            self.conn.commit()
 
     def __init__(self, login:str,
                  password:str,
@@ -202,6 +204,8 @@ class Conn:
                         "USE " not in statement.upper(),
                         "DROP DATABASE" not in statement.upper()
                     ]
+                    print('\n\nTESTING',conditions,'\n\n')
+                    print('\n\nTESTING',statement,'\n\n')
                     if all(conditions):
                         conn.execute(text(statement))
 
