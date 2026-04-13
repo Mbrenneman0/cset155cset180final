@@ -130,7 +130,8 @@ class Conn:
             if join_tables is None:
                 query = f"SELECT * FROM {self.table_name} WHERE {self.primary_key} = {pk_value}"
             else:
-                join_sql = self._build_joins(join_tables.insert(0, base))
+                join_tables.insert(0, base)
+                join_sql = self._build_joins(join_tables)
                 query = f"SELECT * FROM {self.table_name} {join_sql}"
             rslt = self.conn.execute(text(query))
             row = rslt.fetchone()
@@ -141,7 +142,8 @@ class Conn:
             if join_tables is None:
                 query = f"SELECT * FROM {self.table_name}"
             else:
-                join_sql = self._build_joins(join_tables.insert(0, base))
+                join_tables.insert(0, base)
+                join_sql = self._build_joins(join_tables)
                 query = f"SELECT * FROM {self.table_name} {join_sql}"
             if condition:
                 query += f" WHERE {condition}"
