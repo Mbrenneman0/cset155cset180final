@@ -68,7 +68,9 @@ print("Delte row:")
 conn.delete_row("users", 3)
 
 column_names = conn._get_table("users").get_column_names()
-results = conn.get_rows("users")
+column_names += conn._get_table("product").get_column_names()
+column_names += conn._get_table("prod_imgs").get_column_names()
+results = conn.get_rows("users", join_tables=["product", "prod_imgs"])
 for row in results:
     for i in range(len(column_names)):
         print(f"{column_names[i]}: {row[i]}")
