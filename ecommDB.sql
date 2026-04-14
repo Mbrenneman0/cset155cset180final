@@ -28,7 +28,7 @@ CREATE TABLE products(
 CREATE TABLE prod_imgs(
 	sku VARCHAR(12) NOT NULL,
     img_url VARCHAR(1024),
-    FOREIGN KEY (sku) REFERENCES product(sku) ON DELETE CASCADE
+    FOREIGN KEY (sku) REFERENCES products(sku) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
 CREATE TABLE discounts(
@@ -37,7 +37,7 @@ CREATE TABLE discounts(
     start_date DATETIME NOT NULL,
     end_date DATETIME NOT NULL,
 		CHECK (end_date > start_date),
-    FOREIGN KEY (sku) REFERENCES product(sku) ON DELETE CASCADE
+    FOREIGN KEY (sku) REFERENCES products(sku) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
 CREATE TABLE carts(
@@ -46,7 +46,7 @@ CREATE TABLE carts(
     qty INT NOT NULL,
     PRIMARY KEY (user_id, sku),
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (sku) REFERENCES product(sku) ON DELETE CASCADE
+    FOREIGN KEY (sku) REFERENCES products(sku) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
 CREATE TABLE orders(
@@ -66,7 +66,7 @@ CREATE TABLE order_items(
     warranty_period VARCHAR(20),
     PRIMARY KEY (order_num, sku),
     FOREIGN KEY (order_num) REFERENCES orders(order_num) ON DELETE CASCADE,
-    FOREIGN KEY (sku) REFERENCES product(sku) ON DELETE CASCADE
+    FOREIGN KEY (sku) REFERENCES products(sku) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
 CREATE TABLE reviews(
@@ -78,7 +78,7 @@ CREATE TABLE reviews(
     content VARCHAR(2048) NOT NULL,
     rvw_time DATETIME NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (sku) REFERENCES product(sku) ON DELETE CASCADE,
+    FOREIGN KEY (sku) REFERENCES products(sku) ON DELETE CASCADE,
     CONSTRAINT unique_review UNIQUE (user_id, sku)
 ) ENGINE = InnoDB;
 
@@ -93,10 +93,10 @@ CREATE TABLE complaints(
 
 CREATE TABLE chats(
 	chat_id INT PRIMARY KEY AUTO_INCREMENT,
-    complaint_id INT NOT NULL,
+    complaint_id INT,
     customer_id INT NOT NULL,
     support_id INT NOT NULL,
-    FOREIGN KEY (complaint_id) REFERENCES complaint(complaint_id) ON DELETE CASCADE,
+    FOREIGN KEY (complaint_id) REFERENCES complaints(complaint_id) ON DELETE CASCADE,
     FOREIGN KEY (customer_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (support_id) REFERENCES users(user_id) ON DELETE CASCADE
 ) ENGINE = InnoDB;
