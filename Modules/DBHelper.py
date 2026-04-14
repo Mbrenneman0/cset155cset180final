@@ -246,6 +246,10 @@ class Conn:
         table = self._get_table(table_name)
         table.create_row(data)
 
+    def update_row(self, table_name:str, pk_value:any, data:dict):
+        table = self._get_table(table_name)
+        table.update_row(pk_value, data)
+
     def get_row(self, table_name:str, pk_value:any, join_tables:list = None):
         table = self._get_table(table_name)
         rslt = table.get_row(pk_value, join_tables)
