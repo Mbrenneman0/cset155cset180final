@@ -11,7 +11,7 @@ CREATE TABLE users(
     role VARCHAR(50) NOT NULL
 ) ENGINE = InnoDB;
 
-CREATE TABLE product(
+CREATE TABLE products(
 	sku VARCHAR(12) PRIMARY KEY,
     vender_id INT NOT NULL,
     qty INT NOT NULL,
@@ -31,7 +31,7 @@ CREATE TABLE prod_imgs(
     FOREIGN KEY (sku) REFERENCES product(sku) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
-CREATE TABLE discount(
+CREATE TABLE discounts(
 	sku VARCHAR(12) NOT NULL,
     amount VARCHAR(10) NOT NULL,
     start_date DATETIME NOT NULL,
@@ -40,7 +40,7 @@ CREATE TABLE discount(
     FOREIGN KEY (sku) REFERENCES product(sku) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
-CREATE TABLE cart(
+CREATE TABLE carts(
 	user_id INT NOT NULL,
     sku VARCHAR(12) NOT NULL,
     qty INT NOT NULL,
@@ -69,19 +69,20 @@ CREATE TABLE order_items(
     FOREIGN KEY (sku) REFERENCES product(sku) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
-CREATE TABLE review(
+CREATE TABLE reviews(
+    review_id INT PRIMARY KEY AUTO_INCREMENT,
 	user_id INT NOT NULL,
     sku VARCHAR(12) NOT NULL,
     rating INT NOT NULL 
 		CHECK (rating BETWEEN 1 AND 5),
     content VARCHAR(2048) NOT NULL,
     rvw_time DATETIME NOT NULL,
-    PRIMARY KEY (user_id, sku),
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (sku) REFERENCES product(sku) ON DELETE CASCADE
+    FOREIGN KEY (sku) REFERENCES product(sku) ON DELETE CASCADE,
+    CONSTRAINT unique_review UNIQUE (user_id, sku)
 ) ENGINE = InnoDB;
 
-CREATE TABLE complaint(
+CREATE TABLE complaints(
 	complaint_id INT PRIMARY KEY AUTO_INCREMENT,
     order_num INT NOT NULL,
     comp_time DATETIME NOT NULL,
@@ -90,7 +91,7 @@ CREATE TABLE complaint(
     FOREIGN KEY (order_num) REFERENCES orders(order_num) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
-CREATE TABLE chat(
+CREATE TABLE chats(
 	chat_id INT PRIMARY KEY AUTO_INCREMENT,
     complaint_id INT NOT NULL,
     customer_id INT NOT NULL,
@@ -100,7 +101,7 @@ CREATE TABLE chat(
     FOREIGN KEY (support_id) REFERENCES users(user_id) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
-CREATE TABLE message(
+CREATE TABLE messages(
 	msg_id INT PRIMARY KEY AUTO_INCREMENT,
 	chat_id INT NOT NULL,
     user_id INT NOT NULL,

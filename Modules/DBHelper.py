@@ -137,8 +137,8 @@ class Conn:
                 join_sql = self._build_joins(base, join_tables)
                 query = f"SELECT * FROM {self.table_name} {join_sql}"
             rslt = self.conn.execute(text(query))
-            row = rslt.fetchone()
-            return list(row) if row else None  
+            row = rslt.mappings().first()
+            return dict(row) if row else None  
 
         def get_rows(self, condition, join_tables):
             base = self
@@ -150,7 +150,7 @@ class Conn:
             if condition:
                 query += f" WHERE {condition}"
             rslt = self.conn.execute(text(query))
-            return [list(row) for row in rslt.all()]    
+            return [dict(row) for row in rslt.mappings().all()]    
             
         def create_row(self, data: dict):
             columns = ', '.join(data.keys())
