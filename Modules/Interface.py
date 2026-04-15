@@ -1,10 +1,64 @@
 import DBHelper as DBH
 from enum import Enum, auto
+from typing import TypedDict
 
 class EditQtyMode(Enum):
     ADDITIVE = auto()
     SET = auto()
     SUBTRACT = auto()
+
+class Role(str, Enum):
+    ADMIN = "Admin"
+    CUSTOMER = "Customer"
+    VENDOR = "Vendor"
+
+class User(TypedDict):
+    user_id: int
+    name: str
+    username: str
+    password: str
+    email: str
+    role: Role
+
+class UserUpdate(TypedDict, total=False):
+    name: str
+    username: str
+    password: str
+    email: str
+    role: Role
+
+class CartItem(TypedDict):
+    user_id: int
+    sku: str
+    qty: int
+
+class OrderRow(TypedDict):
+    order_num: int
+    user_id: int
+    order_time: str
+    status: str
+
+class OrderItem(TypedDict):
+    order_num: int
+    sku: str
+    qty: int
+    unit_price: float
+    warranty_period: str
+
+class ProductRow(TypedDict):
+    sku: str
+    vender_id: int
+    qty: int
+    title: str
+    color: str
+    size: str
+    description: str
+    unit_price: float
+    warranty_period: str
+    is_removed: bool
+
+#possible warranty period class? to parse warranty_period strings and calculate dates
+
 
 class Client:
     def __init__(self, login, password, server, db_name, schema_path):
@@ -13,36 +67,38 @@ class Client:
     class User:
         def __init__(self, client: "Client", user_id):
             self.user_id = user_id
+            self.client = client
             self.conn =client.conn
             self.table = "users"
 
-        def get_info(self):
+        def get_info(self) -> User:
             rslt = self.conn.get_row(self.table, self.user_id)
+            return rslt
 
         def get_role(self) -> str:
-            rslt = self.conn.get_row(self.table, self.user_id)
+            rslt = self.get_info()
             return rslt.get("role")
         
         def is_customer(self) -> bool:
-            return self.get_role() == "Customer"
+            return self.get_role() == Role.CUSTOMER
         
         def is_vendor(self) -> bool:
-            return self.get_role() == "Vendor"
+            return self.get_role() == Role.VENDOR
         
         def is_admin(self) -> bool:
-            return self.get_role() == "Admin"
+            return self.get_role() == Role.ADMIN
         
-        def update_profile(self, data:dict):
+        def update_profile(self, data:UserUpdate):
             self.conn.update_row(self.table, self.user_id, data)
 
     class Customer(User):
         def __init__(self, client: "Client", user_id):
             super().__init__(client, user_id)
 
-        def get_cart(self):
+        def get_cart(self) -> list[CartItem]:
             return self.conn.get_rows("carts", f"user_id = {self.user_id}")
 
-        def get_orders(self):
+        def get_orders(self) -> list[OrderRow]:
             return self.conn.get_rows("orders", f"user_id = {self.user_id}")
 
         def get_reviews(self):
@@ -87,12 +143,55 @@ class Client:
                     raise
 
         def add_to_cart(self, sku, qty:int=1):
+            in_cart = self.is_in_cart(sku)
+            if in_cart:
+                self.update_cart_qty(sku, qty, EditQtyMode.ADDITIVE)
+            else:
+                data = {
+                    "user_id": self.user_id,
+                    "sku": sku,
+                    "qty": qty
+                }
+                self.conn.create_row("carts", data)
 
         def remove_from_cart(self, sku):
+            in_cart = self.is_in_cart(sku)
+            if not in_cart:
+                raise ValueError(f"SKU: {sku} not found in database.")
+            else:
+                self.conn.delete_row("carts", (self.user_id, sku))
 
         def clear_cart(self):
+            cart = [row["sku"] for row in self.get_cart()]
+            for sku in cart:
+                self.remove_from_cart(sku)
 
         def place_order(self):
+            #create order
+            self.conn.create_row("orders", {"user_id": self.user_id})
+
+            #get order number
+            orders = self.get_orders()
+            orders.sort(key=lambda x: x["order_time"])
+            new_order = orders.pop()
+            order_num = new_order["order_num"]
+            del orders
+            del new_order
+
+            #add items from cart to order_items with order number
+            cart = self.get_cart()
+
+            for item in cart:
+                product = self.client.product(item["sku"]).get_info()
+                order_item = OrderItem(order_num= order_num,
+                                       sku= item["sku"],
+                                       qty= item["qty"],
+                                       unit_price=product["unit_price"],
+                                       warranty_period=product["warranty_period"])
+                self.conn.create_row("order_items", order_item)
+
+            #clear cart
+            self.clear_cart()
 
         def create_review(self, sku, rating, content):
         
@@ -139,10 +238,17 @@ class Client:
     class Product:
         def __init__(self, client: "Client", sku):
             self.sku = sku
-            self.conn =client.conn
+            self.client = client
+            self.conn = client.conn
             self.table = "products"
 
-        def get_info(self):
+        def exists(self) -> bool:
+            rslt = self.conn.get_row("products", self.sku)
+            return bool(rslt)
+
+        def get_info(self) -> ProductRow:
+            rslt = self.conn.get_row("products", self.sku)
+            return rslt
 
         def get_reviews(self):
 
@@ -152,6 +258,33 @@ class Client:
 
         def is_available(self):
         # Check qty > 0 and maybe is_removed == FALSE
+
+        def get_stock(self) -> int:
+            return self.get_info()["qty"]
+
+        def update_inventory(self, qty, mode:EditQtyMode = EditQtyMode.SUBTRACT):
+            exists = self.exists()
+            if not exists:
+                raise ValueError(f"SKU {self.sku} does not exist in the database.")
+            else:
+                current_qty = self.get_stock()
+                if mode == EditQtyMode.ADDITIVE:
+                    new_qty = current_qty + qty
+                elif mode == EditQtyMode.SUBTRACT:
+                    new_qty = current_qty - qty
+                elif mode == EditQtyMode.SET:
+                    new_qty = qty
+                else:
+                    raise TypeError("mode must use the Enum EditQtyMode")
+                if new_qty < 0:
+                    raise ValueError("New qty must be greater than or equal to 0")
+                else:
+                    try:
+                        self.conn.update_row("products", self.sku, {"qty": new_qty})
+                    except Exception as e:
+                        print(e)
+                        raise
+
 
         def update(self, data):
         # Vendor/admin useself.
