@@ -60,7 +60,7 @@ class ProductRow(TypedDict):
 
 #possible warranty period class? to parse warranty_period strings and calculate dates
 
-class reviews(TypedDict):
+class Review(TypedDict):
     review_id: int
     user_id: int
     sku: str
@@ -68,20 +68,20 @@ class reviews(TypedDict):
     content: str
     rvw_time: datetime
 
-class complaints(TypedDict):
+class Complaint(TypedDict):
     complaint_id: int
     order_num: int
     comp_time: datetime
     type: str
     is_accepted: bool
 
-class chats(TypedDict, total=False):
+class Chat(TypedDict, total=False):
     chat_id: int
     complaint_id: int
     customer_id: int
     support_id: int
 
-class messages(TypedDict):
+class Message(TypedDict):
     msg_id: int
     chat_id: int
     user_id: int
@@ -231,6 +231,7 @@ class Client:
             self.clear_cart()
 
         def create_review(self, sku, rating, content):
+            review =
         
         def create_complaint(self, order_num, type):
 
