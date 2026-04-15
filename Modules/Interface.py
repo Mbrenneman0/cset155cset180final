@@ -65,8 +65,19 @@ class NewProduct(TypedDict):
     color:str
     size:str
     description: str
-    price:float
+    unit_price:float
     warranty_period:str
+
+class ProductUpdate(TypedDict, total=False):
+        sku: str
+        qty: int
+        title: str
+        color: str
+        size: str
+        description: str
+        unit_price: float
+        warranty_period: str
+        is_removed: bool
 
 #possible warranty period class? to parse warranty_period strings and calculate dates
 
@@ -266,17 +277,30 @@ class Client:
             super().__init__(client, user_id)
 
         def get_products(self) -> list[ProductRow]:
-            return self.conn.get_rows("poducts", f"vendor_id = {self.user_id}")
+            return self.conn.get_rows("products", f"vendor_id = {self.user_id}")
+
+        def has_product(self, sku) -> bool:
+            products = self.get_products()
+            return sku in [row["sku"] for row in products]
 
         def create_product(self, data:NewProduct):
-            # left off here
+            params = {"vendor_id": self.user_id}
+            params.update(data)
+            self.conn.create_row("products", params)
 
-        def update_product(self, sku, data):
+        def update_product(self, sku:str, data:ProductUpdate):
+            if not self.has_product(sku):
+                raise ValueError(f"Vendor: {self.user_id} does not own SKU: {sku}")
+            self.conn.update_row("products", sku, data)
 
         def remove_product(self, sku):
-            #set is_removed to true, dont actually remove from db
+            if not self.has_product(sku):
+                raise ValueError(f"Vendor: {self.user_id} does not own SKU: {sku}")
+            data = ProductUpdate(is_removed=True)
+            self.update_product(sku, data)
 
-        def get_product_reviews(self):
+        def get_product_reviews(self) -> list[Review]:
+            return self.conn.get_rows("reviews", f"products.vendor_id = :user_id", ["products"], {"user_id": self.user_id})
 
     class Admin(User):
         def __init__(self, client: "Client", user_id):
