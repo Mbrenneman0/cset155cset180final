@@ -13,7 +13,7 @@ class Role(str, Enum):
     CUSTOMER = "Customer"
     VENDOR = "Vendor"
 
-class User(TypedDict):
+class UserRow(TypedDict):
     user_id: int
     name: str
     username: str
@@ -48,7 +48,7 @@ class OrderItem(TypedDict):
 
 class ProductRow(TypedDict):
     sku: str
-    vender_id: int
+    vendor_id: int
     qty: int
     title: str
     color: str
@@ -57,6 +57,16 @@ class ProductRow(TypedDict):
     unit_price: float
     warranty_period: str
     is_removed: bool
+
+class NewProduct(TypedDict):
+    sku:str
+    qty:int
+    title:str
+    color:str
+    size:str
+    description: str
+    price:float
+    warranty_period:str
 
 #possible warranty period class? to parse warranty_period strings and calculate dates
 
@@ -100,7 +110,7 @@ class Client:
             self.conn =client.conn
             self.table = "users"
 
-        def get_info(self) -> User:
+        def get_info(self) -> UserRow:
             rslt = self.conn.get_row(self.table, self.user_id)
             return rslt
 
@@ -119,6 +129,9 @@ class Client:
         
         def update_profile(self, data:UserUpdate):
             self.conn.update_row(self.table, self.user_id, data)
+
+        def get_chats(self) -> list[Chat]:
+            return self.conn.get_rows("chats", f"customer_id = {self.user_id} OR support_id = {self.user_id}")
 
     class Customer(User):
         def __init__(self, client: "Client", user_id):
@@ -230,22 +243,33 @@ class Client:
             #clear cart
             self.clear_cart()
 
-        def create_review(self, sku, rating, content):
-            review =
+        def create_review(self, sku:str, rating:int, content:str):
+            if rating < 1 or rating > 5:
+                raise ValueError("rating must be between 0 and 5")
+            data = {
+                "user_id": self.user_id,
+                "sku": sku,
+                "rating": rating,
+                "content": content
+                }
+            self.conn.create_row("reviews", data)
         
-        def create_complaint(self, order_num, type):
-
-        def get_chats(self):
+        def create_complaint(self, order_num:int, type:str):
+            data = {
+                order_num: int,
+                type: str
+                }
+            self.conn.create_row("complaints", data)
 
     class Vendor(User):
         def __init__(self, client: "Client", user_id):
             super().__init__(client, user_id)
 
-        def get_products(self):
+        def get_products(self) -> list[ProductRow]:
+            return self.conn.get_rows("poducts", f"vendor_id = {self.user_id}")
 
-        def get_product(self, sku):
-
-        def create_product(self, data):
+        def create_product(self, data:NewProduct):
+            # left off here
 
         def update_product(self, sku, data):
 

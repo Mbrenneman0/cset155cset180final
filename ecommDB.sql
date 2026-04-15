@@ -13,7 +13,7 @@ CREATE TABLE users(
 
 CREATE TABLE products(
 	sku VARCHAR(12) PRIMARY KEY,
-    vender_id INT NOT NULL,
+    vendor_id INT NOT NULL,
     qty INT NOT NULL,
     title VARCHAR(255) NOT NULL,
     color VARCHAR(255) NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE products(
     unit_price DECIMAL(12,2) NOT NULL,
     warranty_period VARCHAR(255),
     is_removed BOOLEAN NOT NULL DEFAULT FALSE,
-    FOREIGN KEY (vender_id) REFERENCES users(user_id) ON DELETE CASCADE
+    FOREIGN KEY (vendor_id) REFERENCES users(user_id) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
 CREATE TABLE prod_imgs(
@@ -76,7 +76,7 @@ CREATE TABLE reviews(
     rating INT NOT NULL 
 		CHECK (rating BETWEEN 1 AND 5),
     content VARCHAR(2048) NOT NULL,
-    rvw_time DATETIME NOT NULL,
+    rvw_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (sku) REFERENCES products(sku) ON DELETE CASCADE,
     CONSTRAINT unique_review UNIQUE (user_id, sku)
@@ -85,9 +85,9 @@ CREATE TABLE reviews(
 CREATE TABLE complaints(
 	complaint_id INT PRIMARY KEY AUTO_INCREMENT,
     order_num INT NOT NULL,
-    comp_time DATETIME NOT NULL,
+    comp_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     type VARCHAR(8) NOT NULL,
-    is_accepted BOOLEAN,
+    is_accepted BOOLEAN DEFAULT NULL,
     FOREIGN KEY (order_num) REFERENCES orders(order_num) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
@@ -106,7 +106,7 @@ CREATE TABLE messages(
 	chat_id INT NOT NULL,
     user_id INT NOT NULL,
     content VARCHAR(2048) NOT NULL,
-    msg_time DATETIME NOT NULL
+    msg_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE = InnoDB;
 
 -- example data:
@@ -124,9 +124,9 @@ INSERT INTO users (name, username, password, email, role) VALUES
 ('Ethan Hunt', 'cust5', 'pass', 'ethan@mail.com', 'Customer'),
 
 -- Vendors
-('Vendor A', 'vendor1', 'pass', 'vendor1@mail.com', 'Vender'),
-('Vendor B', 'vendor2', 'pass', 'vendor2@mail.com', 'Vender'),
-('Vendor C', 'vendor3', 'pass', 'vendor3@mail.com', 'Vender');
+('Vendor A', 'vendor1', 'pass', 'vendor1@mail.com', 'Vendor'),
+('Vendor B', 'vendor2', 'pass', 'vendor2@mail.com', 'Vendor'),
+('Vendor C', 'vendor3', 'pass', 'vendor3@mail.com', 'Vendor');
 
 INSERT INTO product VALUES
 ('SKU001', 1, 50, 'Laptop', 'Black', '15in', 'Gaming laptop', 1200.00, '1 year', FALSE),
