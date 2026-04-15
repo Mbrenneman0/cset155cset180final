@@ -59,17 +59,32 @@ class Client:
             return 0
         
         def update_cart_qty(self, sku, qty:int=1, mode:EditQtyMode = EditQtyMode.SET):
-            if mode != EditQtyMode.SET:
-                current_qty = self.get_cart_qty(sku)
-            if qty < 0:
-                raise ValueError("qty must be greater than 0")
-            if mode == EditQtyMode.SUBTRACT:
-                if
             in_cart = self.is_in_cart(sku)
             if not in_cart:
-                self.add_to_cart(sku, qty)
+                current_qty = 0
             else:
-                
+                current_qty = self.get_cart_qty(sku)
+            
+            if mode == EditQtyMode.ADDITIVE:
+                new_qty = current_qty + qty
+            elif mode == EditQtyMode.SUBTRACT:
+                new_qty = current_qty - qty
+            elif mode == EditQtyMode.SET:
+                new_qty = qty
+            else:
+                raise TypeError("mode must use the Enum EditQtyMode")
+            if new_qty < 0:
+                raise ValueError("New qty must be greater than or equal to 0")
+            elif new_qty == 0:
+                self.remove_from_cart(sku)
+            elif not in_cart:
+                self.add_to_cart(sku, new_qty)
+            else:
+                try:
+                    self.conn.update_row("carts", (self.user_id, sku), {"qty": new_qty})
+                except Exception as e:
+                    print(e)
+                    raise
 
         def add_to_cart(self, sku, qty:int=1):
 
