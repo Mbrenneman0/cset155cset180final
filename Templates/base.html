@@ -53,5 +53,14 @@
 
 <!-- toggle dropdown view of filter catagories -->
 <script>
+    const filter_dropdown = document.getElementById('filter-cont')
+    const filter_form = document.getElementById('filter-form')
 
+    filter_dropdown.addEventListener('click', function(){
+        if (filter_form.style.display == 'block'){
+            filter_form.style.display = 'none'
+        }else{
+            filter_form.style.display = 'block'
+        }
+    })
 </script>

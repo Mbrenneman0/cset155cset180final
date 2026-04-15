@@ -165,10 +165,14 @@ class Client:
             self.table = "messages"
 
         def get_info(self):
+            rslt = self.conn.get_row(self.table,self.message_id)
+            return rslt
 
         def get_content(self):
+            return self.get_info().get('content')
 
         def delete(self):
+            self.conn.delete_row(self.table,self.message_id)
 
     class Chat:
         def __init__(self, client: "Client", chat_id):
@@ -177,28 +181,56 @@ class Client:
             self.table = "chats"
 
         def get_info(self):
+            rslt = self.conn.get_row(self.table,self.chat_id)
+            return rslt
 
         def get_messages(self):
+            return self.conn.get_rows('messages', condition=f'chat_id = {self.chat_id}')
 
         def send_message(self, user_id, content):
 
-        def get_participants(self):
+            return 
+
+        def get_participants(self) -> dict:
+            rslt = self.conn.get_row(self.table, self.chat_id)
+            keep_keys = ['customer_id','support_id']
+            return {k: rslt[k] for k in keep_keys if k in rslt}
 
         def is_complaint(self) -> bool:
+            rslt = self.get_info()
+            if rslt.get('complaint_id') is None:
+                return False
+            else:
+                return True
 
         def get_complaint(self):
-
+            if self.is_complaint():
+                complaint_id = self.get_info.get('complaint_id')
+                rslt = self.conn.get_rows('complaints',condition=f'complaint_id = {complaint_id}')
+                return rslt
+            else:
+                raise ValueError (f'The chat at id: {self.chat_id} does not contain a complaint')
 
     class Complaint(Message):
         def __init__(self, client: "Client", complaint_id):
             super().__init__(client, complaint_id)
+            self.complaint_id = self.complaint_id
             self.table = "complaints"
 
         def get_info(self):
+            rslt = self.conn.get_row(self.table,self.complaint_id)
+            return rslt
 
         def get_order(self):
+            order_num = self.get_info().get('order_num')
+            rslt = self.conn.get_rows('orders', condition=f'order_num = {order_num}')
+            return rslt
 
         def get_chat(self):
+            try:
+                rslt = self.conn.get
+            except ValueError:
+                raise ValueError ('This complaint does not have a chat linked to it')
 
         def set_status(self, is_accepted):
 
@@ -208,9 +240,12 @@ class Client:
     class Review(Message):
         def __init__(self, client: "Client",  review_id):
             super().__init__(client, review_id)
+            self.review_id = self.review_id
             self.table = "reviews"
 
         def get_info(self):
+            rslt = self.conn.get_row(self.table,self.review_id)
+            return rslt
 
         def update(data):
 
