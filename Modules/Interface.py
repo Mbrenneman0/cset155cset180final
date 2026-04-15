@@ -1,6 +1,7 @@
 import DBHelper as DBH
 from enum import Enum, auto
 from typing import TypedDict
+from datetime import datetime
 
 class EditQtyMode(Enum):
     ADDITIVE = auto()
@@ -35,7 +36,7 @@ class CartItem(TypedDict):
 class OrderRow(TypedDict):
     order_num: int
     user_id: int
-    order_time: str
+    order_time: datetime
     status: str
 
 class OrderItem(TypedDict):
@@ -58,6 +59,34 @@ class ProductRow(TypedDict):
     is_removed: bool
 
 #possible warranty period class? to parse warranty_period strings and calculate dates
+
+class reviews(TypedDict):
+    review_id: int
+    user_id: int
+    sku: str
+    rating: int
+    content: str
+    rvw_time: datetime
+
+class complaints(TypedDict):
+    complaint_id: int
+    order_num: int
+    comp_time: datetime
+    type: str
+    is_accepted: bool
+
+class chats(TypedDict, total=False):
+    chat_id: int
+    complaint_id: int
+    customer_id: int
+    support_id: int
+
+class messages(TypedDict):
+    msg_id: int
+    chat_id: int
+    user_id: int
+    content: str
+    msg_time: datetime
 
 
 class Client:
@@ -167,6 +196,16 @@ class Client:
                 self.remove_from_cart(sku)
 
         def place_order(self):
+            
+            #validate order
+            cart = self.get_cart()
+            if len(cart) <= 0:
+                raise ValueError(f"Cart for user id: {self.user_id} is empty.")
+            for item in cart:
+                product = self.client.product(item["sku"]).get_info()
+                if product["qty"] < item["qty"]:
+                    raise ValueError(f"Available inventory less than cart qty for {item['sku']}")
+            
             #create order
             self.conn.create_row("orders", {"user_id": self.user_id})
 
@@ -175,20 +214,18 @@ class Client:
             orders.sort(key=lambda x: x["order_time"])
             new_order = orders.pop()
             order_num = new_order["order_num"]
-            del orders
-            del new_order
 
             #add items from cart to order_items with order number
-            cart = self.get_cart()
-
             for item in cart:
-                product = self.client.product(item["sku"]).get_info()
+                product = self.client.product(item["sku"])
+                prod_info = product.get_info()
                 order_item = OrderItem(order_num= order_num,
                                        sku= item["sku"],
                                        qty= item["qty"],
-                                       unit_price=product["unit_price"],
-                                       warranty_period=product["warranty_period"])
+                                       unit_price=prod_info["unit_price"],
+                                       warranty_period=prod_info["warranty_period"])
                 self.conn.create_row("order_items", order_item)
+                product.update_inventory(item["qty"])
 
             #clear cart
             self.clear_cart()
