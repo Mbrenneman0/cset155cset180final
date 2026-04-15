@@ -321,7 +321,7 @@ class Client:
             return self.conn.get_rows('messages', condition=f'chat_id = {self.chat_id}')
 
         def send_message(self, user_id, content):
-
+            
             return 
 
         def get_participants(self) -> dict:
@@ -361,14 +361,19 @@ class Client:
 
         def get_chat(self):
             try:
-                rslt = self.conn.get
+                rslt = self.conn.get_rows('chats', condition=f'complaint_id = {self.complaint_id}')
+                return rslt
             except ValueError:
-                raise ValueError ('This complaint does not have a chat linked to it')
+                raise ValueError (f'The complaint at id: {self.complaint_id} does not have a chat linked to it')
 
         def set_status(self, is_accepted):
+            self.conn.update_row(self.table,self.complaint_id,{'is_accepted':is_accepted})
 
         def create_chat(self, customer_id, support_id):
-
+            chat_date = {'complaint_id':self.complaint_id,
+                         'customer_id': customer_id,
+                         'support_id': support_id}
+            self.conn.create_row('chats', chat_date)
 
     class Review(Message):
         def __init__(self, client: "Client",  review_id):
@@ -380,13 +385,19 @@ class Client:
             rslt = self.conn.get_row(self.table,self.review_id)
             return rslt
 
-        def update(data):
+        def update(self, data):
+            self.conn.update_row(self.review_id, data)
 
         def delete(self):
+            self.conn.delete_row(self.table, self.review_id)
 
         def get_author(self):
+            user_id = self.get_info().get('user_id')
+            rslt = self.conn.get_rows('users',condition=f'user_id = {user_id}')
+            return rslt
 
         def get_product(self):
+
 
     def user(self, user_id) -> User:
         return Client.User(self, user_id)
