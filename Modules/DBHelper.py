@@ -39,7 +39,11 @@ class Conn:
                 "db_name": self.db_name,
                 "table_name": self.table_name
             })
-            self.primary_key = rslt.scalar()
+            primary_keys = list(rslt.scalars().all())
+            if len(primary_keys) == 0:
+                self.primary_keys = None
+            else:
+                self.primary_keys = primary_keys
             
         def _set_foreignkeys(self):
             query = f"""SELECT COLUMN_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME
@@ -48,6 +52,39 @@ class Conn:
                     AND TABLE_SCHEMA = DATABASE() AND REFERENCED_TABLE_NAME IS NOT NULL"""
             rslt = self.conn.execute(text(query))
             self.foreign_keys = {row.COLUMN_NAME: {'table': row.REFERENCED_TABLE_NAME, 'column': row.REFERENCED_COLUMN_NAME} for row in rslt}
+
+        def _where_clause_from_pk(self):
+            where_clause = " AND ".join([f"{self.table_name}.{col} = :{col}" for col in self.primary_keys])
+            return where_clause
+        
+        def _normalize_pk_value(self, pk_value) -> dict:
+            if not self.primary_keys:
+                raise ValueError(f"Table {self.table_name} has no primary key")
+            if type(pk_value) == dict:
+                if set(pk_value.keys()) != set(self.primary_keys):
+                    raise ValueError(
+                        f"Expected primary key fields {self.primary_keys}"
+                    )
+                return {key: pk_value[key] for key in self.primary_keys}
+            
+            if len(self.primary_keys) == 1:
+                if isinstance(pk_value, (tuple, list)):
+                    if len(pk_value) != 1:
+                        raise ValueError(
+                            f"Table {self.table_name} expects 1 primary key value"
+                        )
+                    return {self.primary_keys[0]: pk_value[0]}
+                return {self.primary_keys[0]: pk_value}
+            
+            if isinstance(pk_value, (tuple, list)):
+                if len(pk_value) != len(self.primary_keys):
+                    raise ValueError(
+                        f"Table {self.table_name} expects {len(self.primary_keys)} primary key values "
+                        f"{self.primary_keys}, got {len(pk_value)}")
+                return dict(zip(self.primary_keys, pk_value))
+            raise ValueError(
+                f"Table {self.table_name} expects primary key values for {self.primary_keys}. "
+                f"Use tuple, list, or dict.")
 
         def _build_joins(self, join_tables):
             joins = []
@@ -112,31 +149,31 @@ class Conn:
             return output
 
         def delete_row(self, pk_value:any):
-            if type(pk_value) == str:
-                pk_value = f"'{pk_value}'"
-            query = f"DELETE FROM {self.table_name} WHERE {self.primary_key} = {pk_value}"
-            self.conn.execute(text(query))
+            params = self._normalize_pk_value(pk_value)
+            query = f"DELETE FROM {self.table_name} WHERE {self._where_clause_from_pk()}"
+            self.conn.execute(text(query), params)
             self.conn.commit()
 
         def update_row(self, pk_value, data: dict):
+            params = self._normalize_pk_value(pk_value)
+            params.update(data)
             set_txt = ', '.join([f"{col} = :{col}" for col in data.keys()])
             query = f"""UPDATE {self.table_name}
                     SET {set_txt}
-                    WHERE {self.primary_key} = :pk
+                    WHERE {self._where_clause_from_pk()}
                     """
-            params = dict(data)
-            params["pk"] = pk_value
             self.conn.execute(text(query), params)
             self.conn.commit()
 
         def get_row(self, pk_value, join_tables):
+            params = self._normalize_pk_value(pk_value)
             base = self
             if join_tables is None:
-                query = f"SELECT * FROM {self.table_name} WHERE {self.primary_key} = {pk_value}"
+                query = f"SELECT * FROM {self.table_name} WHERE {self._where_clause_from_pk()}"
             else:
                 join_sql = self._build_joins(base, join_tables)
-                query = f"SELECT * FROM {self.table_name} {join_sql}"
-            rslt = self.conn.execute(text(query))
+                query = f"SELECT * FROM {self.table_name} {join_sql} WHERE {self._where_clause_from_pk()}"
+            rslt = self.conn.execute(text(query), params)
             row = rslt.mappings().first()
             return dict(row) if row else None  
 
