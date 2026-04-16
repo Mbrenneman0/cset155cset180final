@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
-from Modules.Interface import Client
+from Modules.Interface import *
 
 LOGIN = 'root'
 PASSWORD = 'cset155'
