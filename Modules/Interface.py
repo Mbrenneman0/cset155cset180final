@@ -418,15 +418,11 @@ class Client:
             return {k: rslt[k] for k in keep_keys if k in rslt}
 
         def is_complaint(self) -> bool:
-            rslt = self.get_info()
-            if rslt.get('complaint_id') is None:
-                return False
-            else:
-                return True
+            return self.get_info().get('complaint_id') is not None
 
         def get_complaint(self):
             if self.is_complaint():
-                complaint_id = self.get_info.get('complaint_id')
+                complaint_id = self.get_info().get('complaint_id')
                 rslt = self.conn.get_row('complaints', complaint_id)
                 return rslt
             else:
@@ -435,7 +431,7 @@ class Client:
     class Complaint(Message):
         def __init__(self, client: "Client", complaint_id):
             super().__init__(client, complaint_id)
-            self.complaint_id = self.complaint_id
+            self.complaint_id = complaint_id
             self.table = "complaints"
 
         def get_info(self):
@@ -449,7 +445,7 @@ class Client:
 
         def get_chat(self):
             try:
-                rslt = self.conn.get_row('chats', condition=f'complaint_id = {self.complaint_id}')
+                rslt = self.conn.get_rows('chats', condition=f'complaint_id = {self.complaint_id}')
                 return rslt
             except ValueError:
                 raise ValueError (f'The complaint at id: {self.complaint_id} does not have a chat linked to it')
@@ -466,7 +462,7 @@ class Client:
     class Review(Message):
         def __init__(self, client: "Client",  review_id):
             super().__init__(client, review_id)
-            self.review_id = self.review_id
+            self.review_id = review_id
             self.table = "reviews"
 
         def get_info(self):
@@ -474,7 +470,7 @@ class Client:
             return rslt
 
         def update(self, data):
-            self.conn.update_row(self.review_id, data)
+            self.conn.update_row(self.table, self.review_id, data)
 
         def delete(self):
             self.conn.delete_row(self.table, self.review_id)
