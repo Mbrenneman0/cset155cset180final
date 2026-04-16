@@ -178,7 +178,6 @@ class Conn:
             return dict(row) if row else None  
 
         def get_rows(self, condition, join_tables, params:dict = {}):
-            base = self
             if join_tables is None:
                 query = f"SELECT * FROM {self.table_name}"
             else:
