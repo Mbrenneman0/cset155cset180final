@@ -85,10 +85,12 @@ CREATE TABLE reviews(
 CREATE TABLE complaints(
 	complaint_id INT PRIMARY KEY AUTO_INCREMENT,
     order_num INT NOT NULL,
+    content VARCHAR(2048),
     comp_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     type VARCHAR(8) NOT NULL,
     is_accepted BOOLEAN DEFAULT NULL,
-    FOREIGN KEY (order_num) REFERENCES orders(order_num) ON DELETE CASCADE
+    FOREIGN KEY (order_num) REFERENCES orders(order_num) ON DELETE CASCADE,
+    CONSTRAINT complaint_type_value CHECK(type IN ('Return','Refund','Warranty'))
 ) ENGINE = InnoDB;
 
 CREATE TABLE chats(
@@ -128,7 +130,7 @@ INSERT INTO users (name, username, password, email, role) VALUES
 ('Vendor B', 'vendor2', 'pass', 'vendor2@mail.com', 'Vendor'),
 ('Vendor C', 'vendor3', 'pass', 'vendor3@mail.com', 'Vendor');
 
-INSERT INTO product VALUES
+INSERT INTO products VALUES
 ('SKU001', 1, 50, 'Laptop', 'Black', '15in', 'Gaming laptop', 1200.00, '1 year', FALSE),
 ('SKU002', 1, 30, 'Phone', 'White', '6in', 'Smartphone', 800.00, '1 year', FALSE),
 ('SKU003', 1, 20, 'Tablet', 'Gray', '10in', 'Android tablet', 400.00, '6 months', FALSE),
@@ -147,16 +149,16 @@ INSERT INTO prod_imgs VALUES
 ('SKU004', 'img4.jpg');
 
 -- UNTIMED 
-INSERT INTO discount VALUES
+INSERT INTO discounts VALUES
 ('SKU001', '10%', '2000-01-01', '2099-12-31'),
 ('SKU002', '$5.00', '2000-01-01', '2099-12-31');
 
 -- TIMED 
-INSERT INTO discount VALUES
+INSERT INTO discounts VALUES
 ('SKU003', '$15.00', '2026-01-01', '2026-12-31'),
 ('SKU004', '5%', '2026-03-01', '2026-06-01');
 
-INSERT INTO cart VALUES
+INSERT INTO carts VALUES
 (3, 'SKU001', 1),
 (3, 'SKU002', 2),
 
@@ -196,19 +198,19 @@ INSERT INTO order_items VALUES
 -- Order 7 (confirmed)
 (7, 'SKU007', 1, 200.00, '1 year');
 
-INSERT INTO review VALUES
+INSERT INTO reviews VALUES
 (3, 'SKU001', 5, 'Great laptop!', NOW()),
 (4, 'SKU003', 4, 'Pretty good tablet', NOW());
 
-INSERT INTO complaint (order_num, comp_time, type, is_accepted) VALUES
-(1, NOW(), 'damage', TRUE),
-(4, NOW(), 'late', FALSE);
+INSERT INTO complaints (order_num, content, comp_time, type, is_accepted) VALUES
+(1, "Product lowkey exploded", NOW(), 'Warranty', TRUE),
+(4, "Product arrived late", NOW(), 'Refund', NULL);
 
-INSERT INTO chat (complaint_id, customer_id, support_id) VALUES
+INSERT INTO chats (complaint_id, customer_id, support_id) VALUES
 (1, 3, 1),
 (2, 4, 2);
 
-INSERT INTO message (chat_id, user_id, content, msg_time) VALUES
+INSERT INTO messages (chat_id, user_id, content, msg_time) VALUES
 (1, 3, 'My product arrived damaged', NOW()),
 (1, 1, 'We are reviewing your complaint', NOW()),
 (2, 4, 'Order is late', NOW());
