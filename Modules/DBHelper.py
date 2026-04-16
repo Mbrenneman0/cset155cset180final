@@ -167,11 +167,10 @@ class Conn:
 
         def get_row(self, pk_value, join_tables):
             params = self._normalize_pk_value(pk_value)
-            base = self
             if join_tables is None:
                 query = f"SELECT * FROM {self.table_name} WHERE {self._where_clause_from_pk()}"
             else:
-                join_sql = self._build_joins(base, join_tables)
+                join_sql = self._build_joins(join_tables)
                 query = f"SELECT * FROM {self.table_name} {join_sql} WHERE {self._where_clause_from_pk()}"
             rslt = self.conn.execute(text(query), params)
             row = rslt.mappings().first()

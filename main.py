@@ -1,55 +1,28 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
-from Modules.Interface import Client
+from flask import Flask
+from config import Config
 
-LOGIN = 'root'
-PASSWORD = 'cset155'
-SERVER = 'localhost'
-DB_NAME = 'ecom'
-SCHEMA_PATH = 'ecommDB.sql'
+from Blueprints.auth import auth_bp
+from Blueprints.products import products_bp
+from Blueprints.cart import cart_bp
+from Blueprints.orders import orders_bp
+from Blueprints.account import account_bp
 
-client = Client(LOGIN, PASSWORD, SERVER, DB_NAME, SCHEMA_PATH)
-app = Flask(__name__)
+from extensions import init_client
 
-# -------------- LOG IN / SIGN UP ---------------
-@app.route('/login', methods=['GET', 'POST'])
-def log_in():
-    return
+def create_app():
+    app = Flask(__name__)
+    app.config.from_object(Config)
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    return
+    init_client(app)
 
-@app.route('/venders/register', methods=['GET', 'POST'])
-def vender_register():
-    return
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(products_bp)
+    app.register_blueprint(cart_bp)
+    app.register_blueprint(orders_bp)
+    app.register_blueprint(account_bp)
 
-# -------------- PRODUCTS ---------------
-@app.route('/products', methods=['GET', 'POST'])
-def list_products():
-    return render_template('index.html')
-
-@app.route('/products/<int:id>', methods=['GET', 'POST'])
-def product_detail(id):
-    return
-
-# -------------- ORDERS ---------------
-@app.route('/order/<int:id>', methods=['GET','POST'])
-def order(id):
-    return
-
-# ------------ ACCOUNT ------------------
-@app.route('/account', methods=['GET','POST'])
-def account():
-    return
-
-@app.route('/account/orders', methods=['GET','POST'])
-def account_orders():
-    return
-
-@app.route('/account/orders/<int:id>', methods=['GET'])
-def account_order_detail(id):
-    return
-
+    return app
 
 if __name__ == '__main__':
+    app = create_app()
     app.run(debug=True)
