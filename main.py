@@ -1,18 +1,28 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
-from Modules.Interface import *
+from flask import Flask
+from config import Config
 
-LOGIN = 'root'
-PASSWORD = 'cset155'
-SERVER = 'localhost'
-DB_NAME = 'ecom'
-SCHEMA_PATH = 'ecommDB.sql'
+from Blueprints.auth import auth_bp
+from Blueprints.products import products_bp
+from Blueprints.cart import cart_bp
+from Blueprints.orders import orders_bp
+from Blueprints.account import account_bp
 
-client = Client(LOGIN, PASSWORD, SERVER, DB_NAME, SCHEMA_PATH)
-app = Flask(__name__)
+from extensions import init_client
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+def create_app():
+    app = Flask(__name__)
+    app.config.from_object(Config)
+
+    init_client(app)
+
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(products_bp)
+    app.register_blueprint(cart_bp)
+    app.register_blueprint(orders_bp)
+    app.register_blueprint(account_bp)
+
+    return app
 
 if __name__ == '__main__':
+    app = create_app()
     app.run(debug=True)
