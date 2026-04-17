@@ -1,154 +1,5 @@
 import DBHelper as DBH
-from enum import Enum, auto
-from typing import TypedDict
-from datetime import datetime, timedelta
-import re as regex
-
-class EditQtyMode(Enum):
-    ADDITIVE = auto()
-    SET = auto()
-    SUBTRACT = auto()
-
-class TableNames(str, Enum):
-    USERS = "users"
-    PRODUCTS = "products"
-    PROD_IMGS = "prod_imgs"
-    DISCOUNTS = "discounts"
-    CARTS = "carts"
-    ORDERS = "orders"
-    ORDER_ITEMS = "order_items"
-    REVIEWS = "reviews"
-    COMPLAINTS = "complaints"
-    CHATS = "chats"
-    MESSAGES = "messages"
-
-class Role(str, Enum):
-    ADMIN = "Admin"
-    CUSTOMER = "Customer"
-    VENDOR = "Vendor"
-
-class ComplaintTypes(str, Enum):
-    RETURN = 'Return'
-    REFUND ='Refund'
-    WARRANTY = 'Warranty'
-
-class UserRow(TypedDict):
-    user_id: int
-    name: str
-    username: str
-    password: str
-    email: str
-    role: Role
-
-class UserUpdate(TypedDict, total=False):
-    name: str
-    username: str
-    password: str
-    email: str
-    role: Role
-
-class CartItem(TypedDict):
-    user_id: int
-    sku: str
-    qty: int
-
-class OrderRow(TypedDict):
-    order_num: int
-    user_id: int
-    order_time: datetime
-    status: str
-
-class OrderItem(TypedDict):
-    order_num: int
-    sku: str
-    qty: int
-    unit_price: float
-    warranty_period: str
-
-class ProductRow(TypedDict):
-    sku: str
-    vendor_id: int
-    qty: int
-    title: str
-    color: str
-    size: str
-    description: str
-    unit_price: float
-    warranty_period: str
-    is_removed: bool
-
-class NewProduct(TypedDict):
-    sku: str
-    qty: int
-    title: str
-    color: str
-    size: str
-    description: str
-    unit_price: float
-    warranty_period: str
-
-class ProductImageRow(TypedDict):
-    sku: str
-    img_url: str
-
-class ProductUpdate(TypedDict, total=False):
-    sku: str
-    qty: int
-    title: str
-    color: str
-    size: str
-    description: str
-    unit_price: float
-    warranty_period: str
-    is_removed: bool
-
-class DiscountRow(TypedDict):
-    sku: str
-    amount: str
-    start_date: datetime
-    end_date: datetime
-
-class ReviewRow(TypedDict):
-    review_id: int
-    user_id: int
-    sku: str
-    rating: int
-    content: str
-    rvw_time: datetime
-
-class ReviewUpdate(TypedDict, total=False):
-    review_id: int
-    user_id: int
-    sku: str
-    rating: int
-    content: str
-    rvw_time: datetime
-
-class ComplaintRow(TypedDict):
-    complaint_id: int
-    order_num: int
-    content: str
-    comp_time: datetime
-    type: ComplaintTypes
-    is_accepted: bool
-
-class ChatRow(TypedDict, total=False):
-    chat_id: int
-    complaint_id: int
-    customer_id: int
-    support_id: int
-
-class ChatMessageRow(TypedDict):
-    msg_id: int
-    chat_id: int
-    user_id: int
-    content: str
-    msg_time: datetime
-
-class NewChatMessage(TypedDict):
-    chat_id: int
-    user_id: int
-    content: str
+from Types import *
 
 class WarrantyPeriod:
     def __init__(self, time:str):
@@ -178,8 +29,6 @@ class WarrantyPeriod:
                 break
             temp_int = match.group()
             temp_str = temp_str[match.end():]
-
-
 
 class Client:
     def __init__(self, login, password, server, db_name, schema_path):
@@ -290,41 +139,6 @@ class Client:
             for sku in cart:
                 self.remove_from_cart(sku)
 
-        def place_order(self):
-            
-            #validate order
-            cart = self.get_cart()
-            if len(cart) <= 0:
-                raise ValueError(f"Cart for user id: {self.user_id} is empty.")
-            for item in cart:
-                product = self.client.product(item["sku"]).get_info()
-                if product["qty"] < item["qty"]:
-                    raise ValueError(f"Available inventory less than cart qty for {item['sku']}")
-            
-            #create order
-            self.conn.create_row(TableNames.ORDERS, {"user_id": self.user_id})
-
-            #get order number
-            orders = self.get_orders()
-            orders.sort(key=lambda x: x["order_time"])
-            new_order = orders.pop()
-            order_num = new_order["order_num"]
-
-            #add items from cart to order_items with order number
-            for item in cart:
-                product = self.client.product(item["sku"])
-                prod_info = product.get_info()
-                order_item = OrderItem(order_num= order_num,
-                                       sku= item["sku"],
-                                       qty= item["qty"],
-                                       unit_price=prod_info["unit_price"],
-                                       warranty_period=prod_info["warranty_period"])
-                self.conn.create_row(TableNames.ORDER_ITEMS, order_item)
-                product.update_inventory(item["qty"])
-
-            #clear cart
-            self.clear_cart()
-
         def create_review(self, sku:str, rating:int, content:str):
             if rating < 1 or rating > 5:
                 raise ValueError("rating must be between 1 and 5")
@@ -335,13 +149,6 @@ class Client:
                 "content": content
                 }
             self.conn.create_row(TableNames.REVIEWS, data)
-        
-        def create_complaint(self, order_num:int, type:ComplaintTypes):
-            data = {
-                "order_num": order_num,
-                "type": type
-                }
-            self.conn.create_row(TableNames.COMPLAINTS, data)
 
     class Vendor(User):
         def __init__(self, client: "Client", user_id):
@@ -390,10 +197,6 @@ class Client:
         
         def get_unresolved_complaints(self) -> list[ComplaintRow]:
             return self.conn.get_rows(TableNames.COMPLAINTS, "is_accepted is NULL")
-
-        def review_complaint(self, complaint_id:int, accepted:bool):
-            complaint = self.client.complaint(complaint_id)
-            complaint.set_status(accepted)
 
         def get_all_orders(self) -> list[OrderRow]:
             return self.conn.get_rows(TableNames.ORDERS)
@@ -493,12 +296,6 @@ class Client:
         def get_messages(self) -> ChatMessageRow:
             return self.conn.get_rows(TableNames.MESSAGES, condition=f'chat_id = :chat_id', params={"chat_id": self.chat_id})
 
-        def send_message(self, user_id, content):
-            msg_data = NewChatMessage(chat_id=self.chat_id,
-                               user_id=user_id,
-                               content=content)
-            self.conn.create_row(TableNames.MESSAGES, msg_data)
-
         def get_participants(self) -> dict:
             rslt = self.conn.get_row(self.table, self.chat_id)
             keep_keys = ['customer_id','support_id']
@@ -590,8 +387,8 @@ class Client:
     def message(self, message_id) -> Message:
         return Client.Message(self, message_id)
     
-    def chat(self, message_id) -> Chat:
-        return Client.Chat(self, message_id)
+    def chat(self, chat_id) -> Chat:
+        return Client.Chat(self, chat_id)
     
     def complaint(self, message_id) -> Complaint:
         return Client.Complaint(self, message_id)
