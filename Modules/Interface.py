@@ -1,6 +1,35 @@
 import DBHelper as DBH
 from Types import *
 
+class WarrantyPeriod:
+    def __init__(self, time:str):
+        """
+        Time strings must be formated with a series of
+        integers followed by the time unit.
+        \n
+        Examples of valid inputs:\n
+        "7 Years, 6 Months and 3 Days"\n
+        "7 years 6 months 3 days"\n
+        "7year:6month:3day"\n
+        \n
+        Examples of invalid inputs:\n
+        "06/03/07"\n
+        "Years: 7, Months: 6, Days: 3"
+        """
+        self.time_str = time
+        self.time = self.delta_t()
+
+    def delta_t(self) -> timedelta:
+        substrings = ["year", "month", "week", "day"]
+        time = {}
+        temp_str = self.time_str
+        while True:
+            match = regex.search(r"\d+", temp_str)
+            if not match:
+                break
+            temp_int = match.group()
+            temp_str = temp_str[match.end():]
+
 class Client:
     def __init__(self, login, password, server, db_name, schema_path):
         self.conn = DBH.Conn(login, password, server, db_name, schema_path)
