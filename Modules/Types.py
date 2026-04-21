@@ -1,6 +1,7 @@
 from typing import TypedDict
-from datetime import datetime
+from datetime import datetime, timedelta
 from enum import Enum,auto
+import re as Regex
 
 class EditQtyMode(Enum):
     ADDITIVE = auto()
@@ -106,8 +107,6 @@ class DiscountRow(TypedDict):
     start_date: datetime
     end_date: datetime
 
-#possible warranty period class? to parse warranty_period strings and calculate dates
-
 class ReviewRow(TypedDict):
     review_id: int
     user_id: int
@@ -149,3 +148,51 @@ class NewChatMessage(TypedDict):
     chat_id: int
     user_id: int
     content: str
+
+class WarrantyPeriod:
+    def __init__(self, time:str):
+        """
+        Time strings must be formated with a series of
+        integers followed by the time unit.\n
+        Unit -> Amount\n
+        NOT: Amount -> Unit\n
+        \n
+        Examples of valid inputs:\n
+        "7 Years, 6 Months and 3 Days"\n
+        "7 years 6 months 3 days"\n
+        "7year:6month:3day"\n
+        \n
+        Examples of invalid inputs:\n
+        "06/03/07"\n
+        "Years: 7, Months: 6, Days: 3"
+        """
+
+        self.time_str = time
+        self.time = self._delta_t()
+
+    def _delta_t(self) -> timedelta:
+        pattern = r"(\d+)\s*(year|month|week|day)s?"
+        matches = Regex.findall(pattern, self.time_str.lower())
+
+        if not matches:
+            raise ValueError("Invalid input")
+
+        multipliers = {
+            "day": 1,
+            "week": 7,
+            "month": 30,
+            "year": 365,
+        }
+
+        total_days = sum(int(amount) * multipliers[unit] for amount, unit in matches)
+        return timedelta(days=total_days)
+
+    def get_end_date(self, start_date:datetime) -> datetime:
+        end_date = start_date + self.time
+        return end_date
+    
+    def is_active(self, start_date:datetime) -> bool:
+        return datetime.now().date() >= self.get_end_date(start_date).date()
+
+
+

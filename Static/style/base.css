@@ -63,3 +63,12 @@ header span{
 footer{
     height: 20vh;
 }
+
+/* ------------- DROPDOWN ------------- */
+.DropDown_Cont{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 30px;
+    background-color: white;
+}
