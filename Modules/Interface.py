@@ -1,5 +1,5 @@
-from . import DBHelper as DBH
-from .Types import *
+import DBHelper as DBH
+from Types import *
 
 class Client:
     def __init__(self, login, password, server, db_name, schema_path):
