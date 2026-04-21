@@ -270,7 +270,12 @@ class Conn:
                     print('\n\nTESTING',conditions,'\n\n')
                     print('\n\nTESTING',statement,'\n\n')
                     if all(conditions):
-                        conn.execute(text(statement))
+                        try:
+                            conn.execute(text(statement))
+                        except Exception as e:
+                            print(f"ERROR executing statement: {statement[:100]}")
+                            print(f"Exception: {e}")
+                            raise  # Re-raise to see the actual error
 
     def _get_table(self, table_name:str) -> Table:
                 return self.tables.get(table_name)
