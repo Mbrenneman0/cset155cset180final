@@ -205,7 +205,7 @@ INSERT INTO order_items VALUES
 -- Order 7 (confirmed)
 (7, 'SKU007', 1, 200.00, '1 year');
 
-INSERT INTO reviews VALUES
+INSERT INTO reviews (user_id, sku, rating, content, rvw_time) VALUES
 (3, 'SKU001', 5, 'Great laptop!', NOW()),
 (4, 'SKU003', 4, 'Pretty good tablet', NOW());
 
