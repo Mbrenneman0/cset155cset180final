@@ -230,6 +230,14 @@ class Conn:
         engine.dispose()
         return self.db_name in databases
     
+    def reset_db(self):
+        connection_str = f"mysql://{self.login}:{self.password}@{self.server}"
+        engine = create_engine(connection_str, echo=True, connect_args={"local_infile":1})
+        with engine.begin() as conn:
+            conn.execute(text(f"DROP DATABASE IF EXISTS {self.db_name}"))
+        engine.dispose()
+        self._create_db()
+    
     def _create_db(self):
         connection_str = f"mysql://{self.login}:{self.password}@{self.server}"
         engine = create_engine(connection_str, echo=True, connect_args={"local_infile":1})

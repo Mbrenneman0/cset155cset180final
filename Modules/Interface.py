@@ -149,6 +149,9 @@ class Client:
 
         def get_product_reviews(self) -> list[ReviewRow]:
             return self.conn.get_rows(TableNames.REVIEWS, f"products.vendor_id = :user_id", ["products"], {"user_id": self.user_id})
+        
+        def reset_database(self):
+            self.conn.reset_db()
 
     class Admin(User):
         def __init__(self, client: "Client", user_id):

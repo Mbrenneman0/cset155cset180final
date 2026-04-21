@@ -131,22 +131,29 @@ INSERT INTO users (name, username, password, email, role) VALUES
 ('Vendor C', 'vendor3', 'pass', 'vendor3@mail.com', 'Vendor');
 
 INSERT INTO products VALUES
-('SKU001', 1, 50, 'Laptop', 'Black', '15in', 'Gaming laptop', 1200.00, '1 year', FALSE),
-('SKU002', 1, 30, 'Phone', 'White', '6in', 'Smartphone', 800.00, '1 year', FALSE),
-('SKU003', 1, 20, 'Tablet', 'Gray', '10in', 'Android tablet', 400.00, '6 months', FALSE),
-('SKU004', 1, 100, 'Headphones', 'Black', 'Std', 'Wireless', 150.00, NULL, FALSE),
-('SKU005', 2, 75, 'Keyboard', 'Black', 'Full', 'Mechanical', 100.00, NULL, FALSE),
-('SKU006', 2, 60, 'Mouse', 'White', 'Std', 'Wireless mouse', 50.00, NULL, FALSE),
-('SKU007', 2, 40, 'Monitor', 'Black', '24in', 'LED monitor', 200.00, '1 year', FALSE),
-('SKU008', 3, 25, 'Printer', 'White', 'Std', 'Laser printer', 300.00, '1 year', FALSE),
-('SKU009', 3, 80, 'USB Drive', 'Blue', '32GB', 'Flash storage', 20.00, NULL, FALSE),
-('SKU010', 3, 15, 'Camera', 'Black', 'Std', 'Digital camera', 500.00, '2 years', FALSE);
+('SKU001', 8, 50, 'Laptop', 'Black', '15in', 'Gaming laptop', 1200.00, '1 year', FALSE),
+('SKU002', 8, 30, 'Phone', 'White', '6in', 'Smartphone', 800.00, '1 year', FALSE),
+('SKU003', 8, 20, 'Tablet', 'Gray', '10in', 'Android tablet', 400.00, '6 months', FALSE),
+('SKU004', 8, 100, 'Headphones', 'Black', 'Std', 'Wireless', 150.00, NULL, FALSE),
+('SKU005', 9, 75, 'Keyboard', 'Black', 'Full', 'Mechanical', 100.00, NULL, FALSE),
+('SKU006', 9, 60, 'Mouse', 'White', 'Std', 'Wireless mouse', 50.00, NULL, FALSE),
+('SKU007', 9, 40, 'Monitor', 'Black', '24in', 'LED monitor', 200.00, '1 year', FALSE),
+('SKU008', 10, 25, 'Printer', 'White', 'Std', 'Laser printer', 300.00, '1 year', FALSE),
+('SKU009', 10, 80, 'USB Drive', 'Blue', '32GB', 'Flash storage', 20.00, NULL, FALSE),
+('SKU010', 10, 15, 'Camera', 'Black', 'Std', 'Digital camera', 500.00, '2 years', FALSE);
 
 INSERT INTO prod_imgs VALUES
-('SKU001', 'img1.jpg'),
-('SKU002', 'img2.jpg'),
-('SKU003', 'img3.jpg'),
-('SKU004', 'img4.jpg');
+('SKU001', 'images/prod-imgs/vendor1/sku001-1.png'),
+('SKU002', 'images/prod-imgs/vendor1/sku002-1.png'),
+('SKU003', 'images/prod-imgs/vendor1/sku003-1.png'),
+('SKU004', 'images/prod-imgs/vendor1/sku004-1.png'),
+('SKU005', 'images/prod-imgs/vendor2/sku005-1.png'),
+('SKU006', 'images/prod-imgs/vendor2/sku006-1.png'),
+('SKU007', 'images/prod-imgs/vendor2/sku007-1.png'),
+('SKU008', 'images/prod-imgs/vendor3/sku008-1.png'),
+('SKU009', 'images/prod-imgs/vendor3/sku009-1.png'),
+('SKU010', 'images/prod-imgs/vendor3/sku010-1.png'),
+('SKU010', 'images/prod-imgs/vendor3/sku010-2.png');
 
 -- UNTIMED 
 INSERT INTO discounts VALUES
