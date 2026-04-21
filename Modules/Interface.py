@@ -1,9 +1,9 @@
-from Modules.DBHelper import Conn
-from Modules.Types import *
+import DBHelper as DBH
+from Types import *
 
 class Client:
     def __init__(self, login, password, server, db_name, schema_path):
-        self.conn = Conn(login, password, server, db_name, schema_path)
+        self.conn = DBH.Conn(login, password, server, db_name, schema_path)
 
     class User:
         def __init__(self, client: "Client", user_id):
