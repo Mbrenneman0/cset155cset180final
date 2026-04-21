@@ -12,6 +12,7 @@ from extensions import init_client
 
 def create_app():
     app = Flask(__name__, static_folder='Static')
+    app.secret_key = 'secret_key'
     app.config.from_object(Config)
 
     init_client(app)
