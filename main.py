@@ -11,7 +11,7 @@ from Blueprints.account import account_bp
 from extensions import init_client
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder='Static')
     app.config.from_object(Config)
 
     init_client(app)
