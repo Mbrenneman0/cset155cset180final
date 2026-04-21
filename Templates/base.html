@@ -8,8 +8,10 @@
 </head>
 <body>
     {% include 'header.html' %}
-    {% block body %}
-    {% endblock %}
+    <div id="body">
+        {% block body %}
+        {% endblock %}
+    </div>
     {% include 'footer.html' %}
 </body>
 </html>
