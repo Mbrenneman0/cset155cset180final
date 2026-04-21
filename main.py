@@ -1,6 +1,7 @@
 from flask import Flask
 from config import Config
 
+from Blueprints.index import index_bp
 from Blueprints.auth import auth_bp
 from Blueprints.products import products_bp
 from Blueprints.cart import cart_bp
@@ -15,6 +16,7 @@ def create_app():
 
     init_client(app)
 
+    app.register_blueprint(index_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(products_bp)
     app.register_blueprint(cart_bp)
