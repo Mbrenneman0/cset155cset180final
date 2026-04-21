@@ -1,0 +1,29 @@
+:root{
+    --accent-primary: #F3E308;
+    --accent-secondary: #2C4C5C;
+    --neutral-light: #B8BFC1;
+    --neutral-dark: #6C8494;
+    --neutral-highlight: #E5E5E5;
+    --text-dark: #1a1a1a;
+    --text-light: #ffffff;
+    --text-muted: #666666;
+    --border-color: #d0d0d0;
+    --transition: all 0.3s ease;
+}
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ---------- BACKGROUND ----------- */
+body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--neutral-dark);
+}
+
+
+/* ---------- FORM ----------- */
