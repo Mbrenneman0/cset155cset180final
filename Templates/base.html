@@ -7,43 +7,10 @@
     <title>Document</title>
 </head>
 <body>
-    <header>
-        <span id="logo">
-            <a href=""><img src="{{ url_for('static', filename='images/TradeHive_Logo.png') }}" alt=""></a>
-        </span>
-        <span id="filter-cont">
-            <div>CATAGORIES</div>
-        </span>
-        <form action="" method="post" id="filter-form">
-            <div class="DropDown_Cont">
-                <h4 class="titles">Category</h4>
-            </div>
-            <div class="DropDown_Cont">
-                <h4 class="titles">Color</h4>
-            </div>
-            <div class="DropDown_Cont">
-                <h4 class="titles">Size</h4>
-            </div>
-            <div class="DropDown_Cont">
-                <h4 class="titles">Availability</h4>
-            </div>
-        </form>
-        
-        <span id="searchbar">
-
-        </span>
-        <span id="account">
-
-        </span>
-        <span id="cart">
-
-        </span>
-    </header>
+    {% include 'header.html' %}
     {% block body %}
     {% endblock %}
-    <footer>
-
-    </footer>
+    {% include 'footer.html' %}
 </body>
 </html>
 
