@@ -4,10 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='style/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/auth.css') }}">
     <title>Document</title>
 </head>
-<body>
-    
+<body class="auth_bg flex-cont">
+    <form action="" method="POST">
+        <img src="../Static/images/TradeHive_Logo.png">
+        <h1>{{ title }}</h1>
+        <p>Enter your credentials to access your account.</p>
+        {% for input in inputs %}
+            <h3>{{ input }}</h3>
+            <input type="text" name="{{ input|lower }}" placeholder='{{ input|lower }}' class="input_fields" required>
+        {% endfor %}
+        <input type="submit" value="Login">
+    </form>
+
+
 </body>
 </html>
 
