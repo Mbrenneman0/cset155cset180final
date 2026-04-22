@@ -1,2 +1,2 @@
-from extensions import client
+import extensions
 from Modules.Types import *
