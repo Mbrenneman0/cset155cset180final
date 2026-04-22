@@ -15,7 +15,7 @@ def login_email():
     if request.method == 'POST':
         return
     else:
-        inputs = ['Username','Password']
+        inputs = ['Email','Password']
         return render_template('base_auth.html', title='Login', inputs=inputs, log_type='Sign in with username instead? Click here!')
 
 @auth_bp.route('/logout', methods=['POST'])
@@ -27,13 +27,13 @@ def register():
     if request.method == 'POST':
         return
     else:
-        inputs = ['Username','Password']
-        return render_template('base_auth.html', title='Login', inputs=inputs)
+        inputs = ['Name','Username','Email','Password']
+        return render_template('base_auth.html', title='Register', inputs=inputs)
 
 @auth_bp.route('/vender/register', methods=['GET','POST'])
 def vender_register():
     if request.method == 'POST':
         return
     else:
-        inputs = ['Username','Password']
-        return render_template('base_auth.html', title='Login', inputs=inputs)
+        inputs = ['Name','Username','Email','Password']
+        return render_template('base_auth.html', title='Register', inputs=inputs)
