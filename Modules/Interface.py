@@ -175,10 +175,6 @@ class Client:
         def get_all_orders(self) -> list[OrderRow]:
             return self.conn.get_rows(TableNames.ORDERS)
 
-        def get_all_products(self):
-            return self.conn.get_rows(TableNames.PRODUCTS)
-
-
     class Product:
         def __init__(self, client: "Client", sku):
             self.sku = sku
@@ -369,3 +365,6 @@ class Client:
     
     def review(self, message_id) -> Review:
         return Client.Review(self, message_id)
+    
+    def get_all_products(self) -> list[ProductRow]:
+            return self.conn.get_rows(TableNames.PRODUCTS)

@@ -1,8 +1,8 @@
-from extensions import client
+import extensions
 from Modules.Types import *
 
 def place_order(user_id: int):
-    customer = client.customer(user_id)
+    customer = extensions.client.customer(user_id)
         
     #validate order
     cart = customer.get_cart()

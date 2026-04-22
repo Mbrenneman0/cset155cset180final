@@ -3,6 +3,16 @@
 {% block title %}Home{% endblock %}
 
 {% block body %}
-    <h1>Welcome to Our Store</h1>
-    <p>This is the home page.</p>
+    <div>
+        <h1>Welcome to Our Store</h1>
+        <p>This is the home page.</p>
+    </div>
+    <h2>Featured Products</h2>
+    <div class="products_grid">
+        {% for product in products %}
+        {% with title=product.title, images=product.get('images', []), price=product.unit_price %}
+            {% include "product_card.html" %}
+        {% endwith %}
+        {% endfor %}
+    </div>
 {% endblock %}
