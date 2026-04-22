@@ -367,4 +367,4 @@ class Client:
         return Client.Review(self, message_id)
     
     def get_all_products(self) -> list[ProductRow]:
-            return self.conn.get_rows(TableNames.PRODUCTS)
+        return self.conn.get_rows(TableNames.PRODUCTS)
