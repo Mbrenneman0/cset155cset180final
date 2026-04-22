@@ -1,0 +1,62 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='style/product_card.css') }}">
+<div class="prod_cont">
+<div class = "title_row">
+<h2 class = "title">{{ title }}</h2>
+</div>
+<div class = "prod_row">
+    <div class = "prod_img">
+        {% if images %}
+            <div class="image_carousel">
+                <img src="{{ url_for('static', filename=images[0]['img_url']) }}" alt="{{ title }}" class="product_image" class="main_image">
+                {% if images|length > 1 %}
+                    <button class="prev_btn" onclick="changeImage(-1)">❮</button>
+                    <button class="next_btn" onclick="changeImage(1)">❯</button>
+                    <div class="image_indicators">
+                        {% for i in range(images|length) %}
+                            <span class="indicator {% if i == 0 %}active{% endif %}" onclick="goToImage({{ i }})"></span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        {% else %}
+            <img src="{{ url_for('static', filename='images/placeholder.png') }}" alt="{{ title }}" class="product_image">
+        {% endif %}
+    </div>
+    <div class = "prod_info">
+        <p class = "prod_price">Price: ${{ price }}</p>
+    </div>
+</div>
+
+<script>
+    // Store image URLs for this product card - map dictionary keys to img_url values
+    const productImages = {{ (images | map(attribute='img_url') | list if images else []) | tojson }};
+    let currentImageIndex = 0;
+
+    function changeImage(direction) {
+        if (productImages.length <= 1) return;
+        
+        currentImageIndex = (currentImageIndex + direction + productImages.length) % productImages.length;
+        updateImage();
+    }
+
+    function goToImage(index) {
+        if (index >= 0 && index < productImages.length) {
+            currentImageIndex = index;
+            updateImage();
+        }
+    }
+
+    function updateImage() {
+        const mainImage = document.getElementById('main_image');
+        if (mainImage) {
+            // Prepend static directory to relative paths
+            mainImage.src = "{{ url_for('static', filename='') }}".slice(0, -1) + productImages[currentImageIndex];
+            
+            // Update active indicator
+            const indicators = document.querySelectorAll('.indicator');
+            indicators.forEach((indicator, index) => {
+                indicator.classList.toggle('active', index === currentImageIndex);
+            });
+        }
+    }
+</script>
