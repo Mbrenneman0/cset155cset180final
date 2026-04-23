@@ -8,6 +8,10 @@ class EditQtyMode(Enum):
     SET = auto()
     SUBTRACT = auto()
 
+class DiscountType(Enum):
+    PERCENTAGE = auto()
+    FIXED_AMOUNT = auto()
+
 class TableNames(str, Enum):
     USERS = "users"
     PRODUCTS = "products"
@@ -193,6 +197,50 @@ class WarrantyPeriod:
     
     def is_active(self, start_date:datetime) -> bool:
         return datetime.now().date() >= self.get_end_date(start_date).date()
+    
+class Discount:
+    def __init__(self, amount:str, start_date:datetime = None, end_date:datetime= None):
+        self.amount = self._parse_discount(amount)
+        self.type = self._set_type(amount)
+        self.start_date = start_date
+        self.end_date = end_date
+
+    def is_active(self) -> bool:
+        now = datetime.now()
+        if self.start_date is None and self.end_date is None:
+            return True
+        elif self.start_date is None:
+            return now <= self.end_date
+        elif self.end_date is None:
+            return now >= self.start_date
+        return self.start_date <= now <= self.end_date
+    
+    def _parse_discount(self, amount:str) -> float:
+        pattern = r"\d*\.?\d+"
+        match = Regex.search(pattern, amount)
+        if match:
+            return float(match.group())
+        else:
+            raise ValueError("Invalid discount format")
+            
+    def _set_type(self, amount:str) -> DiscountType:
+        if "%" in amount:
+            return DiscountType.PERCENTAGE
+        else:
+            return DiscountType.FIXED_AMOUNT
+        
+    def apply_discount(self, price:float) -> float:
+        if self.type == DiscountType.PERCENTAGE:
+            discount_amount = price * (self.amount / 100)
+        else:
+            discount_amount = self.amount
+        return max(price - discount_amount, 0.0)
+    
+    def get_discount_amount(self, price:float) -> float:
+        if self.type == DiscountType.PERCENTAGE:
+            return price * (self.amount / 100)
+        else:
+            return self.amount
 
 
 
