@@ -37,6 +37,9 @@ h1, h3{
 input, p{
     margin-bottom: 1.5rem;
 }
+.access_route{
+    text-align: center;
+}
 ::-webkit-scrollbar {
     width: 10px;
 }
