@@ -4,10 +4,10 @@ auth_bp = Blueprint('authenticate', __name__, url_prefix='/authenticate')
 
 @auth_bp.route('/login/username', methods=['GET','POST'])
 def login_username():
+    inputs = ['Username','Password']
     if request.method == 'POST':
         return
     else:
-        inputs = ['Username','Password']
         return render_template('base_auth.html', title='Login', inputs=inputs, log_type='Sign in with email instead? Click here!')
     
 @auth_bp.route('/login/email', methods=['GET','POST'])

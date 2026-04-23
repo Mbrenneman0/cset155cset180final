@@ -1,0 +1,71 @@
+<div id="alert">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">X</button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</div>
+
+<style>
+    #alert{
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        width: fit-content;
+        height: 3rem;
+        padding: 0.5rem 0.9rem;
+        left: 0;
+        top: 0;
+    }
+    .alert{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: darksalmon;
+        border: 1px chocolate solid;
+        border-radius: 0.5rem;
+        color: var(--text-dark);
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        margin-bottom: 1rem;
+    }
+    .btn-close{
+        background-color: transparent;
+        width: fit-content;
+        height: fit-content;
+        padding: 0.25rem 0.5rem;
+        margin-left: 2rem;
+        color: var(--text-muted);
+        font-size: 1.5rem;
+        font-weight: 900;
+        transform: scaleX(1.2);
+    }
+    .btn-close:hover{
+        background-color: rgba(222, 184, 135, 0.3);
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const dismissButtons = document.querySelectorAll('[data-bs-dismiss="alert"]')
+        
+        dismissButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const alert = this.closest('.alert')
+                if (alert) {
+                    alert.style.transition = 'opacity 0.3s ease-out'
+                    alert.style.opacity = '0'
+                    
+                    setTimeout(() => {
+                        alert.remove()
+                    }, 300)
+                }
+            })
+        })
+    })
+</script>

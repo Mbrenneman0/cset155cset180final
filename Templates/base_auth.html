@@ -8,7 +8,9 @@
     <title>Document</title>
 </head>
 <body class="auth_bg flex-cont">
-    <form action="" method="POST">
+    {% include 'alert.html' %}
+
+    <form action="{{ url_for(request.endpoint) }}" method="POST">
         <img src="{{ url_for('static', filename='images/TradeHive_Logo.png') }}">
         <h1>{{ title }}</h1>
         {% if log_type is defined %}
@@ -16,14 +18,21 @@
         {% else %}
             <p>Enter your credentials to create your account.</p>
         {% endif %}
+
         {% for input in inputs %}
             <h3>{{ input }}</h3>
             <input type="text" name="{{ input|lower }}" placeholder='{{ input|lower }}' class="input_fields" required>
         {% endfor %}
+
         {% if log_type is defined %}
             <a href="{{ url_for('authenticate.login_username') if 'username' in log_type.lower() else url_for('authenticate.login_email') }}">{{ log_type }}</a>
         {% endif %}
         <input type="submit" value="{{ 'Login' if log_type is defined else 'Register' }}">
+        {% if title == 'Login' %}
+            <p class="access_route">Don't have an account? <a href="{{ url_for('authenticate.register') }}">Register here!</a></p>
+        {% else %}
+            <p class="access_route">Already have an account? <a href="{{ url_for('authenticate.login_username') }}">Login here!</a></p> 
+        {% endif %}
     </form>
 
 
