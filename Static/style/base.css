@@ -1,8 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Quantico:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 
 :root{
-    --accent-primary: #F3E308;
-    --accent-secondary: #2C4C5C;
+    --accent-primary: #F0B020;
+    --accent-secondary: #003F70;
+    --secondary-muted: #2C4C5C;
+    --accent-highlight: #F8C440;
+    --accent-muted: #D8A020;
     --neutral-light: #B8BFC1;
     --neutral-dark: #6C8494;
     --neutral-highlight: #E5E5E5;
@@ -168,7 +171,6 @@ footer p{
 h1, h2, h3, h4, h5, h6{
     font-weight: 600;
     line-height: 1.3;
-    margin-bottom: 1rem;
     color: var(--text-dark);
 }
 
