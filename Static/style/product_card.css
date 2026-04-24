@@ -27,7 +27,6 @@
 .prod_row {
     display: flex;
     flex-direction: column;
-    gap: 20px;
     margin-bottom: 20px;
     width: 100%;
     height: fit-content;
@@ -155,4 +154,22 @@
     font-size: 1.2rem;
     font-weight: bold;
     color: var(--text-light);
+}
+
+.atc_form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.atc_btn {
+    display: block;
+    width:80%;
+    border: 2px solid var(--accent-primary);
+    box-shadow: 0 0 10px -4px black;
+}
+
+.atc_btn:hover {
+    box-shadow: 0 -2px 12px -2px black !important;
 }

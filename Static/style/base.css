@@ -195,7 +195,6 @@ a{
     color: var(--accent-secondary);
     text-decoration: none;
     transition: var(--transition);
-    border-bottom: 1px solid transparent;
 }
 
 a:hover{
