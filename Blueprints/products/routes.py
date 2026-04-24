@@ -9,7 +9,7 @@ def list_products():
 
 @products_bp.route('/view_product/<string:sku>', methods=['GET'])
 def view_product(sku):
-    product = get_product(sku, with_imgs=True, with_reviews=True, with_rating=True)
+    product = get_product(sku, with_imgs=True, with_reviews=True)
     if not product:
         flash('Product not found')
         return redirect(url_for('index.index'))

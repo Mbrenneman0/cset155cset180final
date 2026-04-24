@@ -4,8 +4,46 @@
     {{ product.title }}
 {% endblock %}
 
-{% block content %}
-    <h1>{{ product.title }}</h1>
-    <p>{{ product.description }}</p>
-    <p>Price: ${{ product.unit_price }}</p>
+{% block body %}
+<link rel="stylesheet" href="{{ url_for('static', filename='style/prod_page.css') }}">
+    <div class="prod_content">
+    <div class="prod_images">
+        {% if product.images %}
+        <img src="{{ url_for('static', filename=product.images[0]['img_url']) }}" alt="{{ product.title }}"
+            class="prod_main_image">
+        {% if product.images|length > 1 %}
+        <div class="prod_img_thumbnails">
+            {% for img in product.images %}
+            <img src="{{ url_for('static', filename=img['img_url']) }}" alt="{{ product.title }}"
+                class="prod_thumbnail" onclick="document.querySelector('.prod_main_image').src=this.src">
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% else %}
+        <img src="{{ url_for('static', filename='images/placeholder.png') }}" alt="{{ product.title }}"
+            class="prod_main_image">
+        {% endif %}
+    </div>
+    <div class="prod_details">
+        <h1>{{ product.title }}</h1>
+        <p>{{ product.description }}</p>
+        <p>Price: ${{ product.unit_price }}</p>
+        <form action="{{ url_for('cart.add_to_cart') }}" method="post" class="atc_form">
+            <input type="hidden" name="sku" value="{{ product.sku }}">
+            <button type="submit" class="atc_btn">Add to Cart</button>
+        </form>
+    </div>
+    </div>
+    <div class="reviews_section">
+        <h2>Customer Reviews</h2>
+        {% if product.reviews %}
+        {% for review in product.reviews %}
+        <div class="review_card">
+            <p><strong>Rating:</strong> {{ review.rating }} / 5</p>
+            <p>{{ review.content }}</p>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p>No reviews yet. Be the first to review this product!</p>
+        {% endif %}
 {% endblock %}
