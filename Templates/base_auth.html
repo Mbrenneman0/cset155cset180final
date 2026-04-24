@@ -21,7 +21,7 @@
 
         {% for input in inputs %}
             <h3>{{ input }}</h3>
-            <input type="text" name="{{ input|lower }}" placeholder='{{ input|lower }}' class="input_fields" required>
+            <input type="text" name="{{ input|lower }}" placeholder='{{ input|lower }}' value="{{ saved_inputs.get(input|lower) if saved_inputs is defined and saved_inputs.get(input|lower) }}" class="input_fields" required>
         {% endfor %}
 
         {% if log_type is defined %}
