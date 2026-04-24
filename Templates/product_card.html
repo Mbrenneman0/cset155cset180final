@@ -1,37 +1,49 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='style/product_card.css') }}">
-<div class="prod_cont"
-     data-images='{{ (images | map(attribute="img_url") | list if images else []) | tojson }}'
-     data-current-index="0">
-<div class = "title_row">
-<h2 class = "title">{{ title }}</h2>
-</div>
-<div class = "prod_row">
-    <div class = "prod_img">
-        {% if images %}
+<div class="prod_cont" data-images='{{ (images | map(attribute="img_url") | list if images else []) | tojson }}'
+    data-current-index="0">
+    <a href="{{ url_for('products.view_product', sku=sku) }}" class="product_card_link">
+    <div class="title_row">
+        <h2 class="title">{{ title }}</h2>
+    </div>
+    </a>
+    <div class="prod_row">
+        <div class="prod_img">
+            {% if images %}
             <div class="image_carousel">
-                <img src="{{ url_for('static', filename=images[0]['img_url']) }}" alt="{{ title }}" class="product_image main_image">
+                <a href="{{ url_for('products.view_product', sku=sku) }}" class="product_card_link">
+                    <img src="{{ url_for('static', filename=images[0]['img_url']) }}" alt="{{ title }}"
+                        class="product_image main_image">
+                </a>
                 {% if images|length > 1 %}
-                    <div class="change_img_btn_row">
-                        <button class="prev_btn" onclick="changeImage(this, -1)">❮</button>
-                        <button class="next_btn" onclick="changeImage(this, 1)">❯</button>
-                    </div>
-                    <div class="image_ind_cont">
+                <div class="change_img_btn_row">
+                    <button class="prev_btn" onclick="changeImage(this, -1)">❮</button>
+                    <button class="next_btn" onclick="changeImage(this, 1)">❯</button>
+                </div>
+                <div class="image_ind_cont">
                     <div class="image_indicators">
                         {% for i in range(images|length) %}
-                            <span class="indicator {% if i == 0 %}active{% endif %}" onclick="goToImage(this, {{ i }})"></span>
+                        <span class="indicator {% if i == 0 %}active{% endif %}"
+                            onclick="goToImage(this, {{ i }})"></span>
                         {% endfor %}
                     </div>
-                    </div>
+                </div>
                 {% endif %}
             </div>
-        {% else %}
-            <img src="{{ url_for('static', filename='images/placeholder.png') }}" alt="{{ title }}" class="product_image">
-        {% endif %}
+            {% else %}
+            <img src="{{ url_for('static', filename='images/placeholder.png') }}" alt="{{ title }}"
+                class="product_image">
+            {% endif %}
+        </div>
+        <div class="prod_info">
+            <a href="{{ url_for('products.view_product', sku=sku) }}" class="product_card_link">
+                <p class="prod_price">Price: ${{ price }}</p>
+            </a>
+            <form action="{{ url_for('cart.add_to_cart') }}" method="post" class="atc_form">
+                <input type="hidden" name="sku" value="{{ sku }}">
+                <button type="submit" class="atc_btn">Add to Cart</button>
+            </form>
+        </div>
     </div>
-    <div class = "prod_info">
-        <p class = "prod_price">Price: ${{ price }}</p>
-    </div>
-</div>
 </div>
 
 <script>

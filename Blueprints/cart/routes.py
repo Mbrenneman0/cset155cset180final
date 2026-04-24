@@ -14,3 +14,10 @@ def add_item():
 @cart_bp.route('/remove', methods=['POST'])
 def remove_item():
     return
+
+@cart_bp.route('/add_to_cart', methods=['POST'])
+def add_to_cart():
+    sku = request.form.get('sku')
+    # Call service function to add item to cart
+    flash('Item added to cart!')
+    return redirect(request.referrer or url_for('index.index'))

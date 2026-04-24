@@ -140,7 +140,8 @@ INSERT INTO products VALUES
 ('SKU007', 9, 40, 'Monitor', 'Black', '24in', 'LED monitor', 200.00, '1 year', FALSE),
 ('SKU008', 10, 25, 'Printer', 'White', 'Std', 'Laser printer', 300.00, '1 year', FALSE),
 ('SKU009', 10, 80, 'USB Drive', 'Blue', '32GB', 'Flash storage', 20.00, NULL, FALSE),
-('SKU010', 10, 15, 'Camera', 'Black', 'Std', 'Digital camera', 500.00, '2 years', FALSE);
+('SKU010', 10, 15, 'Camera', 'Black', 'Std', 'Digital camera', 500.00, '2 years', FALSE),
+('SKU011', 10, 2, 'RAM', 'Gold', '4GB', '4GBx1 RAM, extremely valuable and rare', 6000.00, '4 weeks', FALSE);
 
 INSERT INTO prod_imgs VALUES
 ('SKU001', 'images/prod-imgs/vendor1/sku001-1.png'),
@@ -153,7 +154,8 @@ INSERT INTO prod_imgs VALUES
 ('SKU008', 'images/prod-imgs/vendor3/sku008-1.png'),
 ('SKU009', 'images/prod-imgs/vendor3/sku009-1.png'),
 ('SKU010', 'images/prod-imgs/vendor3/sku010-1.png'),
-('SKU010', 'images/prod-imgs/vendor3/sku010-2.png');
+('SKU010', 'images/prod-imgs/vendor3/sku010-2.png'),
+('SKU011', 'images/prod-imgs/vendor3/sku011-1.png');
 
 -- UNTIMED 
 INSERT INTO discounts VALUES
@@ -207,11 +209,13 @@ INSERT INTO order_items VALUES
 
 INSERT INTO reviews (user_id, sku, rating, content, rvw_time) VALUES
 (3, 'SKU001', 5, 'Great laptop!', NOW()),
-(4, 'SKU003', 4, 'Pretty good tablet', NOW());
+(4, 'SKU003', 4, 'Pretty good tablet', NOW()),
+(5, 'SKU011', 3, "I couldn't find it anywhere else!", NOW());
 
 INSERT INTO complaints (order_num, content, comp_time, type, is_accepted) VALUES
 (1, "Product lowkey exploded", NOW(), 'Warranty', TRUE),
-(4, "Product arrived late", NOW(), 'Refund', NULL);
+(4, "Product arrived late", NOW(), 'Refund', NULL),
+(5, "RAM didnt work at all", NOW(), 'Return', FALSE);
 
 INSERT INTO chats (complaint_id, customer_id, support_id) VALUES
 (1, 3, 1),
