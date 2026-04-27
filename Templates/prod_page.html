@@ -35,7 +35,13 @@
     </div>
     </div>
     <div class="reviews_section">
-        <h2>Customer Reviews</h2>
+        <div>
+            <h2>Customer Reviews</h2>
+                <form action="{{ url_for('cart.add_to_cart') }}" method="post" class="atc_form">
+                    <input type="hidden" name="sku" value="{{ product.sku }}">
+                    <button type="submit" class="atc_btn">Add to Cart</button>
+                </form>
+        </div>
         {% if product.reviews %}
         {% for review in product.reviews %}
         <div class="review_card">
