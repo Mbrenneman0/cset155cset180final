@@ -14,3 +14,9 @@ def view_product(sku):
         flash('Product not found')
         return redirect(url_for('index.index'))
     return render_template('prod_page.html', product=product)
+
+@products_bp.route('/add_review/<string:sku>', methods=['POST'])
+def add_review(sku):
+    # change return to page for review submission form
+    # review submission form will redirect back to view product page after submission
+    return redirect(url_for('products.view_product', sku=sku))

@@ -5,6 +5,6 @@ index_bp = Blueprint('index',__name__, url_prefix='/')
 
 @index_bp.route('/', methods=['GET'])
 def index():
-    products = get_products(with_imgs=True)
+    products = get_products(with_imgs=True, with_rating=True)
     return render_template('index.html', products=products)
 

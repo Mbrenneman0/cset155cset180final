@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "rating_stars.html" as rating %}
 
 {% block title %}
     {{ product.title }}
@@ -37,15 +38,16 @@
     <div class="reviews_section">
         <div>
             <h2>Customer Reviews</h2>
-                <form action="{{ url_for('cart.add_to_cart') }}" method="post" class="atc_form">
+                <form action="{{ url_for('products.add_review', sku=product.sku) }}" method="post" class="atc_form">
                     <input type="hidden" name="sku" value="{{ product.sku }}">
-                    <button type="submit" class="atc_btn">Add to Cart</button>
+                    <button type="submit" class="atc_btn">Add Review</button>
                 </form>
         </div>
         {% if product.reviews %}
         {% for review in product.reviews %}
         <div class="review_card">
-            <p><strong>Rating:</strong> {{ review.rating }} / 5</p>
+            {{ rating.rating_stars(review.rating, with_label=True) }}
+             <p><strong>{{ review.username }}</strong> - {{ review.rvw_time.strftime('%b %d, %Y') }}</p>
             <p>{{ review.content }}</p>
         </div>
         {% endfor %}

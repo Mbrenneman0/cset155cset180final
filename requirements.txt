@@ -1,2 +1,3 @@
 sqlalchemy
 mysqlclient
+argon2-cffi

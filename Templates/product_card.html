@@ -1,3 +1,4 @@
+{% import 'rating_stars.html' as rating_stars %}
 <link rel="stylesheet" href="{{ url_for('static', filename='style/product_card.css') }}">
 <div class="prod_cont" data-images='{{ (images | map(attribute="img_url") | list if images else []) | tojson }}'
     data-current-index="0">
@@ -37,6 +38,7 @@
         <div class="prod_info">
             <a href="{{ url_for('products.view_product', sku=sku) }}" class="product_card_link">
                 <p class="prod_price">Price: ${{ price }}</p>
+                {{ rating_stars.rating_stars(rating) }}
             </a>
             <form action="{{ url_for('cart.add_to_cart') }}" method="post" class="atc_form">
                 <input type="hidden" name="sku" value="{{ sku }}">
