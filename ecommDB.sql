@@ -209,8 +209,14 @@ INSERT INTO order_items VALUES
 
 INSERT INTO reviews (user_id, sku, rating, content, rvw_time) VALUES
 (3, 'SKU001', 5, 'Great laptop!', NOW()),
+(6, 'SKU001', 5, 'It runs Oregon Trail at 7000 frames per second!', NOW()),
+(3, 'SKU002', 4, 'Nice phone for the price.', NOW()),
+(4, 'SKU002', 3, 'Battery life is terrible.', NOW()),
 (4, 'SKU003', 4, 'Pretty good tablet', NOW()),
-(5, 'SKU011', 3, "I couldn't find it anywhere else!", NOW());
+(5, 'SKU011', 3, "I couldn't find it anywhere else!", NOW()),
+(6, 'SKU011', 3, "It's a little overpriced.", NOW()),
+(7, 'SKU011', 2, "Thanks Elon, for making RAM so expensive :(", NOW()),
+(3, 'SKU011', 5, "I'm pretty sure the diamonds make it faster", NOW());
 
 INSERT INTO complaints (order_num, content, comp_time, type, is_accepted) VALUES
 (1, "Product lowkey exploded", NOW(), 'Warranty', TRUE),
