@@ -6,14 +6,18 @@ def _does_input_exist(col:str, value:str) -> bool:
     rslt = extensions.client.conn.get_rows(TableNames.USERS, condition=f'{col}=\"{value}\"')
     return True if len(rslt) != 0 else False
 
-def check_credentials(role_type:str, user_id:str=session['user_id']) -> bool:
+def check_credentials(role_type:str, user_id:str=None) -> bool:
     check = True
+    if user_id is None:
+        user_id = session['user_id']
+    if not user_id:
+        raise KeyError('No user_id found in session')
     if not _does_input_exist('user_id', user_id):
         check = False
         raise KeyError(f'User ID not found at: {session['user_id']}')
     if session['role'] != role_type:
         check = False
-        raise KeyError(f'User at user_id :{session['user_id']}, does not have {role_type} access')
+        raise KeyError(f'User {session['user_id']} does not have {role_type} access')
     return check
 
 def parse_login_inputs(form_inputs) -> dict:
