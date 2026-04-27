@@ -24,7 +24,7 @@
             <input type="text" name="{{ input|lower }}" placeholder='{{ input|lower }}' value="{{ saved_inputs.get(input|lower) if saved_inputs is defined and saved_inputs.get(input|lower) }}" class="input_fields" required>
         {% endfor %}
 
-        {% if log_type is defined %}
+        {% if log_type != None %}
             <a href="{{ url_for('authenticate.login_username') if 'username' in log_type.lower() else url_for('authenticate.login_email') }}">{{ log_type }}</a>
         {% endif %}
         <input type="submit" value="{{ 'Login' if log_type is defined else 'Register' }}">
