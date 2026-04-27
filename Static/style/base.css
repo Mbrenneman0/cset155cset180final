@@ -15,6 +15,7 @@
     --border-color-light: #d0d0d0;
     --border-color-dark: #7e9bae;
     --transition: all 0.3s ease;
+    --background-color: #f5f5f5;
 
     --header-height: 10vh;
     --footer-height: 20vh;
@@ -38,7 +39,7 @@ body{
     font-size: 16px;
     line-height: 1.6;
     color: var(--text-dark);
-    background-color: #fafafa;
+    background-color: var(--background-color);
 }
 /* ------------- SHARED ------------- */
 header, footer{
@@ -78,8 +79,34 @@ header span{
     max-height: 8vh;
     object-fit: contain;
 }
+
+.navlinks{
+    display: flex;
+    gap: 1rem;
+    margin-left: auto;
+}
+
+.navlink{
+    scale: 1.5;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: var(--transition);
+    --ionicon-stroke-width: 40px;
+}
+
+.acct-icn{
+    border: 2px solid var(--accent-secondary);
+    border-radius: 50%;
+    padding: 0.25rem;
+}
+
+a:hover .acct-icn{
+    border-color: var(--accent-primary);
+    transition: var(--transition);
+}
+
 /* filter */
-#filter-cont{
+/* #filter-cont{
     display: flex;
     justify-content: center;
     align-items: center;
@@ -116,21 +143,53 @@ header span{
 
 #filter-form.active{
     display: block;
-}
+} */
 
-#searchbar{
+.searchbar{
     width: 50%;
+    height: 98%;
     padding: 0.75rem 1rem;
     font-size: 1rem;
-    border: 1px solid var(--border-color-light);
-    border-radius: 4px;
+    border: 2px solid var(--border-color-light);
+    border-radius: 10px;
     transition: var(--transition);
 }
 
-#searchbar:focus{
+.searchbar:focus{
     outline: none;
     border-color: var(--accent-primary);
     box-shadow: 0 0 0 3px rgba(243, 227, 8, 0.1);
+}
+
+.search_form{
+    width: 100%;
+    height: 100%;
+    padding-top: auto;
+    padding-bottom: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.search_form input{
+    width: 100%;
+}
+
+.search_form button{
+    position: absolute;
+    background-color: var(--neutral-light) !important;
+    right: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.search_form button:hover{
+    background-color: var(--accent-secondary) !important;
+    color: var(--accent-muted) !important;
+    transform: translateY(-1px) !important;
 }
 
 #account, #cart{
@@ -187,7 +246,6 @@ h3{
 }
 
 p{
-    margin-bottom: 1rem;
     color: var(--text-muted);
 }
 

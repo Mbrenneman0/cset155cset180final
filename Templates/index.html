@@ -10,7 +10,7 @@
     <h2>Featured Products</h2>
     <div class="products_grid">
         {% for product in products %}
-        {% with sku=product.sku, title=product.title, images=product.get('images', []), price=product.unit_price %}
+        {% with sku=product.sku, title=product.title, images=product.get('images', []), price=product.unit_price, rating=product.rating %}
             {% include "product_card.html" %}
         {% endwith %}
         {% endfor %}

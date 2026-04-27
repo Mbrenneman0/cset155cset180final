@@ -1,0 +1,67 @@
+{% macro rating_stars(rating, with_label=False, display_block=True) %}
+{% set percent = ((rating or 0) / 5) * 100 %}
+<div class="rating_row">
+{% if with_label %}
+    <p class="rating_label"><strong>Rating:</strong></p>
+{% endif %}
+<div class="star_rating">
+    <div class="stars_filled_clip" style="width: {{ percent }}%;">
+            <div class="stars stars_filled">
+                {% for i in range(5) %}
+                    <ion-icon name="star-sharp"></ion-icon>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="stars stars_empty">
+        {% for i in range(5) %}
+            <ion-icon name="star-outline"></ion-icon>
+        {% endfor %}
+    </div>
+</div>
+</div>
+
+<style>
+.rating_row {
+    display: {{ 'block' if display_block else 'inline-flex' }};
+    align-items: center;
+    gap: 5px;
+}
+
+.rating_label {
+    display: inline-block;
+}
+.star_rating {
+    position: relative;
+    display: inline-block;
+    font-size: 1.4rem;
+    line-height: 1;
+}
+
+.stars {
+    display: flex;
+    gap: 2px;
+}
+
+.stars_empty {
+    color: var(--text-dark);
+    --ionicon-stroke-width: 36px;
+}
+
+.stars_filled_clip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.stars_filled {
+    color: var(--accent-primary);
+    display: flex;
+    gap: 2px;
+    width: max-content;
+    --ionicon-stroke-width: 16px;
+}
+</style>
+
+{% endmacro %}
