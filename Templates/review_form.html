@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Review Form{% endblock %}
+
+{% block body %}
+<link rel="stylesheet" href="{{ url_for('static', filename='style/review-form.css') }}">
+
+    <div class="form_cont">
+    <h1>Leave a Review</h1>
+    <form method="POST" action="{{ url_for('products.submit_review', sku=sku) }}">
+        <div>
+            <label for="rating">Rating:</label>
+            <select name="rating" id="rating" required>
+                <option value="5">5 Stars</option>
+                <option value="4">4 Stars</option>
+                <option value="3">3 Stars</option>
+                <option value="2">2 Stars</option>
+                <option value="1">1 Star</option>
+            </select>
+        </div>
+        <div>
+            <label for="comment">Comment:</label>
+            <textarea name="comment" id="comment" rows="4" required></textarea>
+        </div>
+        <button type="submit">Submit Review</button>
+    </form>
+    </div>
+{% endblock %}

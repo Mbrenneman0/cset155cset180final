@@ -1,5 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, Blueprint
-from Services.product_service import get_product
+from flask import Flask, render_template, request, redirect, session, url_for, flash, Blueprint
+from Services.product_service import get_product, save_review
 
 products_bp = Blueprint('products', __name__, url_prefix='/products')
 
@@ -15,8 +15,24 @@ def view_product(sku):
         return redirect(url_for('index.index'))
     return render_template('prod_page.html', product=product)
 
-@products_bp.route('/add_review/<string:sku>', methods=['POST'])
+@products_bp.route('/add_review/<string:sku>', methods=['GET'])
 def add_review(sku):
     # change return to page for review submission form
     # review submission form will redirect back to view product page after submission
+    return render_template('review_form.html', sku=sku)
+
+@products_bp.route('/add_review/<string:sku>', methods=['POST'])
+def submit_review(sku):
+    rating = request.form.get('rating')
+    comment = request.form.get('comment')
+    user_id = session.get('user_id')
+    if not user_id:
+        flash('You must be logged in to submit a review')
+        return redirect(url_for('account.login'))
+    try:
+        save_review(user_id, sku, rating, comment)
+    except Exception as e:
+        flash('Error submitting review: ' + str(e), 'error')
+        return redirect(url_for('products.view_product', sku=sku))
+    flash('Review submitted successfully')
     return redirect(url_for('products.view_product', sku=sku))

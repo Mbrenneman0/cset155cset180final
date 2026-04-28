@@ -111,6 +111,7 @@
     border-radius: 8px;
     cursor: pointer;
     transition: var(--transition, all 0.3s ease);
+    text-align: center;
 }
 
 .atc_btn:hover,
@@ -135,6 +136,13 @@
     border-top: 1px solid var(--border-color-light, #d0d0d0);
 }
 
+.rvw-btn-row {
+    margin-top: 20px;
+    display:flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
 .review_card {
     background-color: var(--text-light, #ffffff);
     padding: 1.25rem;
@@ -149,7 +157,6 @@
     margin-bottom: 0;
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
     .prod_content {
         grid-template-columns: 1fr;
