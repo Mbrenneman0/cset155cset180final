@@ -38,10 +38,9 @@
     <div class="reviews_section">
         <div>
             <h2>Customer Reviews</h2>
-                <form action="{{ url_for('products.add_review', sku=product.sku) }}" method="post" class="atc_form">
-                    <input type="hidden" name="sku" value="{{ product.sku }}">
-                    <button type="submit" class="atc_btn">Add Review</button>
-                </form>
+            <div class="rvw-btn-row">
+                <a href="{{ url_for('products.add_review', sku=product.sku) }}" class="link-btn atc_btn">Add Review</a>
+            </div>
         </div>
         {% if product.reviews %}
         {% for review in product.reviews %}

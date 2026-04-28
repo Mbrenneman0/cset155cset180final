@@ -1,6 +1,8 @@
 from sqlalchemy import create_engine, Connection, text
 import os
 from pathlib import Path
+from argon2 import PasswordHasher
+import re
 
 class Conn:
 
@@ -191,8 +193,13 @@ class Conn:
             columns = ', '.join(data.keys())
             placeholders = ', '.join([f":{key}" for key in data.keys()])
             query = f"INSERT INTO {self.table_name} ({columns}) VALUES ({placeholders})"
-            self.conn.execute(text(query), data)
-            self.conn.commit()
+            try:
+                self.conn.execute(text(query), data)
+                self.conn.commit()
+            except Exception as e:
+                print(f"Error executing query: {query} with data: {data}")
+                print(e)
+                raise
 
     def __init__(self, login:str,
                  password:str,
@@ -230,6 +237,36 @@ class Conn:
         engine.dispose()
         return self.db_name in databases
     
+    def _is_insert_users_statement(self, statement: str) -> bool:
+        return bool(re.search(
+            r"\bINSERT\s+INTO\s+users\b",
+            statement,
+            re.IGNORECASE
+        ))
+    
+    def _hash_passwords_in_insert(self, statement: str) -> str:
+        ph = PasswordHasher()
+
+        pattern = re.compile(
+            r"\('([^']*)',\s*'([^']*)',\s*'([^']*)',\s*'([^']*)',\s*'([^']*)'\)"
+        )
+
+        def hash_password(match):
+            name = match.group(1)
+            username = match.group(2)
+            password = match.group(3)
+            email = match.group(4)
+            role = match.group(5)
+
+            hashed = ph.hash(password)
+
+            return (
+                f"('{name}', '{username}', '{hashed}', "
+                f"'{email}', '{role}')"
+            )
+
+        return pattern.sub(hash_password, statement)
+
     def reset_db(self):
         connection_str = f"mysql://{self.login}:{self.password}@{self.server}"
         engine = create_engine(connection_str, echo=True, connect_args={"local_infile":1})
@@ -271,6 +308,8 @@ class Conn:
                     print('\n\nTESTING',statement,'\n\n')
                     if all(conditions):
                         try:
+                            if self._is_insert_users_statement(statement):
+                                statement = self._hash_passwords_in_insert(statement)
                             conn.execute(text(statement))
                         except Exception as e:
                             print(f"ERROR executing statement: {statement[:100]}")
@@ -292,11 +331,17 @@ class Conn:
       
     def create_row(self, table_name:str, data:dict):
         table = self._get_table(table_name)
-        table.create_row(data)
+        try:
+            table.create_row(data)
+        except Exception as e:
+            raise
 
     def update_row(self, table_name:str, pk_value:any, data:dict):
         table = self._get_table(table_name)
-        table.update_row(pk_value, data)
+        try:
+            table.update_row(pk_value, data)
+        except Exception as e:
+            raise
 
     def get_row(self, table_name:str, pk_value:any, join_tables:list = None):
         table = self._get_table(table_name)

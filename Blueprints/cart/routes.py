@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, Blueprint
-# from Services."folder" import 'funcs_needed'
+from Services.cart_service import add_item_to_cart
 
 cart_bp = Blueprint('cart',__name__,url_prefix='/cart')
 
@@ -18,6 +18,13 @@ def remove_item():
 @cart_bp.route('/add_to_cart', methods=['POST'])
 def add_to_cart():
     sku = request.form.get('sku')
-    # Call service function to add item to cart
-    flash('Item added to cart!')
-    return redirect(request.referrer or url_for('index.index'))
+    try:
+        add_item_to_cart(sku)
+    except Exception as e:
+        if str(e) == "Not logged in":
+            flash('You must be logged in to add items to your cart', 'error')
+            return redirect(url_for('account.login'))
+        flash(str(e), 'error')
+        return redirect(request.referrer)
+    flash('Item added to cart!', 'info')
+    return redirect(request.referrer)

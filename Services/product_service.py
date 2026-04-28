@@ -40,3 +40,11 @@ def get_rating(sku):
     total_rating = sum(review['rating'] for review in reviews)
     return round(total_rating / len(reviews), 1)
 
+def save_review(user_id, sku, rating, comment):
+    try:
+        extensions.client.customer(user_id).create_review(sku, int(rating), comment)
+    except Exception as e:
+        if "duplicate entry" in str(e).lower():
+            raise Exception("You have already submitted a review for this product")
+        else:
+            raise

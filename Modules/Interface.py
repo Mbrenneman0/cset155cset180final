@@ -119,7 +119,10 @@ class Client:
                 "rating": rating,
                 "content": content
                 }
-            self.conn.create_row(TableNames.REVIEWS, data)
+            try:
+                self.conn.create_row(TableNames.REVIEWS, data)
+            except Exception as e:
+                raise
 
     class Vendor(User):
         def __init__(self, client: "Client", user_id):
