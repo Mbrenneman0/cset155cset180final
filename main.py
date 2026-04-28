@@ -7,6 +7,7 @@ from Blueprints.products import products_bp
 from Blueprints.cart import cart_bp
 from Blueprints.orders import orders_bp
 from Blueprints.account import account_bp
+from Blueprints.dashboard import dash_bp
 
 from extensions import init_client
 
@@ -23,6 +24,7 @@ def create_app():
     app.register_blueprint(cart_bp)
     app.register_blueprint(orders_bp)
     app.register_blueprint(account_bp)
+    app.register_blueprint(dash_bp)
 
     return app
 

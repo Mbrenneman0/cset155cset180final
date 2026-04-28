@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/dash.css') }}">
+    <title>Document</title>
+</head>
+<body>
+{% include 'sidebar.html' %}
+<div class="log_body">
+    <form class="topbar floating-wrapper flex">
+        <input class="searchbar" placeholder="Search orders/products..." name="search">
+        <div class="role"><strong>role**</strong></div>
+    </form>
+    <div class="log-wrapper">
+        <div class="quick_log flex">
+            <div class="card_col floating-wrapper">
+                <div class="card"><small>Orders Today</small><h3>18</h3></div>
+            </div>
+            <div class="card_col floating-wrapper">
+                <div class="card"><small>Revenue</small><h3>$2,140</h3></div>
+            </div>
+            <div class="card_col floating-wrapper">
+                <div class="card"><small>Products</small><h3>124</h3></div>
+            </div>
+            <div class="card_col floating-wrapper">
+                <div class="card"><small>Complaints</small><h3>6</h3></div>
+            </div>
+        </div>
+        <div class="graph_log flex">
+            <div class="sales-wrapper floating-wrapper">
+                <div class="graph-wrapper">
+                    <h4>Monthly Sales</h4>
+                    <div>**</div>
+                </div>
+            </div>
+            <div class="order-wrapper floating-wrapper">
+                <div class="graph-wrapper">
+                    <h4>Order Status</h4>
+                    <div>**</div>
+                </div>
+            </div>
+        </div>
+        <form class="table-wrapper floating-wrapper">
+            <h4>Recent Orders</h4>
+            <table>
+                <thead><tr><th>Order ID</th><th>Cutomer</th><th style="width: 16%;">Total</th><th>Status</th><th>Action</td></tr></thead>
+                <tbody>
+                    <tr><td>**</td><td>Name</td><td style="width: 16%;">Order Total</td><td>Pending</td><td><input type="submit" name="input-btn" value="Confirm" class="badge-confirmed"></td></tr>
+                    <tr><td>**</td><td>Name</td><td style="width: 16%;">Order Total</td><td>Pending</td><td><input type="submit" name="input-btn" value="Pending" class="badge-pending"></td></tr>
+                    <tr><td>**</td><td>Name</td><td style="width: 16%;">Order Total</td><td>Pending</td><td><input type="submit" name="input-btn" value="Shipped" class="badge-shipped"></td></tr>
+                </tbody>
+            </table>
+            
+        </form>
+    </div>
+</div>
+
+</body>
+</html>
+
