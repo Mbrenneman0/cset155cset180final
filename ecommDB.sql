@@ -85,11 +85,13 @@ CREATE TABLE reviews(
 CREATE TABLE complaints(
 	complaint_id INT PRIMARY KEY AUTO_INCREMENT,
     order_num INT NOT NULL,
+    sku VARCHAR(12) NOT NULL,
     content VARCHAR(2048),
     comp_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     type VARCHAR(8) NOT NULL,
     is_accepted BOOLEAN DEFAULT NULL,
     FOREIGN KEY (order_num) REFERENCES orders(order_num) ON DELETE CASCADE,
+    FOREIGN KEY (sku) REFERENCES products(sku) ON DELETE CASCADE,
     CONSTRAINT complaint_type_value CHECK(type IN ('Return','Refund','Warranty'))
 ) ENGINE = InnoDB;
 
@@ -218,10 +220,10 @@ INSERT INTO reviews (user_id, sku, rating, content, rvw_time) VALUES
 (7, 'SKU011', 2, "Thanks Elon, for making RAM so expensive :(", NOW()),
 (3, 'SKU011', 5, "I'm pretty sure the diamonds make it faster", NOW());
 
-INSERT INTO complaints (order_num, content, comp_time, type, is_accepted) VALUES
-(1, "Product lowkey exploded", NOW(), 'Warranty', TRUE),
-(4, "Product arrived late", NOW(), 'Refund', NULL),
-(5, "RAM didnt work at all", NOW(), 'Return', FALSE);
+INSERT INTO complaints (order_num, sku, content, comp_time, type, is_accepted) VALUES
+(1, "SKU001", "Product lowkey exploded", NOW(), 'Warranty', TRUE),
+(4, "SKU004", "Product arrived late", NOW(), 'Refund', NULL),
+(5, "SKU005", "RAM didnt work at all", NOW(), 'Return', FALSE);
 
 INSERT INTO chats (complaint_id, customer_id, support_id) VALUES
 (1, 3, 1),

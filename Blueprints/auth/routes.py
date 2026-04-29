@@ -1,4 +1,6 @@
-from flask import render_template, request, redirect, url_for, flash, Blueprint, session
+from flask import redirect, url_for, Blueprint, session
+from Modules.Types import Role
+
 from Services.auth_service import *
 
 auth_bp = Blueprint('authenticate', __name__, url_prefix='/authenticate')
@@ -20,6 +22,6 @@ def logout():
 def register():
     return route_controller('register', ['Name', 'Username', 'Email', 'Password'])
 
-@auth_bp.route('/register/vender', methods=['GET','POST'])
+@auth_bp.route('/register/vendor', methods=['GET','POST'])
 def vender_register():
-    return route_controller('register', ['Name', 'Username', 'Email', 'Password'], role=VENDER)
+    return route_controller('register', ['Name', 'Username', 'Email', 'Password'], role=Role.VENDOR)
