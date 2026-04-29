@@ -86,47 +86,87 @@ class Conn:
                 f"Table {self.table_name} expects primary key values for {self.primary_keys}. "
                 f"Use tuple, list, or dict.")
 
+        def _look_backward_build(self, focus_table, join_tables, i):
+            if focus_table.table_name != join_tables[0]:
+                for prior_name in join_tables[:i]:
+                    ref_table = self.parent._get_table(prior_name)
+
+                    for fk_col, ref in focus_table.foreign_keys.items():
+                        if ref['table'] == ref_table.table_name:
+                            return (
+                                f"JOIN {focus_table.table_name} "
+                                f"ON {focus_table.table_name}.{fk_col} = "
+                                f"{ref_table.table_name}.{ref['column']}"
+                            )
+
+                    for fk_col, ref in ref_table.foreign_keys.items():
+                        if ref['table'] == focus_table.table_name:
+                            return (
+                                f"JOIN {focus_table.table_name} "
+                                f"ON {focus_table.table_name}.{ref['column']} = "
+                                f"{ref_table.table_name}.{fk_col}"
+                            )
+
+            return None
+        
+        def _look_forward_build(self, focus_table, join_tables, i):
+            if focus_table.table_name != join_tables[-1]:
+                for next_name in join_tables[i+1:]:
+                    ref_table = self.parent._get_table(next_name)
+
+                    for fk_col, ref in focus_table.foreign_keys.items():
+                        if ref['table'] == ref_table.table_name:
+                            return (
+                                f"JOIN {focus_table.table_name} "
+                                f"ON {focus_table.table_name}.{fk_col} = "
+                                f"{ref_table.table_name}.{ref['column']}"
+                            )
+
+                    for fk_col, ref in ref_table.foreign_keys.items():
+                        if ref['table'] == focus_table.table_name:
+                            return (
+                                f"JOIN {focus_table.table_name} "
+                                f"ON {focus_table.table_name}.{ref['column']} = "
+                                f"{ref_table.table_name}.{fk_col}"
+                            )
+
+            return None
+
         def _build_joins(self, join_tables):
             joins = []
-            i = 0
+            joined = set()
+            i = -1
 
             for join_name in join_tables:
-
+                i += 1
                 join_table = self.parent._get_table(join_name)
-                found = False
-                
+
+                if join_name in joined:
+                    continue
+
                 for fk_col, ref in join_table.foreign_keys.items():
+
                     if ref['table'] == self.table_name:
-                            joins.append(
-                                f"JOIN {join_table.table_name} "
-                                f"ON {join_table.table_name}.{fk_col} = "
-                                f"{self.table_name}.{ref['column']}"
-                            )
-                            found = True
-                            break
-                    if found:
-                        break
+                        joins.append(
+                            f"JOIN {join_table.table_name} "
+                            f"ON {join_table.table_name}.{fk_col} = "
+                            f"{self.table_name}.{ref['column']}"
+                        )
+                        joined.add(join_name)
 
-                i+=1
-                for join_name in join_tables[:i-1]:
+                if join_name not in joined:
+                    backward = self._look_backward_build(join_table, join_tables, i)
 
-                    ref_table = self.parent._get_table(join_name)
-                    found = False
+                    if backward is not None:
+                        joins.append(backward)
+                        joined.add(join_name)
 
-                    for fk_col, ref in join_table.foreign_keys.items():
-                        if ref['table'] == ref_table.table_name:
-                            joins.append(
-                                f"JOIN {join_table.table_name} "
-                                f"ON {join_table.table_name}.{fk_col} = "
-                                f"{join_name}.{ref['column']}"
-                            )
-                            found = True
-                            break
-                    if found:
-                        break
-                    
-                if not found:
-                    raise ValueError(f"Could not join {join_name} to current query")
+                if join_name not in joined:
+                    forward = self._look_forward_build(join_table, join_tables, i)
+
+                    if forward is not None:
+                        joins.append(forward)
+                        joined.add(join_name)
 
             return " ".join(joins)
 

@@ -72,6 +72,50 @@ body{
 .order-wrapper{
     width: 32.5%;
 }
+.graph_body {
+    background: #7d72be34;
+    color: #abafc6;
+    border-radius: 15px;
+    padding: 20px;
+    margin: 1.5vh 0.5vh 0.5vh 0.5vh;
+    height: 38vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.year-stats {
+    white-space: nowrap;
+    max-height: 170px;
+    overflow: hidden;
+}
+
+.year-stats:hover {
+    overflow-x: auto;
+}
+
+.month-group {
+    cursor: pointer;
+    max-width: 400px;
+    height: 110px;
+    margin: 10px;
+    display: inline-block;
+}
+
+.bar {
+    background-color: #abafc6;
+    width: 20px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.month-group:hover .bar{
+    background: #5397d6;
+}
+
+.month-group:hover p{
+    color: #fff;
+}
 
 
 /* quick order status */

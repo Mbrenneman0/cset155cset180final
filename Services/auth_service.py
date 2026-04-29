@@ -5,13 +5,8 @@ from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 
 ph = PasswordHasher()
-CUSTOMER = Role.CUSTOMER
-VENDER = Role.VENDOR
-ADMIN = Role.ADMIN
 
-def _does_input_exist(col: str, value: str) -> bool:
-    if not isinstance(value, str) or not value.strip():
-        return False
+def _does_input_exist(col: str, value) -> bool:
     rslt = extensions.client.conn.get_rows(TableNames.USERS, condition=f"{col} = :value", params={'value': value})
     return len(rslt) != 0
 
@@ -58,7 +53,7 @@ def _find_user_for_login(inputs: dict) -> dict | None:
     return rows[0] if rows else None
 
 
-def route_controller(action: str, input_types: list, log_type: str = None, role: Role = CUSTOMER):
+def route_controller(action: str, input_types: list, log_type: str = None, role: Role = Role.CUSTOMER):
     if request.method == 'POST':
         if action == 'login':
             inputs = _parse_login_inputs(request.form)

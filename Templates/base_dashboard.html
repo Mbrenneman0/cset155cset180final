@@ -33,13 +33,24 @@
             <div class="sales-wrapper floating-wrapper">
                 <div class="graph-wrapper">
                     <h4>Monthly Sales</h4>
-                    <div>**</div>
+                    <div class="graph_body">
+                        <div class="year-stats">
+                            {% for month, rev in graph_log['ytd_rev'] %}
+                                <div class="month-group">
+                                    <div class="bar" style="height: {{ quick_log.get('revenue') / rev }}%;"></div>
+                                    <p class="month">{{ month }}</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="order-wrapper floating-wrapper">
                 <div class="graph-wrapper">
                     <h4>Order Status</h4>
-                    <div>**</div>
+                    <div>
+                        
+                    </div>
                 </div>
             </div>
         </div>
