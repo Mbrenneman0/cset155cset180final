@@ -84,6 +84,38 @@ def _get_order_statuses(user: Role) -> dict:
     
     return {key: value / total for key, value in status_counts.items()}
 
+def _get_orders(user: Role) -> dict:
+    if user == Role.VENDOR:
+        condition = f'products.vendor_id = {session["user_id"]}'
+    else:
+        condition = None
+
+    orders = extensions.client.conn.get_rows(TableNames.PRODUCTS.value,
+                                            join_tables=[TableNames.ORDER_ITEMS.value, TableNames.ORDERS.value, TableNames.USERS.value],
+                                            condition=condition,
+                                            cols=['DISTINCT order_items.order_num', 'users.name', 'orders.status', 'products.*'])
+    return orders
+
+def _get_orders_cost(user: Role) -> dict:
+    cost = {}
+
+    if user == Role.VENDOR:
+        condition = f'products.vendor_id = {session["user_id"]}'
+    else:
+        condition = None
+
+    orders = extensions.client.conn.get_rows(TableNames.PRODUCTS.value,
+                                            join_tables=[TableNames.ORDER_ITEMS.value, TableNames.ORDERS.value, TableNames.USERS.value],
+                                            condition=condition,
+                                            cols=['order_items.order_num', 'products.unit_price', 'order_items.qty'])
+
+    for order in orders:
+        if order.get('order_num') in cost:
+            cost[order.get('order_num')] += order.get('unit_price') * order.get('qty')
+        else:
+            cost[order.get('order_num')] = order.get('unit_price') * order.get('qty')
+    return cost
+
 
 def get_dashboard_data(user: Role) -> str:
     if not check_credentials(user.value, session.get('user_id')):
@@ -92,7 +124,7 @@ def get_dashboard_data(user: Role) -> str:
 
     quick_log = {}
     graph_log = {}
-    order_log = {}  # TODO: Populate with order details if needed
+    order_log = {}
 
     if user == Role.VENDOR:
         condition = f'products.vendor_id = {session["user_id"]}'
@@ -110,11 +142,14 @@ def get_dashboard_data(user: Role) -> str:
     graph_log['ytd_rev'] = _get_monthly_revenue(user)
     graph_log['order_status'] = _get_order_statuses(user)
 
+    order_log['order_details'] = _get_orders(user)
+    order_log['order_costs'] = _get_orders_cost(user)
+
     return render_template('base_dashboard.html',
                            role=session['role'],
                            quick_log=quick_log,
-                           graph_log=graph_log)
-                        #    order_log=order_log)
+                           graph_log=graph_log,
+                           order_log=order_log)
 
 
 
