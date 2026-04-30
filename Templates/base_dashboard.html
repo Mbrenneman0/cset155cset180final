@@ -78,9 +78,9 @@
             <table>
                 <thead><tr><th>Order ID</th><th>Cutomer</th><th style="width: 16%;">Total</th><th>Status</th><th>Action</td></tr></thead>
                 <tbody>
-                    <tr><td>**</td><td>Name</td><td style="width: 16%;">Order Total</td><td>Pending</td><td><input type="submit" name="input-btn" value="Confirm" class="badge-confirmed"></td></tr>
-                    <tr><td>**</td><td>Name</td><td style="width: 16%;">Order Total</td><td>Pending</td><td><input type="submit" name="input-btn" value="Pending" class="badge-pending"></td></tr>
-                    <tr><td>**</td><td>Name</td><td style="width: 16%;">Order Total</td><td>Pending</td><td><input type="submit" name="input-btn" value="Shipped" class="badge-shipped"></td></tr>
+                    {% for order in order_log['order_details'] %}
+                        <tr><td>{{ order.get('order_num') }}</td><td>{{ order.get('name') }}</td><td style="width: 16%;">{{ order_log['order_costs'][loop.index0+1] }}</td><td>{{ order.get('status') }}</td><td><input type="submit" name="input-btn" value="Confirm" class="badge-{{ order.get('status')|lower }}"></td></tr>
+                    {% endfor %}
                 </tbody>
             </table>
             
