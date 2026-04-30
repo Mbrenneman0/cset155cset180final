@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Cart{% endblock %}
+
+{% block body %}
+<link rel="stylesheet" href="{{ url_for('static', filename='style/cart.css') }}">
+<div class="cart_container">
+    <h1>Shopping Cart</h1>
+
+    {% if items %}
+    {% set ns = namespace(cart_total=0) %}
+
+    <div class="cart_table_wrap">
+        <table class="cart_table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for item in items %}
+                {% set item_total = item.product.unit_price * item.qty %}
+                {% set ns.cart_total = ns.cart_total + item_total %}
+
+                <tr>
+                    <td>{{ item.product.title }}</td>
+                    <td>${{ "%.2f"|format(item.product.unit_price) }}</td>
+                    <td class="qty-td">
+                        <form class="qty_form" action="{{ url_for('cart.update_cart_qty') }}" method="POST">
+                            <input type="hidden" name="sku" value="{{ item.product.sku }}">
+                            <input type="hidden" name="action" value="set">
+
+                            <button
+                                type="submit"
+                                class="qty_btn"
+                                onclick="this.form.elements['action'].value='decrease'"
+                                >−</button>
+
+                            <input
+                                type="number"
+                                name="qty"
+                                value="{{ item.qty }}"
+                                min="1"
+                                class="qty_input"
+                                onkeydown="if (event.key === 'Enter') { event.preventDefault(); this.form.elements['action'].value='set'; this.form.requestSubmit(); }">
+
+                            <button
+                                type="submit"
+                                class="qty_btn"
+                                onclick="this.form.elements['action'].value='increase'"
+                                >+</button>
+                        </form>
+                    </td>
+                    <td>${{ "%.2f"|format(item_total) }}</td>
+                    <td>
+                        <form action="{{ url_for('cart.remove_item') }}" method="POST" style="display: inline;">
+                            <input type="hidden" name="sku" value="{{ item.product.sku }}">
+                            <button type="submit" class="remove_btn">
+                                <ion-icon name="trash-sharp"></ion-icon>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="cart_summary">
+        <h3>Total: ${{ "%.2f"|format(ns.cart_total) }}</h3>
+        {# <a href="{{ url_for('checkout') }}" class="link_btn checkout_btn">Proceed to Checkout</a> #}
+    </div>
+    {% else %}
+    <div class="empty_cart">
+        <p>Your cart is empty.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
