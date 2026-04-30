@@ -17,12 +17,11 @@ def view_product(sku):
 
 @products_bp.route('/add_review/<string:sku>', methods=['GET'])
 def add_review(sku):
-    # change return to page for review submission form
-    # review submission form will redirect back to view product page after submission
     return render_template('review_form.html', sku=sku)
 
 @products_bp.route('/add_review/<string:sku>', methods=['POST'])
 def submit_review(sku):
+    # IMPORTANT: add check to make sure customer purchased and recieved the product before allowing review submission
     rating = request.form.get('rating')
     comment = request.form.get('comment')
     user_id = session.get('user_id')
