@@ -22,13 +22,12 @@ def _get_product_quantity(user: Role) -> int:
 
 def _get_complaint_quantity(user: Role) -> int:
     if user == Role.VENDOR:
-        condition = f'products.vendor_id = {session["user_id"]}'
+        condition = f'products.vendor_id = {session["user_id"]} AND complaints.is_accepted = True'
     else:
-        condition = None
+        condition = f'complaints.is_accepted = True'
     complaints = extensions.client.conn.get_rows(TableNames.PRODUCTS.value,
                                                 join_tables=[TableNames.COMPLAINTS.value],
                                                 condition=condition)
-    print(complaints)
     return len(complaints)
 
 def _get_monthly_revenue(user: Role) -> dict:
@@ -49,20 +48,41 @@ def _get_monthly_revenue(user: Role) -> dict:
 
     rows = extensions.client.conn.get_rows(TableNames.ORDERS.value,
                                           join_tables=[TableNames.ORDER_ITEMS.value,TableNames.PRODUCTS.value],
-                                          condition=condition)
-    print('\n\n',rows,'\n\n')
-
+                                          condition=condition,
+                                          cols=['orders.order_time','order_items.unit_price','order_items.qty'])
 
     for row in rows:
         order_time = row.get('order_time')
         if not order_time:
             continue
-        order_time = datetime.strptime(order_time, '%Y-%m-%d %H:%M:%S')
         month_key = order_time.strftime('%Y-%m')
         if month_key in month_map:
-            month_map[month_key] += float(row.get('unit_price', 0)) * float(row.get('qty', 0))
+            month_map[month_key] += float(row.get('unit_price')) * float(row.get('qty', 0))
 
     return {datetime.strptime(key, '%Y-%m').strftime('%b') : month_map[key] for key in keys}
+
+def _get_order_statuses(user: Role) -> dict:
+    if user == Role.VENDOR:
+        condition = f'products.vendor_id = {session["user_id"]}'
+    else:
+        condition = None
+    
+    orders = extensions.client.conn.get_rows(TableNames.ORDERS.value,
+                                            join_tables=[TableNames.ORDER_ITEMS.value, TableNames.PRODUCTS.value],
+                                            condition=condition,
+                                            cols=['orders.status'])
+    
+    status_counts = {'Pending': 0, 'Confirmed': 0, 'Shipped': 0, 'Delivered': 0}
+    for order in orders:
+        status = order.get('status', 'Pending')
+        if status in status_counts:
+            status_counts[status] += 1
+    
+    total = sum(status_counts.values())
+    if total == 0:
+        return {key: 0 for key in status_counts}
+    
+    return {key: value / total for key, value in status_counts.items()}
 
 
 def get_dashboard_data(user: Role) -> str:
@@ -81,7 +101,6 @@ def get_dashboard_data(user: Role) -> str:
     order_items = extensions.client.conn.get_rows(TableNames.PRODUCTS.value,
                                                   join_tables=[TableNames.ORDER_ITEMS.value],
                                                   condition=condition)
-    print(order_items)
 
     quick_log['orders'] = _get_order_quantity(order_items)
     quick_log['revenue'] = _get_revenue(order_items)
@@ -89,12 +108,13 @@ def get_dashboard_data(user: Role) -> str:
     quick_log['complaints'] = _get_complaint_quantity(user)
 
     graph_log['ytd_rev'] = _get_monthly_revenue(user)
+    graph_log['order_status'] = _get_order_statuses(user)
 
     return render_template('base_dashboard.html',
                            role=session['role'],
                            quick_log=quick_log,
-                           graph_log=graph_log,
-                           order_log=order_log)
+                           graph_log=graph_log)
+                        #    order_log=order_log)
 
 
 

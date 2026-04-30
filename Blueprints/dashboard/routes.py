@@ -6,13 +6,13 @@ dash_bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
 
 @dash_bp.route('/vendor')
 def vendor_dash():
-    test(Role.VENDOR, 9)
-    get_dashboard_data(Role.VENDOR)
+    test(Role.VENDOR, 8)
+    return get_dashboard_data(Role.VENDOR)
 
 @dash_bp.route('/admin')
 def admin_dash():
     test(Role.ADMIN, 1)
-    get_dashboard_data(Role.ADMIN)
+    return get_dashboard_data(Role.ADMIN)
 
 # @dash_bp.route('/admin/vender')
 # def admin_dash():

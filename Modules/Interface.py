@@ -33,20 +33,20 @@ class Client:
             self.conn.update_row(self.table, self.user_id, data)
 
         def get_chats(self) -> list[ChatRow]:
-            return self.conn.get_rows(TableNames.CHATS, f"customer_id = :user_id OR support_id = :user_id", params={"user_id": self.user_id})
+            return self.conn.get_rows(TableNames.CHATS, condition=f"customer_id = :user_id OR support_id = :user_id", params={"user_id": self.user_id})
 
     class Customer(User):
         def __init__(self, client: "Client", user_id):
             super().__init__(client, user_id)
 
         def get_cart(self) -> list[CartItem]:
-            return self.conn.get_rows(TableNames.CARTS, f"user_id = :user_id", params={"user_id": self.user_id})
+            return self.conn.get_rows(TableNames.CARTS, condition=f"user_id = :user_id", params={"user_id": self.user_id})
 
         def get_orders(self) -> list[OrderRow]:
-            return self.conn.get_rows(TableNames.ORDERS, f"user_id = :user_id", params={"user_id": self.user_id})
+            return self.conn.get_rows(TableNames.ORDERS, condition=f"user_id = :user_id", params={"user_id": self.user_id})
 
         def get_reviews(self):
-            return self.conn.get_rows(TableNames.REVIEWS, f"user_id = :user_id", params={"user_id": self.user_id})
+            return self.conn.get_rows(TableNames.REVIEWS, condition=f"user_id = :user_id", params={"user_id": self.user_id})
         
         def is_in_cart(self, sku:str) -> bool:
             return sku in [item["sku"] for item in self.get_cart()]
@@ -129,7 +129,7 @@ class Client:
             super().__init__(client, user_id)
 
         def get_products(self) -> list[ProductRow]:
-            return self.conn.get_rows(TableNames.PRODUCTS, f"vendor_id = :vendor_id", params={"vendor_id": self.user_id})
+            return self.conn.get_rows(TableNames.PRODUCTS, condition=f"vendor_id = :vendor_id", params={"vendor_id": self.user_id})
 
         def has_product(self, sku) -> bool:
             products = self.get_products()
@@ -151,7 +151,7 @@ class Client:
             self.client.product(sku).soft_delete()
 
         def get_product_reviews(self) -> list[ReviewRow]:
-            return self.conn.get_rows(TableNames.REVIEWS, f"products.vendor_id = :user_id", ["products"], {"user_id": self.user_id})
+            return self.conn.get_rows(TableNames.REVIEWS, condition=f"products.vendor_id = :user_id", join_tables=["products"], params={"user_id": self.user_id})
         
         def reset_database(self):
             self.conn.reset_db()
@@ -164,16 +164,16 @@ class Client:
             return self.conn.get_rows(TableNames.USERS)
 
         def get_customers(self) -> list[UserRow]:
-            return self.conn.get_rows(TableNames.USERS, "role = :role", params={"role": Role.CUSTOMER})
+            return self.conn.get_rows(TableNames.USERS, condition="role = :role", params={"role": Role.CUSTOMER})
 
         def get_vendors(self):
-            return self.conn.get_rows(TableNames.USERS, "role = :role", params={"role": Role.VENDOR})
+            return self.conn.get_rows(TableNames.USERS, condition="role = :role", params={"role": Role.VENDOR})
 
         def get_all_complaints(self) -> list[ComplaintRow]:
             return self.conn.get_rows(TableNames.COMPLAINTS)
         
         def get_unresolved_complaints(self) -> list[ComplaintRow]:
-            return self.conn.get_rows(TableNames.COMPLAINTS, "is_accepted is NULL")
+            return self.conn.get_rows(TableNames.COMPLAINTS, condition="is_accepted is NULL")
 
         def get_all_orders(self) -> list[OrderRow]:
             return self.conn.get_rows(TableNames.ORDERS)
@@ -196,13 +196,13 @@ class Client:
             return rslt
 
         def get_reviews(self) -> list[ReviewRow]:
-            return self.conn.get_rows(TableNames.REVIEWS, "sku = :sku", params={"sku": self.sku})
+            return self.conn.get_rows(TableNames.REVIEWS, condition="sku = :sku", params={"sku": self.sku})
 
         def get_images(self) -> list[ProductImageRow]:
-            return self.conn.get_rows(TableNames.PROD_IMGS, "sku = :sku", params={"sku": self.sku})
+            return self.conn.get_rows(TableNames.PROD_IMGS, condition="sku = :sku", params={"sku": self.sku})
 
         def get_discounts(self) -> list[DiscountRow]:
-            return self.conn.get_rows(TableNames.DISCOUNTS, "sku = :sku", params={"sku": self.sku})
+            return self.conn.get_rows(TableNames.DISCOUNTS, condition="sku = :sku", params={"sku": self.sku})
 
         def is_available(self) -> bool:
             if self.get_stock() <= 0:
