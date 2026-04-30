@@ -73,7 +73,7 @@
 
     <div class="cart_summary">
         <h3>Total: ${{ "%.2f"|format(ns.cart_total) }}</h3>
-        {# <a href="{{ url_for('checkout') }}" class="link_btn checkout_btn">Proceed to Checkout</a> #}
+        <a href="{{ url_for('cart.checkout') }}" method="GET" class="link_btn checkout_btn">Proceed to Checkout</a>
     </div>
     {% else %}
     <div class="empty_cart">

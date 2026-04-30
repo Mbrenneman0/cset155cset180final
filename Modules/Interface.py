@@ -124,6 +124,30 @@ class Client:
             except Exception as e:
                 raise
 
+        def create_order(self, items:list[CartItem]):
+            order_data = {
+                "user_id": self.user_id
+            }
+            try:
+                self.conn.create_row(TableNames.ORDERS, order_data)
+                condition="user_id = :user_id ORDER BY order_time DESC LIMIT 1"
+                params={"user_id": self.user_id}
+                order_num = self.conn.get_rows(TableNames.ORDERS, condition=condition, params=params)[0]["order_num"]
+                for item in items:
+                    product = self.client.product(item["sku"]).get_info()
+                    unit_price = product["unit_price"]
+                    warranty_period = product["warranty_period"]
+                    item_data = {
+                        "order_num": order_num,
+                        "sku": item["sku"],
+                        "qty": item["qty"],
+                        "unit_price": unit_price,
+                        "warranty_period": warranty_period
+                    }
+                    self.conn.create_row(TableNames.ORDER_ITEMS, item_data)
+            except Exception as e:
+                raise
+
     class Vendor(User):
         def __init__(self, client: "Client", user_id):
             super().__init__(client, user_id)

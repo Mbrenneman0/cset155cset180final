@@ -13,7 +13,7 @@ def login_username():
 def login_email():
     return route_controller('login', ['Email', 'Password'], 'Sign in with username instead? Click here!')
 
-@auth_bp.route('/logout', methods=['POST'])
+@auth_bp.route('/logout', methods=['GET','POST'])
 def logout():
     session.clear()
     return redirect(url_for('index.index'))

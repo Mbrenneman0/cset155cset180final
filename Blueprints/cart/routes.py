@@ -19,7 +19,7 @@ def update_cart_qty():
     except Exception as e:
         if str(e) == "Not logged in":
             flash('You must be logged in to update your cart', 'error')
-            return redirect(url_for('account.login'))
+            return redirect(url_for('auth.login'))
         flash(str(e), 'error')
 
     return redirect(request.referrer)
@@ -32,7 +32,7 @@ def add_to_cart():
     except Exception as e:
         if str(e) == "Not logged in":
             flash('You must be logged in to add items to your cart', 'error')
-            return redirect(url_for('account.login'))
+            return redirect(url_for('auth.login'))
         flash(str(e), 'error')
         return redirect(request.referrer)
     flash('Item added to cart!', 'info')
@@ -46,6 +46,19 @@ def remove_item():
     except Exception as e:
         if str(e) == "Not logged in":
             flash('You must be logged in to update your cart', 'error')
-            return redirect(url_for('account.login'))
+            return redirect(url_for('auth.login'))
         flash(str(e), 'error')
     return redirect(request.referrer)
+
+@cart_bp.route('/checkout', methods=['GET'])
+def checkout():
+    try:
+        Cart_Service.checkout()
+        flash('Checkout successful! Your order has been placed.', 'success')
+        return redirect(url_for('cart.view_cart'))
+    except Exception as e:
+        if str(e) == "Not logged in":
+            flash('You must be logged in to checkout', 'error')
+            return redirect(url_for('auth.login'))
+        flash(str(e), 'error')
+        return redirect(request.referrer)
