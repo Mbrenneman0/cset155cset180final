@@ -1,11 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, Blueprint
-from Services.cart_service import add_item_to_cart
+from Services.cart_service import add_item_to_cart, get_cart_items
 
 cart_bp = Blueprint('cart',__name__,url_prefix='/cart')
 
 @cart_bp.route('/', methods=['GET'])
 def view_cart():
-    return
+    items = get_cart_items()
+    return render_template('cart.html', items=items)
 
 @cart_bp.route('/add', methods=['POST'])
 def add_item():
