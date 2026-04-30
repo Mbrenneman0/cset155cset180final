@@ -81,25 +81,53 @@ body{
     height: 38vh;
     display: flex;
     align-items: center;
-    justify-content: center;
 }
 
 .year-stats {
     white-space: nowrap;
-    max-height: 170px;
-    overflow: hidden;
-}
-
-.year-stats:hover {
-    overflow-x: auto;
+    max-height: 150px;
+    width: 100%;
+    align-items: baseline;
+    margin: 0 2.5rem;
 }
 
 .month-group {
     cursor: pointer;
-    max-width: 400px;
-    height: 110px;
+    max-width: 80%;
+    height: 130px;
     margin: 10px;
     display: inline-block;
+    position: relative;
+}
+
+.monthly_details {
+    position: absolute;
+    bottom: auto;
+    left: 200%;
+    transform: translateX(-30%);
+    background-color: #333;
+    padding: 5px 10px;
+    border-radius: 5px;
+    white-space: nowrap;
+    display: none;
+    pointer-events: none;
+}
+
+.monthly_details h4{
+    color: #fff;
+}
+
+.month-group:hover .monthly_details {
+    display: block;
+}
+
+@keyframes barLoad {
+    0% {
+        transform: scaleY(0);
+    }
+    100% {
+        transform: scaleY(1);
+    }
 }
 
 .bar {
@@ -107,16 +135,82 @@ body{
     width: 20px;
     border-radius: 5px;
     margin-bottom: 10px;
+    transform-origin: bottom;
+    animation: barLoad 0.6s ease-out;
 }
 
 .month-group:hover .bar{
     background: #5397d6;
 }
 
-.month-group:hover p{
-    color: #fff;
+.month-group:hover .monthly_details{
+    position: absolute;
+}
+.monthly_details{
+    position: relative;
+    top: 0;
 }
 
+.month-group:hover p{
+    color: #000000;
+}
+
+.donut-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    height: 100%;
+    margin-top: 15%;
+}
+
+.donut {
+    width: 25vh;
+    height: 25vh;
+    border-radius: 50%;
+    background: conic-gradient(
+        #facc15 0% calc(var(--pending, 0) * 100%),
+        #3b82f6 calc(var(--pending, 0) * 100%) calc((var(--pending, 0) + var(--confirmed, 0)) * 100%),
+        #16a34a calc((var(--pending, 0) + var(--confirmed, 0)) * 100%) calc((var(--pending, 0) + var(--confirmed, 0) + var(--shipped, 0)) * 100%),
+        #1CB2F6 calc((var(--pending, 0) + var(--confirmed, 0) + var(--shipped, 0)) * 100%) 100%
+    );
+    position: relative;
+}
+
+.donut::after {
+    content: '';
+    position: absolute;
+    width: 65%;
+    height: 65%;
+    background: white;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.donut__slice {
+    display: none;
+}
+
+.donut-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+}
 
 /* quick order status */
 .table-wrapper{

@@ -218,12 +218,15 @@ class Conn:
             row = rslt.mappings().first()
             return dict(row) if row else None  
 
-        def get_rows(self, condition, join_tables, params:dict = {}):
+        def get_rows(self, condition, join_tables, cols, params:dict = {}):
+            select_cols = "*"
+            if cols:
+                select_cols = ", ".join(cols)
             if join_tables is None:
-                query = f"SELECT * FROM {self.table_name}"
+                query = f"SELECT {select_cols} FROM {self.table_name}"
             else:
                 join_sql = self._build_joins(join_tables)
-                query = f"SELECT * FROM {self.table_name} {join_sql}"
+                query = f"SELECT {select_cols} FROM {self.table_name} {join_sql}"
             if condition:
                 query += f" WHERE {condition}"
             rslt = self.conn.execute(text(query), params)
@@ -388,9 +391,9 @@ class Conn:
         rslt = table.get_row(pk_value, join_tables)
         return rslt
 
-    def get_rows(self, table_name:str, condition:str = None, join_tables:list = None, params:dict = {}):
+    def get_rows(self, table_name:str, condition:str = None, join_tables:list = None, cols:list = None, params:dict = {}):
         table = self._get_table(table_name)
-        rslt = table.get_rows(condition, join_tables, params)
+        rslt = table.get_rows(condition, join_tables, cols, params)
         return rslt
     
 
