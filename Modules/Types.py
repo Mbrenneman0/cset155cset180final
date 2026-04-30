@@ -61,6 +61,9 @@ class OrderRow(TypedDict):
     order_time: datetime
     status: str
 
+class newOrder(TypedDict):
+    user_id: int
+
 class OrderItem(TypedDict):
     order_num: int
     sku: str
