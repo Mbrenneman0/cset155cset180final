@@ -72,7 +72,7 @@ def _get_order_statuses(user: Role) -> dict:
                                             condition=condition,
                                             cols=['orders.status'])
     
-    status_counts = {'Pending': 0, 'Confirmed': 0, 'Shipped': 0, 'Delivered': 0}
+    status_counts = {'Pending': 0, 'Confirmed': 0, 'Picked Up': 0, 'Shipped': 0}
     for order in orders:
         status = order.get('status', 'Pending')
         if status in status_counts:
@@ -83,6 +83,10 @@ def _get_order_statuses(user: Role) -> dict:
         return {key: 0 for key in status_counts}
     
     return {key: value / total for key, value in status_counts.items()}
+
+def _get_order_action(status: str):
+    action = ['Pending', 'Confirmed', 'Picked Up', 'Shipped', ]
+    return action[action.index(status)+1] if action.index(status) < 3 else 'Completed'
 
 def _get_orders(user: Role) -> dict:
     if user == Role.VENDOR:
@@ -142,8 +146,10 @@ def get_dashboard_data(user: Role) -> str:
     graph_log['ytd_rev'] = _get_monthly_revenue(user)
     graph_log['order_status'] = _get_order_statuses(user)
 
-    order_log['order_details'] = _get_orders(user)
+    orders = _get_orders(user)
+    order_log['order_details'] = orders
     order_log['order_costs'] = _get_orders_cost(user)
+    order_log['order_actions'] = [_get_order_action(order.get('status')) for order in orders]
 
     return render_template('base_dashboard.html',
                            role=session['role'],
