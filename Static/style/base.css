@@ -67,6 +67,14 @@ header span{
     align-items: center;
 }
 
+.span-blue{
+    color: var(--accent-secondary);
+}
+
+.span-gold{
+    color: var(--accent-primary);
+}
+
 #logo{
     width: 15%;
     display: flex;
@@ -344,4 +352,28 @@ label{
     padding: 2rem;
     max-width: 1400px;
     margin: 0 auto;
+}
+
+
+/* ------------- WELCOME CONTENT ------------- */
+.welcome-content h1{
+    margin-left: 20%;
+    margin-top: 2rem;
+}
+
+.welcome-content p{
+    margin-left: 25%;
+    margin-top: 1rem;
+    font-size: 1.25rem;
+    color: var(--text-muted);
+}
+
+.welcome-content h2{
+    width: 100%;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    margin-top: 3rem;
 }

@@ -1,13 +1,26 @@
 <div class="sidebar">
-    <h4>TradeHive</h4>
+    <a href="{{ url_for('index.index') }}"><h4>TradeHive</h4></a>
     <a class="active" href="#"><i>Dashboard</i></a>
-    <a href="#"><i></i>Products</a>
-    <a href="#"><i></i>Orders</a>
-    <a href="#"><i></i>Reviews</a>
-    <a href="#"><i></i>Messages</a>
-    <a href="#"><i></i>Complaints</a>
-    <a href="#"><i></i>Settings</a>
-    <a href="#"><i></i>Logout</a>
+
+    {% if role != role.CUSTOMER %}
+        <a href="#"><i></i>Products</a>
+    {% endif %}
+
+        <a href="#"><i></i>Orders</a>
+
+    {% if role != role.CUSTOMER %}
+        <a href="#"><i></i>Reviews</a>
+    {% endif %}
+
+        <a href="#"><i></i>Messages</a>
+
+    {% if role != role.CUSTOMER %}
+        <a href="#"><i></i>Complaints</a>
+    {% endif %}
+
+        <a href="#"><i></i>Settings</a>
+
+    <a href="{{ url_for('authenticate.logout') }}"><i></i>Logout</a>
 </div>
 
 <style>

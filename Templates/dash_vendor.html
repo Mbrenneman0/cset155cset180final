@@ -1,0 +1,78 @@
+<div class="log_body">
+    <form class="topbar floating-wrapper flex">
+        <input class="searchbar" placeholder="Search orders/products..." name="search">
+        <div class="role"><strong>{{ role.value }}</strong></div>
+    </form>
+    <div class="log-wrapper">
+        <div class="quick_log flex">
+            <div class="card_col floating-wrapper">
+                <div class="card"><small>Orders</small><h3>{{ quick_log.orders }}</h3></div>
+            </div>
+            <div class="card_col floating-wrapper">
+                <div class="card"><small>Revenue</small><h3>${{ quick_log.revenue }}</h3></div>
+            </div>
+            <div class="card_col floating-wrapper">
+                <div class="card"><small>Products</small><h3>{{ quick_log.products }}</h3></div>
+            </div>
+            <div class="card_col floating-wrapper">
+                <div class="card"><small>Complaints</small><h3>{{ quick_log.complaints }}</h3></div>
+            </div>
+        </div>
+        <div class="graph_log flex">
+            <div class="sales-wrapper floating-wrapper">
+                <div class="graph-wrapper">
+                    <h4>Monthly Sales</h4>
+                    <div class="graph_body">
+                        <div class="year-stats flex">
+                            {% for month, rev in graph_log['ytd_rev'].items() %}
+                                <div class="month-group">
+                                    {% if rev != 0 %}
+                                        <div class="bar" style="height: {{ (rev*100)|int / (quick_log.get('revenue', 0)|int) if rev else 0 }}%;"></div>
+                                    {% else %}
+                                        <div class="bar" style="height: 1%;"></div>
+                                    {% endif %}
+                                    <div class="monthly_details"><h4>${{ rev }}</h4></div>
+                                    <p class="month">{{ month }}</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="order-wrapper floating-wrapper">
+                <div class="graph-wrapper">
+                    <h4>Order Status</h4>
+                    <div class="donut-container">
+                        <div class="donut" style="--pending: {{ graph_log['order_status'].get('Pending', 0) }};
+                                                  --confirmed: {{ graph_log['order_status'].get('Confirmed', 0) }};
+                                                  --shipped: {{ graph_log['order_status'].get('Shipped', 0) }};
+                                                  --delivered: {{ graph_log['order_status'].get('Delivered', 0) }};">
+                            <div class="donut__slice donut__slice__pending"></div>
+                            <div class="donut__slice donut__slice__confirmed"></div>
+                            <div class="donut__slice donut__slice__shipped"></div>
+                            <div class="donut__slice donut__slice__delivered"></div>
+                        </div>
+                        <div class="donut-legend">
+                            <div class="legend-item"><span class="legend-color" style="background: #FFC820;"></span>Pending</div>
+                            <div class="legend-item"><span class="legend-color" style="background: #3b82f6;"></span>Confirmed</div>
+                            <div class="legend-item"><span class="legend-color" style="background: #16a34a;"></span>Shipped</div>
+                            <div class="legend-item"><span class="legend-color" style="background: #1CB2F6;"></span>Delivered</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <form class="table-wrapper floating-wrapper">
+            <h4>Recent Orders</h4>
+            <table>
+                <thead><tr><th>Order ID</th><th>Cutomer</th><th style="width: 16%;">Total</th><th>Status</th><th>Action</td></tr></thead>
+                <tbody>
+                    {% for order in order_log['order_details'] %}
+                        <tr><td>{{ order.get('order_num') }}</td><td>{{ order.get('name') }}</td><td style="width: 16%;">{{ order_log['order_costs'][loop.index0+1] }}</td><td>{{ order.get('status') }}</td><td><input type="submit" name="input-btn" value="Confirm" class="badge-{{ order.get('status')|lower }}"></td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+        </form>
+    </div>
+</div>

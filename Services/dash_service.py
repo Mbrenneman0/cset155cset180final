@@ -30,11 +30,14 @@ def _get_complaint_quantity(user: Role) -> int:
                                                 condition=condition)
     return len(complaints)
 
-def _get_monthly_revenue(user: Role) -> dict:
+# def _get_monthly_spend(role: Role) -> dict:
+
+
+def _get_monthly_revenue(role: Role) -> dict:
     current_year = datetime.now().year
     keys = [f'{current_year}-{month:02d}' for month in range(1, 13)]
     month_map = {key: 0 for key in keys}
-    if user == Role.VENDOR:
+    if role == Role.VENDOR:
         condition = (
             f"products.vendor_id = {session['user_id']} AND "
             f"orders.order_time >= '{current_year}-01-01' AND "
@@ -121,42 +124,52 @@ def _get_orders_cost(user: Role) -> dict:
     return cost
 
 
-def get_dashboard_data(user: Role) -> str:
-    if not check_credentials(user.value, session.get('user_id')):
+def get_dashboard_data(role: Role) -> str:
+    if not check_credentials(role.value, session.get('user_id')):
         flash('You do not have the necessary credentials', 'error')
         return redirect(url_for('index.index'))
 
-    quick_log = {}
-    graph_log = {}
-    order_log = {}
+    quick_log = get_quick_log(role)
+    graph_log = get_graph_log(role)
+    order_log = get_order_log(role)
 
-    if user == Role.VENDOR:
+    return render_template('dash_base.html',
+                           role=session['role'],
+                           quick_log=quick_log,
+                           graph_log=graph_log,
+                           order_log=order_log)
+
+def get_quick_log(role: Role):
+    quick_log = {}
+
+    if role == Role.VENDOR:
         condition = f'products.vendor_id = {session["user_id"]}'
     else:
         condition = None
     order_items = extensions.client.conn.get_rows(TableNames.PRODUCTS.value,
                                                   join_tables=[TableNames.ORDER_ITEMS.value],
                                                   condition=condition)
-
+    
     quick_log['orders'] = _get_order_quantity(order_items)
     quick_log['revenue'] = _get_revenue(order_items)
-    quick_log['products'] = _get_product_quantity(user)
-    quick_log['complaints'] = _get_complaint_quantity(user)
+    quick_log['products'] = _get_product_quantity(role)
+    quick_log['complaints'] = _get_complaint_quantity(role)
 
-    graph_log['ytd_rev'] = _get_monthly_revenue(user)
-    graph_log['order_status'] = _get_order_statuses(user)
+    return quick_log
 
-    orders = _get_orders(user)
-    order_log['order_details'] = orders
-    order_log['order_costs'] = _get_orders_cost(user)
-    order_log['order_actions'] = [_get_order_action(order.get('status')) for order in orders]
+def get_graph_log(role: Role):
+    graph_log = {}
+    # if role == Role.CUSTOMER:
+    #     graph_log['ytd_spent'] = _get_monthly_spend(role)
+    # else:
+    graph_log['ytd_rev'] = _get_monthly_revenue(role)
+    graph_log['order_status'] = _get_order_statuses(role)
 
-    return render_template('base_dashboard.html',
-                           role=session['role'],
-                           quick_log=quick_log,
-                           graph_log=graph_log,
-                           order_log=order_log)
+    return graph_log
 
-
+def get_order_log(role: Role):
+    order_log = {}
+    order_log['order_details'] = _get_orders(role)
+    order_log['order_costs'] = _get_orders_cost(role)
 
 
