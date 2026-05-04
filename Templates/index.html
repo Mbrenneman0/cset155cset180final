@@ -3,11 +3,11 @@
 {% block title %}Home{% endblock %}
 
 {% block body %}
-    <div>
-        <h1>Welcome to Our Store</h1>
-        <p>This is the home page.</p>
-    </div>
+    <div class = "welcome-content">
+        <h1>Welcome to <span class="span-blue">Trade</span><span class="span-gold">Hive</span></h1>
+        <p>We make buying and selling a breeze!</p>
     <h2>Featured Products</h2>
+    </div>
     <div class="products_grid">
         {% for product in products %}
         {% with sku=product.sku, title=product.title, images=product.get('images', []), price=product.unit_price, rating=product.rating %}
