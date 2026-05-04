@@ -14,6 +14,10 @@ def admin_dash():
     test(Role.ADMIN, 1)
     return get_dashboard_data(Role.ADMIN)
 
+# @dash_bp.route('<role:str>/products')
+# def products_dash(role):
+#     return
+
 # @dash_bp.route('/admin/vender')
 # def admin_dash():
 #     return render_template('base_dashboard.html')
