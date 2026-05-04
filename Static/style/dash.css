@@ -229,14 +229,14 @@ table input{
 
 
 
-.badge-pending{
+.badge-Pending{
     background-color:#facc15;
     color:#000
 }
-.badge-confirmed{
+.badge-Confirmed{
     background:#3b82f6
 }
-.badge-shipped{
+.badge-Picked{
     background:#16a34a
 }
 

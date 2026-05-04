@@ -68,7 +68,7 @@
                 <thead><tr><th>Order ID</th><th>Cutomer</th><th style="width: 16%;">Total</th><th>Status</th><th>Action</td></tr></thead>
                 <tbody>
                     {% for order in order_log['order_details'] %}
-                        <tr><td>{{ order.get('order_num') }}</td><td>{{ order.get('name') }}</td><td style="width: 16%;">{{ order_log['order_costs'][loop.index0+1] }}</td><td>{{ order.get('status') }}</td><td><input type="submit" name="input-btn" value="Confirm" class="badge-{{ order.get('status')|lower }}"></td></tr>
+                        <tr><td>{{ order.get('order_num') }}</td><td>{{ order.get('name') }}</td><td style="width: 16%;">{{ order_log['order_costs'][loop.index0+1] }}</td><td>{{ order.get('status') }}</td><td><input type="submit" name="input-btn" value="{{ order_log['order_actions'][loop.index0] }}" class="badge-{{ order_log['order_actions'][loop.index0] }}"></td></tr>
                     {% endfor %}
                 </tbody>
             </table>

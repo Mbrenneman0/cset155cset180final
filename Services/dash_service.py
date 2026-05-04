@@ -75,7 +75,7 @@ def _get_order_statuses(user: Role) -> dict:
                                             condition=condition,
                                             cols=['orders.status'])
     
-    status_counts = {'Pending': 0, 'Confirmed': 0, 'Shipped': 0, 'Delivered': 0}
+    status_counts = {'Pending': 0, 'Confirmed': 0, 'Picked Up': 0, 'Shipped': 0}
     for order in orders:
         status = order.get('status', 'Pending')
         if status in status_counts:
@@ -86,6 +86,10 @@ def _get_order_statuses(user: Role) -> dict:
         return {key: 0 for key in status_counts}
     
     return {key: value / total for key, value in status_counts.items()}
+
+def _get_order_action(status: str):
+    action = ['Pending', 'Confirmed', 'Picked Up', 'Shipped', ]
+    return action[action.index(status)+1] if action.index(status) < 3 else 'Completed'
 
 def _get_orders(user: Role) -> dict:
     if user == Role.VENDOR:
@@ -155,10 +159,10 @@ def get_quick_log(role: Role):
 
 def get_graph_log(role: Role):
     graph_log = {}
-    if role == Role.CUSTOMER:
-        graph_log['ytd_spent'] = _get_monthly_spend(role)
-    else:
-        graph_log['ytd_rev'] = _get_monthly_revenue(role)
+    # if role == Role.CUSTOMER:
+    #     graph_log['ytd_spent'] = _get_monthly_spend(role)
+    # else:
+    graph_log['ytd_rev'] = _get_monthly_revenue(role)
     graph_log['order_status'] = _get_order_statuses(role)
 
     return graph_log
