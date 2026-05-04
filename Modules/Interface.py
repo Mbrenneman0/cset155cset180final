@@ -264,6 +264,25 @@ class Client:
             data = ProductUpdate(is_removed=True)
             self.update(data)
 
+    class Order:
+        def __init__(self, client: 'Client', order_num):
+            self.conn = client.conn
+            self.order_num = order_num
+
+        def get_order_items(self) -> list[OrderItem]:
+            rslt = self.conn.get_rows('orders',
+                                      condition= 'orders.order_num = :order_num',
+                                      join_tables=['order_items'],
+                                      params={'order_num': self.order_num})
+            order_items = []
+            for item in rslt:
+                order_items.append(OrderItem(order_num=self.order_num,
+                                             sku=item['sku'],
+                                             qty=item['qty'],
+                                             unit_price=item['unit_price'],
+                                             warranty_period=item['warranty_period']))
+            return order_items
+
     class Message:
         def __init__(self, client: "Client", message_id):
             self.message_id = message_id
@@ -380,6 +399,9 @@ class Client:
     
     def product(self, sku) -> Product:
         return Client.Product(self, sku)
+    
+    def order(self, order_id) -> Order:
+        return Client.Order(self, order_id)
     
     def message(self, message_id) -> Message:
         return Client.Message(self, message_id)

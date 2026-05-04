@@ -1,7 +1,7 @@
 from flask import flash, session, request, render_template, redirect, url_for
 import extensions
 from .auth_service import check_credentials
-from Modules.Types import TableNames, Role
+from Modules.Types import *
 from datetime import datetime
 
 
@@ -30,8 +30,24 @@ def _get_complaint_quantity(user: Role) -> int:
                                                 condition=condition)
     return len(complaints)
 
-# def _get_monthly_spend(role: Role) -> dict:
+def _get_monthly_spend(role: Role) -> dict:
+    current_year = datetime.now().year
+    keys = [f'{current_year}-{month:02d}' for month in range(1, 13)]
+    month_map = {key: 0.00 for key in keys}
+    all_orders = extensions.client.customer(session['user_id']).get_orders()
+    ytd_orders = [order for order in all_orders if order['order_time'] >= datetime(current_year, 1, 1)]
+    for order in ytd_orders:
+        order_time = order['order_time']
+        if not order_time:
+            continue
+        month_key = order_time.strftime('%Y-%m')
+        order_items = extensions.client.order(order['order_num']).get_order_items()
+        if month_key in month_map:
+            for item in order_items:
+                month_map[month_key] += float(item['qty'])*float(item['unit_price'])
+    return {datetime.strptime(key, '%Y-%m').strftime('%b') : round(month_map[key],2) for key in keys}
 
+    
 
 def _get_monthly_revenue(role: Role) -> dict:
     current_year = datetime.now().year
@@ -159,10 +175,10 @@ def get_quick_log(role: Role):
 
 def get_graph_log(role: Role):
     graph_log = {}
-    # if role == Role.CUSTOMER:
-    #     graph_log['ytd_spent'] = _get_monthly_spend(role)
-    # else:
-    graph_log['ytd_rev'] = _get_monthly_revenue(role)
+    if role == Role.CUSTOMER:
+        graph_log['ytd_spent'] = _get_monthly_spend(role)
+    else:
+        graph_log['ytd_rev'] = _get_monthly_revenue(role)
     graph_log['order_status'] = _get_order_statuses(role)
 
     return graph_log
