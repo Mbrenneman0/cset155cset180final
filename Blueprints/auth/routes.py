@@ -23,5 +23,5 @@ def register():
     return route_controller('register', ['Name', 'Username', 'Email', 'Password'])
 
 @auth_bp.route('/register/vendor', methods=['GET','POST'])
-def vender_register():
+def vendor_register():
     return route_controller('register', ['Name', 'Username', 'Email', 'Password'], role=Role.VENDOR)

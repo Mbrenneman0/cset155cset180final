@@ -8,12 +8,8 @@
     <title>Document</title>
 </head>
 <body>
-<p>{{ role }}</p>
 
 {% include 'dash_sidebar.html' %}
-
-{{role}}
-{{role.ADMIN}}
 
 {% if role == 'Admin' %}
 {% include 'dash_admin.html' %}
