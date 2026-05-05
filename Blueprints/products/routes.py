@@ -27,7 +27,7 @@ def submit_review(sku):
     user_id = session.get('user_id')
     if not user_id:
         flash('You must be logged in to submit a review')
-        return redirect(url_for('auth.login'))
+        return redirect(url_for('authenticate.login_username'))
     try:
         save_review(user_id, sku, rating, comment)
     except Exception as e:

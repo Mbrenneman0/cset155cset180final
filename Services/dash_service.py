@@ -80,20 +80,10 @@ def _get_monthly_revenue(role: Role) -> dict:
 
     return {datetime.strptime(key, '%Y-%m').strftime('%b') : month_map[key] for key in keys}
 
-def _get_order_statuses(role: Role) -> dict:
-    if role == Role.VENDOR:
-        condition = f'products.vendor_id = {session["user_id"]}'
-    else:
-        condition = None
-    
-    orders = extensions.client.conn.get_rows(TableNames.ORDERS.value,
-                                            join_tables=[TableNames.ORDER_ITEMS.value, TableNames.PRODUCTS.value],
-                                            condition=condition,
-                                            cols=['orders.status'])
-    
+def _get_order_statuses(orders: list[OrderRow]) -> dict:
     status_counts = {'Pending': 0, 'Confirmed': 0, 'Picked Up': 0, 'Shipped': 0}
     for order in orders:
-        status = order.get('status', 'Pending')
+        status = order.get('status')
         if status in status_counts:
             status_counts[status] += 1
     
@@ -167,8 +157,13 @@ def get_quick_log(role: Role):
         quick_log['revenue'] = _get_revenue(order_items)
         quick_log['products'] = _get_product_quantity(role)
     elif role == Role.CUSTOMER:
-        orders = extensions.client.customer(session['user_id']).get_orders()
+        customer = extensions.client.customer(session['user_id'])
+        orders = customer.get_orders()
         order_items = [extensions.client.order(item['order_num']).get_order_items() for item in orders]
+        order_items = [item for sublist in order_items for item in sublist] # unpacks nested list to flat list
+        quick_log['total_spent'] = sum([float(item['unit_price'])*int(item['qty'])
+                                        for item in order_items])
+        quick_log['cart_items'] = len(customer.get_cart())
 
     
     quick_log['orders'] = _get_order_quantity(orders)
@@ -178,11 +173,16 @@ def get_quick_log(role: Role):
 
 def get_graph_log(role: Role):
     graph_log = {}
+    orders = []
     if role == Role.CUSTOMER:
         graph_log['ytd_spent'] = _get_monthly_spend()
+        orders = extensions.client.customer(session['user_id']).get_orders()
+    elif role == Role.VENDOR:
+        orders = extensions.client.vendor(session['user_id']).get_orders()
     else:
+        orders = extensions.client.admin(session['user_id']).get_all_orders()
         graph_log['ytd_rev'] = _get_monthly_revenue(role)
-    graph_log['order_status'] = _get_order_statuses(role)
+    graph_log['order_status'] = _get_order_statuses(orders)
 
     return graph_log
 
