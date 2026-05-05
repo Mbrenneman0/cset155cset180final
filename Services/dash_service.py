@@ -30,7 +30,7 @@ def _get_complaint_quantity(role: Role) -> int:
                                                 condition=condition)
     return len(complaints)
 
-def _get_monthly_spend(role: Role) -> dict:
+def _get_monthly_spend() -> dict:
     current_year = datetime.now().year
     keys = [f'{current_year}-{month:02d}' for month in range(1, 13)]
     month_map = {key: 0.00 for key in keys}
@@ -141,7 +141,8 @@ def _get_orders_cost(role: Role) -> dict:
 
 
 def get_dashboard_data(role: Role) -> str:
-    if not check_credentials(role.value, session.get('user_id')):
+    print(session, role)
+    if not check_credentials(role, session.get('user_id')):
         flash('You do not have the necessary credentials', 'error')
         return redirect(url_for('index.index'))
 
@@ -176,7 +177,7 @@ def get_quick_log(role: Role):
 def get_graph_log(role: Role):
     graph_log = {}
     if role == Role.CUSTOMER:
-        graph_log['ytd_spent'] = _get_monthly_spend(role)
+        graph_log['ytd_spent'] = _get_monthly_spend()
     else:
         graph_log['ytd_rev'] = _get_monthly_revenue(role)
     graph_log['order_status'] = _get_order_statuses(role)

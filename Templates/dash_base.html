@@ -10,15 +10,18 @@
 <body>
 {% include 'dash_sidebar.html' %}
 
-{% if role == role.ADMIN %}
+{{role}}
+{{role.ADMIN}}
+
+{% if role == 'Admin' %}
 {% include 'dash_admin.html' %}
 {% endif %}
 
-{% if role == role.VENDOR %}
+{% if role == 'Vendor' %}
 {% include 'dash_vendor.html' %}
 {% endif %}
 
-{% if role == role.CUSTOMER %}
+{% if role == 'Customer' %}
 {% include 'dash_cust.html' %}
 {% endif %}
 
