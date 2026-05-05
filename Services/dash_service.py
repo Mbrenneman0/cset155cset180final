@@ -206,8 +206,13 @@ def get_order_log(role: Role):
         customer = extensions.client.customer(session['user_id'])
         orders = customer.get_orders()
 
-    order_log['order_details'] = orders
-    order_log['order_costs'] = _get_orders_cost(role)
+    order_log['order_details'] = [{'order_num': order['order_num'],
+                                   "name": extensions.client.user(order['user_id']).get_info()['name'],
+                                   "date:": order['order_time'],
+                                   "status": order['status'],
+                                   "total": sum([float(item['unit_price'])*int(item['qty'])
+                                                       for item in extensions.client.order(order['order_num']).get_order_items()])}
+                                   for order in orders]
     order_log['order_actions'] = {order['order_num']: _get_order_action(order.get('status')) for order in orders}
 
     return order_log
