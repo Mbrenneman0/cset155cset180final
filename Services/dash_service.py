@@ -12,16 +12,16 @@ def _get_order_quantity(order_items: list) -> int:
 def _get_revenue(order_items: list) -> float:
     return sum(row['unit_price'] * row['qty'] for row in order_items)
 
-def _get_product_quantity(user: Role) -> int:
-    if user == Role.VENDOR:
+def _get_product_quantity(role: Role) -> int:
+    if role == Role.VENDOR:
         condition = f'vendor_id = {session["user_id"]}'
     else:
         condition = None
     products = extensions.client.conn.get_rows(TableNames.PRODUCTS.value, condition=condition)
     return len(products)
 
-def _get_complaint_quantity(user: Role) -> int:
-    if user == Role.VENDOR:
+def _get_complaint_quantity(role: Role) -> int:
+    if role == Role.VENDOR:
         condition = f'products.vendor_id = {session["user_id"]} AND complaints.is_accepted = True'
     else:
         condition = f'complaints.is_accepted = True'
@@ -80,8 +80,8 @@ def _get_monthly_revenue(role: Role) -> dict:
 
     return {datetime.strptime(key, '%Y-%m').strftime('%b') : month_map[key] for key in keys}
 
-def _get_order_statuses(user: Role) -> dict:
-    if user == Role.VENDOR:
+def _get_order_statuses(role: Role) -> dict:
+    if role == Role.VENDOR:
         condition = f'products.vendor_id = {session["user_id"]}'
     else:
         condition = None
@@ -103,12 +103,12 @@ def _get_order_statuses(user: Role) -> dict:
     
     return {key: value / total for key, value in status_counts.items()}
 
-def _get_order_action(status: str):
+def _get_order_action(status: str) -> str:
     action = ['Pending', 'Confirmed', 'Picked Up', 'Shipped', ]
     return action[action.index(status)+1] if action.index(status) < 3 else 'Completed'
 
-def _get_orders(user: Role) -> dict:
-    if user == Role.VENDOR:
+def _get_orders(role: Role) -> list:
+    if role == Role.VENDOR:
         condition = f'products.vendor_id = {session["user_id"]}'
     else:
         condition = None
@@ -119,10 +119,10 @@ def _get_orders(user: Role) -> dict:
                                             cols=['DISTINCT order_items.order_num', 'users.name', 'orders.status', 'products.*'])
     return orders
 
-def _get_orders_cost(user: Role) -> dict:
+def _get_orders_cost(role: Role) -> dict:
     cost = {}
 
-    if user == Role.VENDOR:
+    if role == Role.VENDOR:
         condition = f'products.vendor_id = {session["user_id"]}'
     else:
         condition = None
@@ -185,7 +185,11 @@ def get_graph_log(role: Role):
 
 def get_order_log(role: Role):
     order_log = {}
-    order_log['order_details'] = _get_orders(role)
+    orders = _get_orders(role)
+    order_log['order_details'] = orders
     order_log['order_costs'] = _get_orders_cost(role)
+    order_log['order_actions'] = {order['order_num']: _get_order_action(order.get('status')) for order in orders}
+
+    return order_log
 
 

@@ -213,9 +213,6 @@ body{
 }
 
 /* quick order status */
-.table-wrapper{
-    
-}
 table tr{
     margin-bottom: 0.5rem;
 }
@@ -224,20 +221,21 @@ table th, table td{
     text-align: left;
 }
 table input{
+    width: 70%;
     margin: 5px 0;
 }
 
 
 
-.badge-Pending{
-    background-color:#facc15;
-    color:#000
+.badge-Shipped{
+    background-color:#1CB2F6 !important;
+    color:#000;
 }
 .badge-Confirmed{
-    background:#3b82f6
+    background:#3b82f6 !important;
 }
 .badge-Picked{
-    background:#16a34a
+    background:#16a34a !important;
 }
 
 
