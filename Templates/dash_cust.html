@@ -93,12 +93,12 @@
 
                             <div class="legend-item">
                                 <span class="legend-color" style="background: #16a34a;"></span>
-                                Shipped
+                                Picked Up
                             </div>
 
                             <div class="legend-item">
                                 <span class="legend-color" style="background: #1CB2F6;"></span>
-                                Delivered
+                                Shipped
                             </div>
                         </div>
                     </div>
@@ -123,22 +123,15 @@
                 <tbody>
                     {% for order in order_log['order_details'] %}
                         <tr>
-                            <td>{{ order.get('order_num') }}</td>
-                            <td>{{ order.get('order_date') }}</td>
-                            <td style="width: 16%;">
-                                ${{ order_log['order_costs'][loop.index0] }}
-                            </td>
-                            <td>{{ order.get('status') }}</td>
+                            <td>{{ order['order_num'] }}</td>
+                            <td>{{ order['name'] }}</td>
+                            <td style="width: 16%;">{{ order_log['order_costs'][order.get('order_num')] }}</td>
+                            <td>{{ order['status'] }}</td>
                             <td>
-                                <button 
-                                    type="submit" 
-                                    name="order_num" 
-                                    value="{{ order.get('order_num') }}" 
-                                    class="badge-{{ order.get('status')|lower }}">
-                                    View
-                                </button>
+                                <input type="submit" name="input-btn" value="{{ order_log['order_actions'][order.get('order_num')] }}" class="badge-{{ order_log['order_actions'][order.get('order_num')] }}">
                             </td>
                         </tr>
+
                     {% endfor %}
                 </tbody>
             </table>

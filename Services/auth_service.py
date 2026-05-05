@@ -90,16 +90,16 @@ def route_controller(action: str, input_types: list, log_type: str = None, role:
 
     return render_template('base_auth.html', title=action.capitalize(), inputs=input_types, log_type=log_type)
             
-def check_credentials(role_type:str, user_id:str=None) -> bool:
+def check_credentials(role_type:Role, user_id:int=None) -> bool:
     check = True
     if user_id is None:
         user_id = session['user_id']
     if not _does_input_exist('user_id', user_id):
         check = False
-        raise KeyError(f'User ID not found at: {session['user_id']}')
+        print(KeyError(f'User ID not found at: {session['user_id']}'))
     if session['role'] != role_type:
         check = False
-        raise KeyError(f'User {session['user_id']} does not have {role_type} access')
+        print(KeyError(f'User {session['user_id']} does not have {role_type.value} access'))
     return check
 
 def create_session(user_id:str=None, role:str=None):
