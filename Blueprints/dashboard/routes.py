@@ -9,11 +9,11 @@ def dashboard():
     if 'user_id' not in session:
         return redirect(url_for('authenticate.login_username'))
     role = session.get('role')
-    if role == Role.VENDOR:
+    if role == Role.VENDOR.value:
         return redirect(url_for('dashboard.vendor_dash'))
-    elif role == Role.ADMIN:
+    elif role == Role.ADMIN.value:
         return redirect(url_for('dashboard.admin_dash'))
-    elif role == Role.CUSTOMER:
+    elif role == Role.CUSTOMER.value:
         return redirect(url_for('dashboard.cust_dash'))
     else:
         flash('Invalid user role. Please log in again.')

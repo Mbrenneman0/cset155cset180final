@@ -8,17 +8,19 @@
     <title>Document</title>
 </head>
 <body>
+<p>{{ role }}</p>
+
 {% include 'dash_sidebar.html' %}
 
-{% if role == role.ADMIN %}
+{% if role == "Role.ADMIN" %}
 {% include 'dash_admin.html' %}
 {% endif %}
 
-{% if role == role.VENDOR %}
+{% if role == "Role.VENDOR" %}
 {% include 'dash_vendor.html' %}
 {% endif %}
 
-{% if role == role.CUSTOMER %}
+{% if role == "Role.CUSTOMER" %}
 {% include 'dash_cust.html' %}
 {% endif %}
 

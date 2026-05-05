@@ -150,7 +150,7 @@ def get_dashboard_data(role: Role) -> str:
     order_log = get_order_log(role)
 
     return render_template('dash_base.html',
-                           role=session['role'],
+                           role=role.value,
                            quick_log=quick_log,
                            graph_log=graph_log,
                            order_log=order_log)
