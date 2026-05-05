@@ -55,8 +55,8 @@
                         <div class="donut-legend">
                             <div class="legend-item"><span class="legend-color" style="background: #FFC820;"></span>Pending</div>
                             <div class="legend-item"><span class="legend-color" style="background: #3b82f6;"></span>Confirmed</div>
-                            <div class="legend-item"><span class="legend-color" style="background: #16a34a;"></span>Shipped</div>
-                            <div class="legend-item"><span class="legend-color" style="background: #1CB2F6;"></span>Delivered</div>
+                            <div class="legend-item"><span class="legend-color" style="background: #16a34a;"></span>Picked Up</div>
+                            <div class="legend-item"><span class="legend-color" style="background: #1CB2F6;"></span>Shipped</div>
                         </div>
                     </div>
                 </div>
@@ -68,7 +68,7 @@
                 <thead><tr><th>Order ID</th><th>Cutomer</th><th style="width: 16%;">Total</th><th>Status</th><th>Action</td></tr></thead>
                 <tbody>
                     {% for order in order_log['order_details'] %}
-                        <tr><td>{{ order.get('order_num') }}</td><td>{{ order.get('name') }}</td><td style="width: 16%;">{{ order_log['order_costs'][loop.index0+1] }}</td><td>{{ order.get('status') }}</td><td><input type="submit" name="input-btn" value="Confirm" class="badge-{{ order.get('status')|lower }}"></td></tr>
+                        <tr><td>{{ order['order_num'] }}</td><td>{{ order['name'] }}</td><td style="width: 16%;">{{ order_log['order_costs'][order.get('order_num')] }}</td><td>{{ order['status'] }}</td><td><input type="submit" name="input-btn" value="{{ order_log['order_actions'][order.get('order_num')] }}" class="badge-{{ order_log['order_actions'][order.get('order_num')] }}"></td></tr>
                     {% endfor %}
                 </tbody>
             </table>
