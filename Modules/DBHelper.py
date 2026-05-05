@@ -204,8 +204,6 @@ class Conn:
                     SET {set_txt}
                     WHERE {self._where_clause_from_pk()}
                     """
-            print(query)
-            print(params)
             self.conn.execute(text(query), params)
             self.conn.commit()
 

@@ -9,12 +9,8 @@ def dashboard():
     if 'user_id' not in session:
         return redirect(url_for('authenticate.login_username'))
     role = session.get('role')
-    if role == Role.VENDOR.value:
-        return redirect(url_for('dashboard.vendor_dash'))
-    elif role == Role.ADMIN.value:
-        return redirect(url_for('dashboard.admin_dash'))
-    elif role == Role.CUSTOMER.value:
-        return redirect(url_for('dashboard.cust_dash'))
+    if role in [Role.VENDOR.value, Role.ADMIN.value, Role.CUSTOMER.value]:
+        return redirect(url_for(f'dashboard.{role.lower()}_dash'))
     else:
         flash('Invalid user role. Please log in again.')
         return redirect(url_for('index.index'))
@@ -29,12 +25,11 @@ def vendor_dash():
 @dash_bp.route('/admin', methods=['GET','POST'])
 def admin_dash():
     if request.method == 'POST':
-        print('HHHHHHHHHHHHHHHHHHHHHHHHHHHHH')
         update_product_status(dict(request.form))
     return get_dashboard_data(Role.ADMIN)
 
 @dash_bp.route('/account')
-def cust_dash():
+def customer_dash():
     return get_dashboard_data(Role.CUSTOMER)
 
 

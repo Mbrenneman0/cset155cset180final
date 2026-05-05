@@ -185,6 +185,7 @@ def get_graph_log(role: Role):
         orders = extensions.client.customer(session['user_id']).get_orders()
     elif role == Role.VENDOR:
         orders = extensions.client.vendor(session['user_id']).get_orders()
+        graph_log['ytd_rev'] = _get_monthly_revenue(role)
     else:
         orders = extensions.client.admin(session['user_id']).get_all_orders()
         graph_log['ytd_rev'] = _get_monthly_revenue(role)
@@ -208,7 +209,7 @@ def get_order_log(role: Role):
 
     order_log['order_details'] = [{'order_num': order['order_num'],
                                    "name": extensions.client.user(order['user_id']).get_info()['name'],
-                                   "date:": order['order_time'],
+                                   "date": order['order_time'],
                                    "status": order['status'],
                                    "total": sum([float(item['unit_price'])*int(item['qty'])
                                                        for item in extensions.client.order(order['order_num']).get_order_items()])}
@@ -218,5 +219,4 @@ def get_order_log(role: Role):
     return order_log
 
 def update_product_status(order_details: dict):
-    print('\n\n',order_details['action'],'\n\n')
     extensions.client.conn.update_row(TableNames.ORDERS, pk_value=int(order_details['order_num']), data={'status': order_details['action']})

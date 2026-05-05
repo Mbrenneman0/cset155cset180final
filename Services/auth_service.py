@@ -73,8 +73,8 @@ def route_controller(action: str, input_types: list, log_type: str = None, role:
             try:
                 if ph.verify(user['password'], inputs['password']):
                     create_session(user['user_id'], user['role'])
-                    if role != Role.CUSTOMER:
-                        return # TODO: redirect to vender/admin page when made
+                    if session['role'] != Role.CUSTOMER:
+                        return redirect(url_for('dashboard.dashboard'))
                     return redirect(url_for('index.index'))
             except VerifyMismatchError:
                 pass
@@ -84,8 +84,8 @@ def route_controller(action: str, input_types: list, log_type: str = None, role:
 
         if action == 'register':
             _create_user(inputs)
-            if role != Role.CUSTOMER:
-                return # TODO: redirect to vender/admin page when made
+            if session['role'] != Role.CUSTOMER:
+                return redirect(url_for('dashboard.dashboard'))
             return redirect(url_for('index.index'))
 
     return render_template('base_auth.html', title=action.capitalize(), inputs=input_types, log_type=log_type)
