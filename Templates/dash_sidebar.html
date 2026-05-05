@@ -3,7 +3,7 @@
     <a class="active" href="#"><i>Dashboard</i></a>
 
     {% if role != role.CUSTOMER %}
-        <a href="#"><i></i>Products</a>
+        <a href="{{ role }}/products"><i></i>Products</a>
     {% endif %}
 
         <a href="#"><i></i>Orders</a>
