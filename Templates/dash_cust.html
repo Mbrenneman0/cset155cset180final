@@ -125,7 +125,7 @@
                         <tr>
                             <td>{{ order['order_num'] }}</td>
                             <td>{{ order['name'] }}</td>
-                            <td style="width: 16%;">{{ order_log['order_costs'][order.get('order_num')] }}</td>
+                            <td style="width: 16%;">{{ order['total'] }}</td>
                             <td>{{ order['status'] }}</td>
                             <td>
                                 <input type="submit" name="input-btn" value="{{ order_log['order_actions'][order.get('order_num')] }}" class="badge-{{ order_log['order_actions'][order.get('order_num')] }}">
