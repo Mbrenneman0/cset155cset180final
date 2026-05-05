@@ -99,7 +99,7 @@ def checkout():
             for item in cart_items:
                 product = extensions.client.product(item['sku']).get_info()
                 if item['qty'] > product['qty']:
-                    raise Exception(f"Not enough stock for SKU:{item['sku']} {product['name']}. Available: {product['qty']}")
+                    raise Exception(f"Not enough stock for SKU:{item['sku']} {product['title']}. Available: {product['qty']}")
 
             extensions.client.customer(user_id).create_order(cart_items)
             clear_cart()
