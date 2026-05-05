@@ -158,8 +158,14 @@ def get_dashboard_data(role: Role) -> str:
 
 def get_quick_log(role: Role):
     quick_log = {}
-
-    if role == Role.VENDOR:
+    if role == Role.ADMIN:
+        admin = extensions.client.admin(session['user_id'])
+        orders = admin.get_all_orders()
+        order_items = [extensions.client.order(item['order_num']).get_order_items() for item in orders]
+        order_items = [item for sublist in order_items for item in sublist] # unpacks nested list to flat list
+        quick_log['revenue'] = _get_revenue(order_items)
+        quick_log['products'] = _get_product_quantity(role)
+    elif role == Role.VENDOR:
         vendor = extensions.client.vendor(session['user_id'])
         orders = vendor.get_orders()
         order_items = [vendor.order_items_from_order(item['order_num']) for item in orders]
@@ -188,7 +194,18 @@ def get_graph_log(role: Role):
 
 def get_order_log(role: Role):
     order_log = {}
-    orders = _get_orders(role)
+    orders = None
+
+    if role == Role.ADMIN:
+        admin = extensions.client.admin(session['user_id'])
+        orders = admin.get_all_orders()
+    elif role == Role.VENDOR:
+        vendor = extensions.client.vendor(session['user_id'])
+        orders = vendor.get_orders()
+    elif role == Role.CUSTOMER:
+        customer = extensions.client.customer(session['user_id'])
+        orders = customer.get_orders()
+
     order_log['order_details'] = orders
     order_log['order_costs'] = _get_orders_cost(role)
     order_log['order_actions'] = {order['order_num']: _get_order_action(order.get('status')) for order in orders}
