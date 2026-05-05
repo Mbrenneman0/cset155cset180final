@@ -72,7 +72,7 @@
                             <tr>
                                 <td>{{ order['order_num'] }}</td>
                                 <td>{{ order['name'] }}</td>
-                                <td style="width: 16%;">{{ order_log['order_costs'][order.get('order_num')] }}</td>
+                                <td style="width: 16%;">{{ order['total'] }}</td>
                                 <td>{{ order['status'] }}</td>
                                 <td>
                                     <input type="hidden" name="order_num" value="{{ order['order_num'] }}">
