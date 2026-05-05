@@ -212,4 +212,6 @@ def get_order_log(role: Role):
 
     return order_log
 
-
+def update_product_status(order_details: dict):
+    print('\n\n',order_details['action'],'\n\n')
+    extensions.client.conn.update_row(TableNames.ORDERS, pk_value=int(order_details['order_num']), data={'status': order_details['action']})

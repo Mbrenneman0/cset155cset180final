@@ -124,7 +124,7 @@
                     {% for order in order_log['order_details'] %}
                         <tr>
                             <td>{{ order['order_num'] }}</td>
-                            <td>{{ order['name'] }}</td>
+                            <td>{{ order['date'] }}</td>
                             <td style="width: 16%;">{{ order_log['order_costs'][order.get('order_num')] }}</td>
                             <td>{{ order['status'] }}</td>
                             <td>
