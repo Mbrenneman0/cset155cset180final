@@ -159,16 +159,18 @@ def get_quick_log(role: Role):
     quick_log = {}
 
     if role == Role.VENDOR:
-        condition = f'products.vendor_id = {session["user_id"]}'
-    else:
-        condition = None
-    order_items = extensions.client.conn.get_rows(TableNames.PRODUCTS.value,
-                                                  join_tables=[TableNames.ORDER_ITEMS.value],
-                                                  condition=condition)
+        vendor = extensions.client.vendor(session['user_id'])
+        orders = vendor.get_orders()
+        order_items = [vendor.order_items_from_order(item['order_num']) for item in orders]
+        order_items = [item for sublist in order_items for item in sublist] # unpacks nested list to flat list
+        quick_log['revenue'] = _get_revenue(order_items)
+        quick_log['products'] = _get_product_quantity(role)
+    elif role == Role.CUSTOMER:
+        orders = extensions.client.customer(session['user_id']).get_orders()
+        order_items = [extensions.client.order(item['order_num']).get_order_items() for item in orders]
+
     
-    quick_log['orders'] = _get_order_quantity(order_items)
-    quick_log['revenue'] = _get_revenue(order_items)
-    quick_log['products'] = _get_product_quantity(role)
+    quick_log['orders'] = _get_order_quantity(orders)
     quick_log['complaints'] = _get_complaint_quantity(role)
 
     return quick_log

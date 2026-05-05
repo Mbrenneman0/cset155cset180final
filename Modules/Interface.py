@@ -177,6 +177,34 @@ class Client:
         def get_product_reviews(self) -> list[ReviewRow]:
             return self.conn.get_rows(TableNames.REVIEWS, condition=f"products.vendor_id = :user_id", join_tables=["products"], params={"user_id": self.user_id})
         
+        def get_orders(self) -> list[OrderRow]:
+            rslt = self.conn.get_rows(
+                    TableNames.ORDERS,
+                    condition="products.vendor_id = :vendor_id",
+                    join_tables=[TableNames.ORDER_ITEMS, TableNames.PRODUCTS],
+                    cols=[
+                        "DISTINCT orders.order_num AS order_num",
+                        "orders.user_id AS user_id",
+                        "orders.order_time AS order_time",
+                        "orders.status AS status"
+                    ],
+                    params={"vendor_id": self.user_id}
+                    )
+            orders_list = [OrderRow(order_num=item['order_num'],
+                                    user_id=item['user_id'],
+                                    order_time=item['order_time'],
+                                    status=item['status'])
+                                    for item in rslt]
+            return orders_list
+
+        def order_items_from_order(self, order_num:int) -> list[OrderItem]:
+            order = self.client.order(order_num)
+            skus = [item['sku'] for item in self.get_products()]
+            order_items = [item for item in order.get_order_items()
+                           if item["sku"] in skus]
+            return order_items
+
+
         def reset_database(self):
             self.conn.reset_db()
 
@@ -270,8 +298,8 @@ class Client:
             self.order_num = order_num
 
         def get_order_items(self) -> list[OrderItem]:
-            rslt = self.conn.get_rows('orders',
-                                      condition= 'orders.order_num = :order_num',
+            rslt = self.conn.get_rows(TableNames.ORDERS,
+                                      condition= f'{TableNames.ORDERS.value}.order_num = :order_num',
                                       join_tables=['order_items'],
                                       params={'order_num': self.order_num})
             order_items = []
