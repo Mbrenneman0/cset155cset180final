@@ -1,6 +1,6 @@
 from flask import render_template, request, redirect, url_for, flash, Blueprint, session
 from Modules.Types import Role
-from Services.dash_service import get_dashboard_data
+from Services.dash_service import get_dashboard_data, update_product_status
 
 dash_bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
 
@@ -20,21 +20,23 @@ def dashboard():
         return redirect(url_for('index.index'))
 
 # ------------ MAIN DASH ----------------
-@dash_bp.route('/vendor')
+@dash_bp.route('/vendor', methods=['GET','POST'])
 def vendor_dash():
+    if request.method == 'POST':
+        update_product_status(dict(request.form))
     return get_dashboard_data(Role.VENDOR)
 
-@dash_bp.route('/admin')
+@dash_bp.route('/admin', methods=['GET','POST'])
 def admin_dash():
+    if request.method == 'POST':
+        print('HHHHHHHHHHHHHHHHHHHHHHHHHHHHH')
+        update_product_status(dict(request.form))
     return get_dashboard_data(Role.ADMIN)
 
 @dash_bp.route('/account')
 def cust_dash():
     return get_dashboard_data(Role.CUSTOMER)
 
-# @dash_bp.route('/admin/vender')
-# def admin_dash():
-#     return render_template('base_dashboard.html')
 
 # ----- PRODUCTS ------
 @dash_bp.route('/<role>/products')

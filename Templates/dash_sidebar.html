@@ -2,19 +2,19 @@
     <a href="{{ url_for('index.index') }}"><h4>TradeHive</h4></a>
     <a class="active" href="#"><i>Dashboard</i></a>
 
-    {% if role != role.CUSTOMER %}
+    {% if role != 'Customer' %}
         <a href="{{ role }}/products"><i></i>Products</a>
     {% endif %}
 
         <a href="#"><i></i>Orders</a>
 
-    {% if role != role.CUSTOMER %}
+    {% if role != 'Customer' %}
         <a href="#"><i></i>Reviews</a>
     {% endif %}
 
         <a href="#"><i></i>Messages</a>
 
-    {% if role != role.CUSTOMER %}
+    {% if role != 'Customer' %}
         <a href="#"><i></i>Complaints</a>
     {% endif %}
 

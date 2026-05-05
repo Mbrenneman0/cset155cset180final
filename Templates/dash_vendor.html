@@ -62,13 +62,23 @@
                 </div>
             </div>
         </div>
-        <form class="table-wrapper floating-wrapper">
+        <form action="url_for(request.endpoint)" class="table-wrapper floating-wrapper" method="POST">
             <h4>Recent Orders</h4>
             <table>
                 <thead><tr><th>Order ID</th><th>Cutomer</th><th style="width: 16%;">Total</th><th>Status</th><th>Action</td></tr></thead>
                 <tbody>
                     {% for order in order_log['order_details'] %}
-                        <tr><td>{{ order['order_num'] }}</td><td>{{ order['name'] }}</td><td style="width: 16%;">{{ order['total'] }}</td><td>{{ order['status'] }}</td><td><input type="submit" name="input-btn" value="{{ order_log['order_actions'][order.get('order_num')] }}" class="badge-{{ order_log['order_actions'][order.get('order_num')] }}"></td></tr>
+                        <tr>
+                            <td>{{ order['order_num'] }}</td>
+                            <td>{{ order['name'] }}</td>
+                            <td style="width: 16%;">{{ order['total'] }}</td>
+                            <td>{{ order['status'] }}</td>
+                            <td>
+                                <input type="hidden" name="order_num" value="{{ order['order_num'] }}">
+                                <input type="hidden" name="action" value="{{ order_log['order_actions'][order.get('order_num')] }}">
+                                <input type="submit" name="input-btn" value="{{ order_log['order_actions'][order.get('order_num')] }}" class="badge-{{ order_log['order_actions'][order.get('order_num')] }}">
+                            </td>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>
