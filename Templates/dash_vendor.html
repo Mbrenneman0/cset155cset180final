@@ -43,14 +43,14 @@
                 <div class="graph-wrapper">
                     <h4>Order Status</h4>
                     <div class="donut-container">
-                        <div class="donut" style="--pending: {{ graph_log['order_status'].get('Pending', 0) }};
-                                                  --confirmed: {{ graph_log['order_status'].get('Confirmed', 0) }};
-                                                  --shipped: {{ graph_log['order_status'].get('Shipped', 0) }};
-                                                  --delivered: {{ graph_log['order_status'].get('Delivered', 0) }};">
-                            <div class="donut__slice donut__slice__pending"></div>
-                            <div class="donut__slice donut__slice__confirmed"></div>
-                            <div class="donut__slice donut__slice__shipped"></div>
-                            <div class="donut__slice donut__slice__delivered"></div>
+                        {% set total = graph_log['order_status']['Pending']
+                                    + graph_log['order_status']['Confirmed']
+                                    + graph_log['order_status']['Picked Up']
+                                    + graph_log['order_status']['Shipped'] %}
+                        <div class="donut" style="--pending: {{ (graph_log['order_status'].get('Pending', 0)) / total }};
+                                                  --confirmed: {{ (graph_log['order_status'].get('Confirmed', 0)) / total }};
+                                                  --picked: {{ (graph_log['order_status'].get('Picked Up', 0)) / total }};
+                                                  --shipped: {{ (graph_log['order_status'].get('Shipped', 0)) / total }};">
                         </div>
                         <div class="donut-legend">
                             <div class="legend-item"><span class="legend-color" style="background: #FFC820;"></span>Pending</div>
@@ -65,22 +65,32 @@
         <div class="table-wrapper floating-wrapper">
             <h4>Recent Orders</h4>
             <table>
-                <thead><tr><th>Order ID</th><th>Cutomer</th><th style="width: 16%;">Total</th><th>Status</th><th>Action</td></tr></thead>
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Cutomer</th>
+                        <th style="width: 16%;">Total</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
                 <tbody>
                     {% for order in order_log['order_details'] %}
-                        <form action="{{ url_for(request.endpoint) }}" class="table-wrapper floating-wrapper" method="POST">
-                            <tr>
-                                <td>{{ order['order_num'] }}</td>
-                                <td>{{ order['name'] }}</td>
-                                <td style="width: 16%;">{{ order['total'] }}</td>
-                                <td>{{ order['status'] }}</td>
-                                <td>
-                                    <input type="hidden" name="order_num" value="{{ order['order_num'] }}">
-                                    <input type="hidden" name="action" value="{{ order_log['order_actions'][order.get('order_num')] }}">
-                                    <input type="submit" name="input-btn" value="{{ order_log['order_actions'][order.get('order_num')] }}" class="badge-{{ order_log['order_actions'][order.get('order_num')] }}">
-                                </td>
-                            </tr>
-                        </form>
+                    <tr class="row_{{ 'even' if loop.index0 % 2 == 1 else 'odd' }}">
+                        <td>{{ order['order_num'] }}</td>
+                        <td>{{ order['name'] }}</td>
+                        <td style="width: 16%;">{{ order['total'] }}</td>
+                        <td>{{ order['status'] }}</td>
+                        <td>
+                            <form action="{{ url_for(request.endpoint) }}" method="POST">
+                                <input type="hidden" name="order_num" value="{{ order['order_num'] }}">
+                                <input type="hidden" name="action" value="{{ order_log['order_actions'][order.get('order_num')] }}">
+                                <input type="submit" name="input-btn"
+                                    value="{{ order_log['order_actions'][order.get('order_num')] }}"
+                                    class="badge-{{ order_log['order_actions'][order.get('order_num')] }}">
+                            </form>
+                        </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>

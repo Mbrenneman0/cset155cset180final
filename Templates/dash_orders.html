@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/dash.css') }}">
+    <title>Document</title>
+</head>
+<body>
+
+{% include 'dash_sidebar.html' %}
+
+<div class="log_body">
+    <form class="topbar floating-wrapper flex">
+        <input class="searchbar" placeholder="Search orders..." name="search">
+        <div class="role"><strong>{{ role }}</strong></div>
+        <form class="flex">
+            <input type="button" class="quick_sort card_col floating-wrapper" value="test">
+            <input type="button" class="quick_sort card_col floating-wrapper" value="test">
+            <input type="button" class="quick_sort card_col floating-wrapper" value="test">
+            <input type="button" class="quick_sort card_col floating-wrapper" value="test">
+        </form>
+    </form>
+    <div class="log-wrapper">
+        <div class="table-wrapper floating-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <td style="width: 2.5%;" class="row_check">
+                            <form>
+                                <input type="checkbox" name="check_all" onclick="checkAll()" class="checks" id="check_all">
+                            </form>
+                        </td>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th style="width: 16%;">Total</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody class="orders_table">
+                    {% for order in order_log['order_details'] %}
+                    <tr class="row_{{ 'even' if loop.index0 % 2 == 1 else 'odd' }}">
+                        <td style="width: 2.5%;">
+                            <form>
+                                <input type="checkbox" name="checks" class="checks">
+                            </form>
+                        </td>
+                        <td>{{ order['order_num'] }}</td>
+                        <td>{{ order['name'] }}</td>
+                        <td>${{ order['total'] }}</td>
+                        <td>{{ order['status'] }}</td>
+                        <td>
+                            <form action="" method="POST">
+                                <input type="hidden" name="order_num" value="{{ order['order_num'] }}">
+                                <input type="hidden" name="action" value="{{ order_log['order_actions'][order.get('order_num')] }}">
+                                <input type="submit" name="input-btn"
+                                    value="{{ order_log['order_actions'][order.get('order_num')] }}"
+                                    class="badge-{{ order_log['order_actions'][order.get('order_num')] }}">
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+    
+</div>
+
+<script>
+    const master_check = document.getElementById('check_all')
+
+    function checkAll(){
+        if (master_check.checked){
+            document.querySelectorAll('.checks').forEach(check => check.checked = true)
+        }else{
+            document.querySelectorAll('.checks').forEach(check => check.checked = false)
+        }
+    }
+
+</script>
+
+</body>
+</html>
+
