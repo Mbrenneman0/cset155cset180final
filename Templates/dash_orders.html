@@ -14,7 +14,7 @@
 <div class="log_body">
     <form class="topbar floating-wrapper flex">
         <input class="searchbar" placeholder="Search orders..." name="search">
-        <div class="role"><strong>{{ role }}</strong></div>
+        <div class="role"><strong>{{ role[0]|upper}}{{role[1:] }}</strong></div>
         <form class="flex">
             <input type="button" class="quick_sort card_col floating-wrapper" value="test">
             <input type="button" class="quick_sort card_col floating-wrapper" value="test">
@@ -22,9 +22,9 @@
             <input type="button" class="quick_sort card_col floating-wrapper" value="test">
         </form>
     </form>
-    <div class="log-wrapper">
-        <div class="table-wrapper floating-wrapper">
-            <table>
+    <div class="log-wrapper fixed">
+        <div class="floating-wrapper fixed">
+            <table class="orders_table fixed">
                 <thead>
                     <tr>
                         <td style="width: 2.5%;" class="row_check">
@@ -34,12 +34,22 @@
                         </td>
                         <th>Order ID</th>
                         <th>Customer</th>
-                        <th style="width: 16%;">Total</th>
+                        <th>Total</th>
                         <th>Status</th>
                         <th>Action</th>
+                        <div class="dropdown order_filter">
+                            <button onclick="dropdown()" class="dropbtn">&#9778;</button>
+                            <div id="myDropdown" class="dropdown-content card_col floating-wrapper">
+                                <a href="{{ url_for('dashboard.view_orders',role=role) }}">All</a>
+                                <a href="{{ url_for('dashboard.view_filtered_orders',role=role,action='Pending') }}">Pending</a>
+                                <a href="{{ url_for('dashboard.view_filtered_orders',role=role,action='Confirmed') }}">Confirmed</a>
+                                <a href="{{ url_for('dashboard.view_filtered_orders',role=role,action='Picked Up') }}">Picked Up</a>
+                                <a href="{{ url_for('dashboard.view_filtered_orders',role=role,action='Shipped') }}">Shipped</a>
+                            </div>
+                        </div>
                     </tr>
                 </thead>
-                <tbody class="orders_table">
+                <tbody class="table-scroll">
                     {% for order in order_log['order_details'] %}
                     <tr class="row_{{ 'even' if loop.index0 % 2 == 1 else 'odd' }}">
                         <td style="width: 2.5%;">
@@ -47,7 +57,7 @@
                                 <input type="checkbox" name="checks" class="checks">
                             </form>
                         </td>
-                        <td>{{ order['order_num'] }}</td>
+                        <td>{{ order['order_num'] }} <button class="dropbtn">&#129123;</button></td>
                         <td>{{ order['name'] }}</td>
                         <td>${{ order['total'] }}</td>
                         <td>{{ order['status'] }}</td>
@@ -61,6 +71,7 @@
                             </form>
                         </td>
                     </tr>
+                    
                     {% endfor %}
                 </tbody>
 
@@ -79,6 +90,25 @@
         }else{
             document.querySelectorAll('.checks').forEach(check => check.checked = false)
         }
+    }
+
+    function dropdown() {
+        document.getElementById("myDropdown").classList.toggle("show");
+    }
+
+    function filterFunction() {
+    const input = document.getElementById("myInput");
+    const filter = input.value.toUpperCase();
+    const div = document.getElementById("myDropdown");
+    const a = div.getElementsByTagName("a");
+    for (let i = 0; i < a.length; i++) {
+        txtValue = a[i].textContent || a[i].innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        a[i].style.display = "";
+        } else {
+        a[i].style.display = "none";
+        }
+    }
     }
 
 </script>

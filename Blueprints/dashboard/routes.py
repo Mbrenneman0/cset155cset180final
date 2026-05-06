@@ -67,3 +67,8 @@ def view_orders(role):
     if request.method == 'POST':
         update_product_status(dict(request.form))
     return render_template('dash_orders.html', role=role, order_log=get_order_log(session['role']))
+@dash_bp.route('/<role>/orders/<action>', methods=['GET','POST'])
+def view_filtered_orders(role, action):
+    if request.method == 'POST':
+        update_product_status(dict(request.form))
+    return render_template('dash_orders.html', role=role, order_log=get_order_log(session['role'], action))
