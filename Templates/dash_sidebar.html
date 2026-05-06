@@ -1,12 +1,12 @@
 <div class="sidebar">
     <a href="{{ url_for('index.index') }}"><h4>TradeHive</h4></a>
-    <a class="active" href="#"><i>Dashboard</i></a>
+    <a class="active" href="{{ url_for('dashboard.' + role|lower + '_dash') }}"><i>Dashboard</i></a>
 
     {% if role != 'Customer' %}
         <a href="{{ role }}/products"><i></i>Products</a>
     {% endif %}
 
-        <a href="#"><i></i>Orders</a>
+        <a href="{{ url_for('dashboard.view_orders',role=role|lower) }}"><i></i>Orders</a>
 
     {% if role != 'Customer' %}
         <a href="#"><i></i>Reviews</a>
