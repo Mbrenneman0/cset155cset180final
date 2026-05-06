@@ -1,5 +1,6 @@
+import os
 import extensions
-from flask import Flask, url_for, request
+from flask import Flask, current_app, url_for, request
 from werkzeug.datastructures import ImmutableMultiDict, FileStorage
 from Modules.Types import *
 
@@ -37,6 +38,9 @@ def get_product(sku, with_imgs = False, with_reviews = False, with_rating = Fals
 def update_product(form:ImmutableMultiDict[str, str], image:FileStorage=None):
     sku = form.get('sku')
     product = extensions.client.product(sku)
+    vendor = extensions.client.vendor(product.get_info()['vendor_id'])
+    vendor_name = vendor.get_info()['username']
+
     data = ProductUpdate(qty = int(form.get('qty')),
                         title = form.get('title'),
                         color = form.get('color'),
@@ -46,6 +50,19 @@ def update_product(form:ImmutableMultiDict[str, str], image:FileStorage=None):
                         warranty_period = form.get('warranty_period'),
                         is_removed = form.get('is_removed')=='True'
                         )
+    filename = f'{sku}-1.png'
+    image.filename = filename
+    upload_path = os.path.join(
+                current_app.root_path,
+                "Static",
+                "Images",
+                "prod-imgs",
+                vendor_name
+            )
+    os.makedirs(upload_path, exist_ok=True)
+    save_path = os.path.join(upload_path, filename)
+    image.save(save_path)
+
     product.update(data)
     
 

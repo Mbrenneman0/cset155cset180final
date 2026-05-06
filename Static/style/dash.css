@@ -316,6 +316,7 @@ tr.row_odd {
 .show{
     display: block;
 }
+
 /************ Products Page ***************/
 
 .dash_main {
@@ -513,9 +514,6 @@ tr.row_odd {
         padding: 1rem;
     }
 }
-
-
-
 /* ---------- SHARED ----------- */
 .floating-wrapper{
     background:#fff;

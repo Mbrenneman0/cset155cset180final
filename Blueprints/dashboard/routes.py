@@ -50,7 +50,7 @@ def edit_product(role, sku):
     elif request.method == 'POST':
         form = request.form
         image = request.files.get('image')
-        if not image or image.filename:
+        if not image:
             image=None
         update_product(form, image)
         return redirect(url_for('dashboard.view_products', role=role))
