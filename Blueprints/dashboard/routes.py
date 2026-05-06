@@ -1,6 +1,7 @@
 from flask import render_template, request, redirect, url_for, flash, Blueprint, session
 from Modules.Types import Role
 from Services.dash_service import get_dashboard_data, update_product_status
+from Services.product_service import get_products
 
 dash_bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
 
@@ -36,8 +37,10 @@ def customer_dash():
 # ----- PRODUCTS ------
 @dash_bp.route('/<role>/products')
 def view_products(role):
-    print(role)
-    return
+    products = get_products(with_imgs=True)
+    if role == Role.VENDOR.value:
+        products = [product for product in products if product['vendor_id'] == session['user_id']]
+    return render_template('dash_products.html', products= products, role= role)
 
 
 def test(role, id):

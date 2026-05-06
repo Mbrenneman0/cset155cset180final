@@ -244,4 +244,103 @@ table input{
 }
 
 
+/************ Products Page ***************/
 
+.dash_main {
+    margin-left: 250px;
+    padding: 2rem;
+}
+
+.dash_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.dash_products_grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.dash_product_card {
+    background-color: var(--text-light);
+    border: 1px solid var(--border-color-light);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.dash_product_img_wrap {
+    width: 100%;
+    height: 180px;
+    background-color: #f3f3f3;
+}
+
+.dash_product_img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.dash_product_no_img {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #777;
+}
+
+.dash_product_info {
+    padding: 1rem;
+}
+
+.dash_product_info h2 {
+    margin-bottom: 0.25rem;
+}
+
+.dash_product_sku {
+    color: #777;
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+}
+
+.dash_product_details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-top: 1rem;
+}
+
+.dash_product_actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.dash_action_btn,
+.dash_small_btn {
+    text-decoration: none;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    background-color: var(--accent-color);
+    color: white;
+}
+
+.dash_small_btn.danger {
+    background-color: #b00020;
+}
+
+.dash_product_removed {
+    margin-top: 1rem;
+    color: #b00020;
+    font-weight: bold;
+}
+
+.dash_empty {
+    background-color: var(--text-light);
+    border: 1px solid var(--border-color-light);
+    border-radius: 12px;
+    padding: 2rem;
+}
