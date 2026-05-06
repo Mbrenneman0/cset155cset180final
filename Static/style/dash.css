@@ -7,20 +7,7 @@ body{
     display: flex;
     flex-wrap: wrap;
     background:#f8fafc;
-}
-
-/* ---------- SHARED ----------- */
-.floating-wrapper{
-    background:#fff;
-    border-radius:18px;
-    box-shadow:0 6px 18px rgba(0,0,0,.06);
-    padding: .5rem 1rem;
-    margin-bottom: 1.5rem;
-}
-.flex{
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+    overflow-y: hidden;
 }
 
 /* -------- LOG BODY ------------ */
@@ -152,6 +139,7 @@ body{
 .monthly_details{
     position: relative;
     top: 0;
+    z-index: 99;
 }
 
 .month-group:hover p{
@@ -261,6 +249,30 @@ tr.row_odd {
 }
 
 /* orders */
+.orders_table thead {
+    display: table;
+    position: relative;
+    width: 100%;
+    table-layout: fixed;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background-color: #fff;
+}
+.orders_table tbody {
+    display: block;
+    max-height: 60vh;
+    overflow-y: auto;
+    width: 100%;
+}
+.orders_table th{
+    border-bottom: 2px solid #ccc;
+}
+.orders_table tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
 .orders_table td{
     width: 19.5%;
     text-align: left;
@@ -272,6 +284,37 @@ tr.row_odd {
 }
 .checks{
     width: 1rem;
+}
+.dropdown{
+    position: relative;
+    display: inline-block;
+}
+.order_filter{
+    position: absolute;
+    z-index: 99;
+    right: 45px;
+    width: 5rem;
+    height: 1rem;
+    text-align: right;
+}
+.dropbtn{
+    background-color: transparent;
+    color: black;
+    padding: 3px 3px;
+    margin-left: 10px;
+}
+.dropbtn:hover{
+    background-color: transparent;
+}
+.dropdown-content{
+    position: absolute;
+    display: none;
+    right: 0;
+    width: fit-content;
+    height: fit-content;
+}
+.show{
+    display: block;
 }
 
 /************ Products Page ***************/
@@ -470,4 +513,20 @@ tr.row_odd {
     .edit_product_wrap {
         padding: 1rem;
     }
+}
+/* ---------- SHARED ----------- */
+.floating-wrapper{
+    background:#fff;
+    border-radius:18px;
+    box-shadow:0 6px 18px rgba(0,0,0,.06);
+    padding: .5rem 1rem;
+    margin-bottom: 1.5rem;
+}
+.flex{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.fixed{
+    overflow-y: hidden;
 }

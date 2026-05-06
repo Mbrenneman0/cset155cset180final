@@ -45,6 +45,9 @@ class Client:
         def get_orders(self) -> list[OrderRow]:
             return self.conn.get_rows(TableNames.ORDERS, condition=f"user_id = :user_id", params={"user_id": self.user_id})
 
+        def get_orders_filtered(self, action:str) -> list[OrderRow]:
+            return self.conn.get_rows(TableNames.ORDERS, condition=f"user_id = :user_id and status = :status", params={"user_id": self.user_id, "status": action})
+
         def get_reviews(self):
             return self.conn.get_rows(TableNames.REVIEWS, condition=f"user_id = :user_id", params={"user_id": self.user_id})
         
@@ -196,6 +199,26 @@ class Client:
                                     status=item['status'])
                                     for item in rslt]
             return orders_list
+        
+        def get_orders_filtered(self, action:str) -> list[OrderRow]:
+            rslt = self.conn.get_rows(
+                    TableNames.ORDERS,
+                    condition=f"products.vendor_id = :vendor_id and status=:status",
+                    join_tables=[TableNames.ORDER_ITEMS, TableNames.PRODUCTS],
+                    cols=[
+                        "DISTINCT orders.order_num AS order_num",
+                        "orders.user_id AS user_id",
+                        "orders.order_time AS order_time",
+                        "orders.status AS status"
+                    ],
+                    params={"vendor_id": self.user_id, "status": action}
+                    )
+            orders_list = [OrderRow(order_num=item['order_num'],
+                                    user_id=item['user_id'],
+                                    order_time=item['order_time'],
+                                    status=item['status'])
+                                    for item in rslt]
+            return orders_list
 
         def order_items_from_order(self, order_num:int) -> list[OrderItem]:
             order = self.client.order(order_num)
@@ -229,6 +252,9 @@ class Client:
 
         def get_all_orders(self) -> list[OrderRow]:
             return self.conn.get_rows(TableNames.ORDERS)
+        
+        def get_all_orders_filtered(self, action:str) -> list[OrderRow]:
+            return self.conn.get_rows(TableNames.ORDERS, condition=f"status = :status", params={"status": action})
 
     class Product:
         def __init__(self, client: "Client", sku):

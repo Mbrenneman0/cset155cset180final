@@ -160,19 +160,19 @@ def get_graph_log(role: Role):
 
     return graph_log
 
-def get_order_log(role: Role):
+def get_order_log(role: Role, action:str = None):
     order_log = {}
     orders = None
 
     if role == Role.ADMIN:
         admin = extensions.client.admin(session['user_id'])
-        orders = admin.get_all_orders()
+        orders = admin.get_all_orders() if action is None else admin.get_all_orders_filtered(action)
     elif role == Role.VENDOR:
         vendor = extensions.client.vendor(session['user_id'])
-        orders = vendor.get_orders()
+        orders = vendor.get_orders() if action is None else vendor.get_orders_filtered(action)
     elif role == Role.CUSTOMER:
         customer = extensions.client.customer(session['user_id'])
-        orders = customer.get_orders()
+        orders = customer.get_orders() if action is None else customer.get_orders_filtered(action)
 
     order_log['order_details'] = [{'order_num': order['order_num'],
                                    "name": extensions.client.user(order['user_id']).get_info()['name'],
@@ -186,4 +186,5 @@ def get_order_log(role: Role):
     return order_log
 
 def update_product_status(order_details: dict):
-    extensions.client.conn.update_row(TableNames.ORDERS, pk_value=int(order_details['order_num']), data={'status': order_details['action']})
+    if order_details['action'] != 'Completed':
+        extensions.client.conn.update_row(TableNames.ORDERS, pk_value=int(order_details['order_num']), data={'status': order_details['action']})
