@@ -97,41 +97,7 @@ def _get_order_action(status: str) -> str:
     action = ['Pending', 'Confirmed', 'Picked Up', 'Shipped', ]
     return action[action.index(status)+1] if action.index(status) < 3 else 'Completed'
 
-def _get_orders(role: Role) -> list:
-    if role == Role.VENDOR:
-        condition = f'products.vendor_id = {session["user_id"]}'
-    else:
-        condition = None
-
-    orders = extensions.client.conn.get_rows(TableNames.PRODUCTS.value,
-                                            join_tables=[TableNames.ORDER_ITEMS.value, TableNames.ORDERS.value, TableNames.USERS.value],
-                                            condition=condition,
-                                            cols=['DISTINCT order_items.order_num', 'users.name', 'orders.status', 'products.*'])
-    return orders
-
-def _get_orders_cost(role: Role) -> dict:
-    cost = {}
-
-    if role == Role.VENDOR:
-        condition = f'products.vendor_id = {session["user_id"]}'
-    else:
-        condition = None
-
-    orders = extensions.client.conn.get_rows(TableNames.PRODUCTS.value,
-                                            join_tables=[TableNames.ORDER_ITEMS.value, TableNames.ORDERS.value, TableNames.USERS.value],
-                                            condition=condition,
-                                            cols=['order_items.order_num', 'products.unit_price', 'order_items.qty'])
-
-    for order in orders:
-        if order.get('order_num') in cost:
-            cost[order.get('order_num')] += order.get('unit_price') * order.get('qty')
-        else:
-            cost[order.get('order_num')] = order.get('unit_price') * order.get('qty')
-    return cost
-
-
 def get_dashboard_data(role: Role) -> str:
-    print(session, role)
     if not check_credentials(role, session.get('user_id')):
         flash('You do not have the necessary credentials', 'error')
         return redirect(url_for('index.index'))
@@ -186,6 +152,7 @@ def get_graph_log(role: Role):
         orders = extensions.client.customer(session['user_id']).get_orders()
     elif role == Role.VENDOR:
         orders = extensions.client.vendor(session['user_id']).get_orders()
+        graph_log['ytd_rev'] = _get_monthly_revenue(role)
     else:
         orders = extensions.client.admin(session['user_id']).get_all_orders()
     graph_log['ytd_rev'] = _get_monthly_revenue(role)
@@ -209,7 +176,7 @@ def get_order_log(role: Role):
 
     order_log['order_details'] = [{'order_num': order['order_num'],
                                    "name": extensions.client.user(order['user_id']).get_info()['name'],
-                                   "date:": order['order_time'],
+                                   "date": order['order_time'],
                                    "status": order['status'],
                                    "total": sum([float(item['unit_price'])*int(item['qty'])
                                                        for item in extensions.client.order(order['order_num']).get_order_items()])}
@@ -218,4 +185,5 @@ def get_order_log(role: Role):
 
     return order_log
 
-
+def update_product_status(order_details: dict):
+    extensions.client.conn.update_row(TableNames.ORDERS, pk_value=int(order_details['order_num']), data={'status': order_details['action']})
