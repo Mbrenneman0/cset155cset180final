@@ -144,7 +144,8 @@ def get_dashboard_data(role: Role) -> str:
                            role=role.value,
                            quick_log=quick_log,
                            graph_log=graph_log,
-                           order_log=order_log)
+                           order_log=order_log,
+                           active_page = 'dashboard')
 
 def get_quick_log(role: Role):
     quick_log = {}

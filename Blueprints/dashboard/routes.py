@@ -1,7 +1,7 @@
-from flask import render_template, request, redirect, url_for, flash, Blueprint, session
+from flask import Flask, render_template, request, redirect, url_for, flash, Blueprint, session, request
 from Modules.Types import Role
 from Services.dash_service import get_dashboard_data
-from Services.product_service import get_products
+from Services.product_service import get_products, get_product, update_product
 
 dash_bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
 
@@ -43,8 +43,21 @@ def view_products(role):
     products = get_products(with_imgs=True)
     if role == Role.VENDOR.value:
         products = [product for product in products if product['vendor_id'] == session['user_id']]
-    return render_template('dash_products.html', products= products, role= role)
+    return render_template('dash_products.html', products= products, role= role, active_page = 'products')
 
+@dash_bp.route('/<role>/products/edit/<sku>', methods=['GET', 'POST'])
+def edit_product(role, sku):
+    if request.method == 'GET':
+        product = get_product(sku, with_imgs=True)
+        return render_template('dash_edit_product.html', product = product, role = role, active_page = 'products')
+    elif request.method == 'POST':
+        form = request.form
+        image = request.files.get('image')
+        if not image or image.filename:
+            image=None
+        update_product(form, image)
+        return redirect(url_for('dashboard.view_products', role=role))
+    
 
 def test(role, id):
     session['role'] = role

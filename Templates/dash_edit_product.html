@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Product</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/dash.css') }}">
+</head>
+<body>
+
+{% include 'dash_sidebar.html' %}
+
+<main class="dash_main">
+    <div class="dash_header">
+        <div>
+            <h1>Edit Product</h1>
+            <p>Update product details for {{ product.title }}.</p>
+        </div>
+
+        <a href="{{ url_for('dashboard.view_products', role=role) }}" class="dash_small_btn">
+            Back to Products
+        </a>
+    </div>
+
+    <section class="edit_product_wrap">
+        <form
+            class="edit_product_form"
+            action="{{ url_for('dashboard.edit_product', role=role, sku=product.sku) }}"
+            method="POST"
+            enctype="multipart/form-data"
+        >
+            <div class="edit_form_grid">
+                <div class="form_group">
+                    <label for="sku">SKU</label>
+                    <input
+                        type="text"
+                        id="sku"
+                        name="sku"
+                        value="{{ product.sku }}"
+                        readonly
+                    >
+                </div>
+
+                <div class="form_group">
+                    <label for="vendor_id">Vendor ID</label>
+                    <input
+                        type="number"
+                        id="vendor_id"
+                        name="vendor_id"
+                        value="{{ product.vendor_id }}"
+                        readonly
+                    >
+                </div>
+
+                <div class="form_group">
+                    <label for="title">Title</label>
+                    <input
+                        type="text"
+                        id="title"
+                        name="title"
+                        value="{{ product.title }}"
+                        required
+                    >
+                </div>
+
+                <div class="form_group">
+                    <label for="qty">Quantity</label>
+                    <input
+                        type="number"
+                        id="qty"
+                        name="qty"
+                        value="{{ product.qty }}"
+                        min="0"
+                        required
+                    >
+                </div>
+
+                <div class="form_group">
+                    <label for="color">Color</label>
+                    <input
+                        type="text"
+                        id="color"
+                        name="color"
+                        value="{{ product.color }}"
+                    >
+                </div>
+
+                <div class="form_group">
+                    <label for="size">Size</label>
+                    <input
+                        type="text"
+                        id="size"
+                        name="size"
+                        value="{{ product.size }}"
+                    >
+                </div>
+
+                <div class="form_group">
+                    <label for="unit_price">Unit Price</label>
+                    <input
+                        type="number"
+                        id="unit_price"
+                        name="unit_price"
+                        value="{{ product.unit_price }}"
+                        min="0"
+                        step="0.01"
+                        required
+                    >
+                </div>
+
+                <div class="form_group">
+                    <label for="warranty_period">Warranty Period</label>
+                    <input
+                        type="text"
+                        id="warranty_period"
+                        name="warranty_period"
+                        value="{{ product.warranty_period }}"
+                        placeholder="Example: 1 year"
+                    >
+                </div>
+
+                <div class="form_group">
+                    <label for="is_removed">Product Status</label>
+                    <select id="is_removed" name="is_removed">
+                        <option value="False" {% if not product.is_removed %}selected{% endif %}>
+                            Active
+                        </option>
+                        <option value="True" {% if product.is_removed %}selected{% endif %}>
+                            Removed
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form_group">
+                    <label for="image">Upload New Image</label>
+                    <input
+                        type="file"
+                        id="image"
+                        name="image"
+                        accept="image/*"
+                    >
+                </div>
+            </div>
+
+            <div class="form_group full_width">
+                <label for="description">Description</label>
+                <textarea
+                    id="description"
+                    name="description"
+                    required
+                >{{ product.description }}</textarea>
+            </div>
+
+            {% if product.images and product.images|length > 0 %}
+            <div class="current_image_preview">
+                <p>Current image:</p>
+                <img
+                    src="{{ url_for('static', filename=product.images[0]['img_url']) }}"
+                    alt="{{ product.title }}"
+                >
+            </div>
+            {% endif %}
+
+            <div class="edit_form_actions">
+                <input type="submit" value="Save Changes">
+                <a href="{{ url_for('dashboard.view_products', role=role) }}" class="dash_cancel_btn">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </section>
+</main>
+
+</body>
+</html>

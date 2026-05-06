@@ -1,3 +1,8 @@
+:root{
+    --dash-width: calc(100% - 260px);
+    --dash_height: 100vh;
+}
+
 body{
     display: flex;
     flex-wrap: wrap;
@@ -247,7 +252,7 @@ table input{
 /************ Products Page ***************/
 
 .dash_main {
-    margin-left: 250px;
+    width: var(--dash-width);
     padding: 2rem;
 }
 
@@ -259,6 +264,7 @@ table input{
 }
 
 .dash_products_grid {
+    width: 100%;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1.5rem;
@@ -315,6 +321,7 @@ table input{
 
 .dash_product_actions {
     display: flex;
+    justify-content: space-around;
     gap: 0.75rem;
     margin-top: 1rem;
 }
@@ -322,10 +329,15 @@ table input{
 .dash_action_btn,
 .dash_small_btn {
     text-decoration: none;
+    text-align: center;
+    width: 100px;
     padding: 0.6rem 1rem;
     border-radius: 8px;
-    background-color: var(--accent-color);
     color: white;
+}
+
+.dash_small_btn.edit {
+    background-color: var(--accent-primary);
 }
 
 .dash_small_btn.danger {
@@ -343,4 +355,94 @@ table input{
     border: 1px solid var(--border-color-light);
     border-radius: 12px;
     padding: 2rem;
+}
+
+/************ Edit Product Form ***************/
+
+.edit_product_wrap {
+    background-color: var(--text-light);
+    border: 1px solid var(--border-color-light);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    padding: 2rem;
+    max-width: 1000px;
+}
+
+.edit_product_form {
+    width: 100%;
+}
+
+.edit_form_grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+}
+
+.form_group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form_group input[readonly] {
+    background-color: #f1f1f1;
+    color: #777;
+    cursor: not-allowed;
+}
+
+.full_width {
+    margin-top: 1.25rem;
+}
+
+.current_image_preview {
+    margin-top: 1.5rem;
+}
+
+.current_image_preview p {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.current_image_preview img {
+    width: 220px;
+    height: 160px;
+    object-fit: cover;
+    border: 1px solid var(--border-color-light);
+    border-radius: 10px;
+    background-color: #f3f3f3;
+}
+
+.edit_form_actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.dash_cancel_btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    background-color: var(--neutral-light);
+    color: var(--text-dark);
+    font-weight: 600;
+}
+
+.dash_cancel_btn:hover {
+    background-color: var(--neutral-highlight);
+    color: var(--accent-secondary);
+}
+
+@media (max-width: 800px) {
+    .edit_form_grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dash_main {
+        margin-left: 0;
+        padding: 1rem;
+    }
+
+    .edit_product_wrap {
+        padding: 1rem;
+    }
 }
