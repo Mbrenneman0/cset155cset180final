@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/dash.css') }}">
+    <title>Dashboard Products</title>
+</head>
+<body>
+
+{% include 'dash_sidebar.html' %}
+
+<main class="dash_main">
+    <div class="dash_header">
+        <h1>Products</h1>
+
+        {% if role == 'Vendor' %}
+            <a class="dash_action_btn" href="#">Add Product</a>
+        {% endif %}
+    </div>
+
+    {% if products %}
+        <div class="dash_products_grid">
+            {% for product in products %}
+                <div class="dash_product_card">
+
+                    <div class="dash_product_img_wrap">
+                        {% if product.images and product.images|length > 0 %}
+                            <img
+                                src="{{ url_for('static', filename=product.images[0]['img_url']) }}"
+                                alt="{{ product.title }}"
+                                class="dash_product_img"
+                            >
+                        {% else %}
+                            <div class="dash_product_no_img">
+                                No Image
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="dash_product_info">
+                        <h2>{{ product.title }}</h2>
+
+                        <p class="dash_product_sku">
+                            SKU: {{ product.sku }}
+                        </p>
+
+                        <p>
+                            {{ product.description }}
+                        </p>
+
+                        <div class="dash_product_details">
+                            <span>Price: ${{ "%.2f"|format(product.unit_price|float) }}</span>
+                            <span>Stock: {{ product.qty }}</span>
+                            <span>Color: {{ product.color }}</span>
+                            <span>Size: {{ product.size }}</span>
+                            <span>Warranty: {{ product.warranty_period }}</span>
+                        </div>
+
+                        {% if product.is_removed %}
+                            <p class="dash_product_removed">Removed</p>
+                        {% endif %}
+
+                        {% if role == 'Vendor' %}
+                            <div class="dash_product_actions">
+                                <a href="#" class="dash_small_btn">Edit</a>
+                                <a href="#" class="dash_small_btn danger">Remove</a>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="dash_empty">
+            <h2>No products found</h2>
+
+            {% if role == 'Vendor' %}
+                <p>You do not have any products listed yet.</p>
+            {% else %}
+                <p>There are no products to display.</p>
+            {% endif %}
+        </div>
+    {% endif %}
+</main>
+
+</body>
+</html>
