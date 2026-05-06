@@ -187,7 +187,7 @@ def get_graph_log(role: Role):
         orders = extensions.client.vendor(session['user_id']).get_orders()
     else:
         orders = extensions.client.admin(session['user_id']).get_all_orders()
-        graph_log['ytd_rev'] = _get_monthly_revenue(role)
+    graph_log['ytd_rev'] = _get_monthly_revenue(role)
     graph_log['order_status'] = _get_order_statuses(orders)
 
     return graph_log
