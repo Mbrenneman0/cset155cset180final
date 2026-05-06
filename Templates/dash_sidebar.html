@@ -1,31 +1,52 @@
 <div class="sidebar">
-    <a href="{{ url_for('index.index') }}"><h4>TradeHive</h4></a>
-    <a class="active" href="{{ url_for('dashboard.' + role|lower + '_dash') }}"><i>Dashboard</i></a>
+    {%if active_page is none or active_page not in ['dashboard', 'products', 'orders', 'reviews', 'messages', 'complaints', 'settings'] %}
+        {% set active_page = 'dashboard' %}
+    {% endif %}
+    <a href="{{ url_for('index.index') }}">
+    <h4>TradeHive</h4></a>
+
+    <a {% if active_page == 'dashboard'%}class="active"{% endif %}
+    href="{{ url_for('dashboard.dashboard')}}">
+    <i>Dashboard</i></a>
 
     {% if role != 'Customer' %}
-        <a href="{{ role }}/products"><i></i>Products</a>
+        <a {% if active_page == 'products'%}class="active"{% endif %}
+        href="{{ role }}/products">
+        <i></i>Products</a>
     {% endif %}
 
-        <a href="{{ url_for('dashboard.view_orders',role=role|lower) }}"><i></i>Orders</a>
+        <a {% if active_page == 'orders'%}class="active"{% endif %}
+        href="#">
+        <i></i>Orders</a>
 
     {% if role != 'Customer' %}
-        <a href="#"><i></i>Reviews</a>
+        <a {% if active_page == 'reviews'%}class="active"{% endif %}
+        href="#">
+        <i></i>Reviews</a>
     {% endif %}
 
-        <a href="#"><i></i>Messages</a>
+        <a {% if active_page == 'messages'%}class="active"{% endif %}
+        href="#">
+        <i></i>Messages</a>
 
     {% if role != 'Customer' %}
-        <a href="#"><i></i>Complaints</a>
+        <a {% if active_page == 'complaints'%}class="active"{% endif %}
+        href="#">
+        <i></i>Complaints</a>
     {% endif %}
 
-        <a href="#"><i></i>Settings</a>
+        <a {% if active_page == 'settings'%}class="active"{% endif %}
+        href="#">
+        <i></i>Settings</a>
 
-    <a href="{{ url_for('authenticate.logout') }}"><i></i>Logout</a>
+    <a href="{{ url_for('authenticate.logout') }}">
+    <i></i>Logout</a>
 </div>
 
 <style>
     /* ------- SIDEBAR -------------- */
     .sidebar{
+        display: inline;
         min-height:100vh;
         width: 15%;
         background:#0f172a;

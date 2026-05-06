@@ -1,5 +1,6 @@
 import extensions
-from flask import url_for
+from flask import Flask, url_for, request
+from werkzeug.datastructures import ImmutableMultiDict, FileStorage
 from Modules.Types import *
 
 def get_products(with_imgs = False, with_reviews = False, with_rating = False):
@@ -32,6 +33,21 @@ def get_product(sku, with_imgs = False, with_reviews = False, with_rating = Fals
     if with_rating:
         product['rating'] = get_rating(sku)
     return product
+
+def update_product(form:ImmutableMultiDict[str, str], image:FileStorage=None):
+    sku = form.get('sku')
+    product = extensions.client.product(sku)
+    data = ProductUpdate(qty = int(form.get('qty')),
+                        title = form.get('title'),
+                        color = form.get('color'),
+                        size = form.get('size'),
+                        description = form.get('description'),
+                        unit_price = float(form.get('unit_price')),
+                        warranty_period = form.get('warranty_period'),
+                        is_removed = form.get('is_removed')=='True'
+                        )
+    product.update(data)
+    
 
 def get_rating(sku):
     reviews = extensions.client.product(sku).get_reviews()

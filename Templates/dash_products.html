@@ -64,7 +64,8 @@
 
                         {% if role == 'Vendor' %}
                             <div class="dash_product_actions">
-                                <a href="#" class="dash_small_btn">Edit</a>
+                                <a href="{{ url_for('dashboard.edit_product', role=role, sku = product.sku) }}"
+                                    class="dash_small_btn edit">Edit</a>
                                 <a href="#" class="dash_small_btn danger">Remove</a>
                             </div>
                         {% endif %}
