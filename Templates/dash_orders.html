@@ -11,7 +11,6 @@
 
 {% include 'dash_sidebar.html' %}
 
-<main class="dash_main">
 <div class="log_body">
     <div class="topbar floating-wrapper flex">
         <input type="search" class="searchbar" placeholder="Search orders..." name="search">
@@ -24,16 +23,17 @@
                 <thead>
                     <tr>
                         <td style="width: 2.5%;" class="row_check">
-                            <input type="{{ 'checkbox' if role != 'customer' else 'hidden'}}" name="check_all" onclick="checkAll()" class="checks_style" id="check_all">
+                            <input type="{{ 'checkbox' if role != 'Customer' else 'hidden'}}" name="check_all" onclick="checkAll()" class="checks_style" id="check_all">
                         </td>
-                        <th>Order ID</th>
+                        <th style="width: 15%;">Order ID</th>
+                        <th style="width: 24%;">Date</th>
                         <th>Customer</th>
                         <th>Total</th>
                         <th>Status</th>
                         <th>Action</th>
                         <div class="dropdown order_filter">
-                            <button onclick="dropdown()" class="dropbtn">&#9778;</button>
-                            <div id="myDropdown" class="dropdown-content card_col floating-wrapper">
+                            <button onclick="dropdown(0)" class="dropbtn">&#9778;</button>
+                            <div class="dropdown-content card_col floating-wrapper myDropdown">
                                 <a href="{{ url_for('dashboard.view_orders',role=role) }}">All</a>
                                 <a href="{{ url_for('dashboard.view_filtered_orders',role=role,action='Pending') }}">Pending</a>
                                 <a href="{{ url_for('dashboard.view_filtered_orders',role=role,action='Confirmed') }}">Confirmed</a>
@@ -51,9 +51,9 @@
                         {% set form_bulk_action = url_for('dashboard.view_orders', role=role) %}
                     {% endif %}
                     {% for order in order_log['order_details'] %}
-                        <tr class="row_{{ 'even' if loop.index0 % 2 == 1 else 'odd' }}">
+                        <tr class="row_{{ 'even' if loop.index0 % 2 == 1 else 'odd' }} first_row">
                             <td style="width: 2.5%;">
-                                {% set show_checkbox = (role != 'customer') and (order['status'] != 'Shipped') %}
+                                {% set show_checkbox = (role != 'Customer') and (order['status'] != 'Shipped') %}
                                 {% if show_checkbox %}
                                     <input
                                         type="checkbox"
@@ -62,10 +62,11 @@
                                         class="checks_style checks">
                                 {% endif %}
                             </td>
-                            <td>
+                            <td style="width: 14%;">
                                 {{ order['order_num'] }}
-                                <button type="button" class="dropbtn">&#129123;</button>
+                                <button onclick="dropdown({{ loop.index0+1 }})" class="dropbtn">🡪</button>
                             </td>
+                            <td style="width: 22%;">{{ order['date'] }}</td>
                             <td>{{ order['name'] }}</td>
                             <td>${{ order['total'] }}</td>
                             <td>{{ order['status'] }}</td>
@@ -89,8 +90,35 @@
                                         name="input-btn"
                                         value="{{ order_log['order_actions'][order.get('order_num')] }}"
                                         class="badge-{{ order_log['order_actions'][order.get('order_num')] }}"
-                                        {% if role == 'customer' %}disabled{% endif %}>
+                                        {% if role == 'Customer' %}disabled{% endif %}>
                                 </form>
+                            </td>
+                        </tr>
+                        <tr class="order_details_wrapper myDropdown row_{{ 'even' if loop.index0 % 2 == 1 else 'odd' }}">
+                            <td>
+                                <table class="order_details">
+                                    <thead>
+                                        <tr>
+                                            <th>SKU</th>
+                                            <th>Qty</th>
+                                            <th>Unit Price</th>
+                                            <th>Warranty</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for item in order['items'] %}
+                                            <tr class="first_row">
+                                                <td>{{ item['sku'] }}</td>
+                                                <td>{{ item['qty'] }}</td>
+                                                <td>{{ item['unit_price'] }}</td>
+                                                <td>{{ item['warranty_period'] }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>   
+                            </td>
+                            <td style="width: 2.5%;">
+                                <a class="complaint_btn">Complaint</a> {# TODO: add routing for complaint page #}
                             </td>
                         </tr>
                     {% endfor %}
@@ -100,7 +128,6 @@
     </div>
     
 </div>
-</main>
 
 <script>
     const master_check = document.getElementById('check_all')
@@ -113,8 +140,12 @@
         }
     }
 
-    function dropdown() {
-        document.getElementById("myDropdown").classList.toggle("show");
+    function dropdown(index) {
+        document.getElementsByClassName('myDropdown')[index].classList.toggle('show')
+        if (index != 0){
+            icon = document.getElementsByClassName('dropbtn')[index]
+            icon.innerHTML = icon.innerHTML !== "🡪" ? "🡪" : "🡫";
+        }
     }
 
     function filterFunction() {

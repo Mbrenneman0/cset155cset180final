@@ -210,9 +210,6 @@ table, tr {
 table{
     width: 100%;
 }
-table tr{
-    margin-bottom: 0.5rem;
-}
 table th, table td{
     width: 21%;
     text-align: left;
@@ -221,10 +218,16 @@ table input{
     width: 8rem;
     margin: 5px 0;
 }
-tr.row_even{
+.row_even{
     background-color: #f5f5f5;
 }
-tr.row_odd {
+.row_odd {
+    background-color: #ffffff;
+}
+.row_even thead tr{
+    background-color: #f5f5f5;
+}
+.row_odd thead tr {
     background-color: #ffffff;
 }
 
@@ -275,7 +278,7 @@ tr.row_odd {
 .orders_table th{
     border-bottom: 2px solid #ccc;
 }
-.orders_table tbody tr {
+.first_row {
     display: table;
     width: 100%;
     table-layout: fixed;
@@ -320,8 +323,27 @@ tr.row_odd {
     width: fit-content;
     height: fit-content;
 }
+.order_details_wrapper{
+    display: none;
+}
+.order_details{
+    width: 80%;
+    margin-left: 10%;
+    margin-bottom: 1rem;
+}
 .show{
-    display: block;
+    display: table-row;
+}
+.complaint_btn{
+    padding: 0.25rem 1rem;
+    border-radius: 5px;
+    color: white;
+    background-color: #b00020;
+}
+.complaint_btn:hover{
+    cursor: pointer;
+    color: white;
+    background-color: #ca0025;
 }
 
 /************ Products Page ***************/
@@ -589,4 +611,7 @@ tr.row_odd {
 }
 .fixed{
     overflow-y: hidden;
+}
+::-webkit-scrollbar {
+    display: none;
 }
