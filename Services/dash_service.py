@@ -185,6 +185,15 @@ def get_order_log(role: Role, action:str = None):
 
     return order_log
 
+def get_order(order_num:int):
+    order = extensions.client.conn.get_row(TableNames.ORDERS, order_num)
+    return {'order_num': order['order_num'],
+            "name": extensions.client.user(order['user_id']).get_info()['name'],
+            "date": order['order_time'],
+            "status": order['status'],
+            "total": sum([float(item['unit_price'])*int(item['qty'])
+                                for item in extensions.client.order(order['order_num']).get_order_items()])}
+
 def update_product_status(order_details: dict):
     if order_details['action'] != 'Completed':
         extensions.client.conn.update_row(TableNames.ORDERS, pk_value=int(order_details['order_num']), data={'status': order_details['action']})
