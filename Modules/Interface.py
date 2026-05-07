@@ -51,6 +51,7 @@ class Client:
                                       condition=f"customer_id = :user_id OR support_id = :user_id",
                                       params={"user_id": self.user_id})
 
+
     class Customer(User):
         def __init__(self, client: "Client", user_id):
             super().__init__(client, user_id)
@@ -142,6 +143,13 @@ class Client:
                 self.conn.create_row(TableNames.REVIEWS, data)
             except Exception as e:
                 raise
+
+        def create_complaint(self, order_num:int, sku:int, content:str, type:ComplaintTypes=ComplaintTypes.REFUND):
+            data = NewComplaint(order_num=order_num,
+                                sku=sku,
+                                type=type,
+                                content=content)
+            self.conn.create_row(TableNames.COMPLAINTS, data)
 
         def create_order(self, items:list[CartItem]):
             order_data = {
@@ -432,8 +440,10 @@ class Client:
         def create_chat(self):
             info = self.get_info()
             order_info = self.client.order(info["order_num"]).get_info()
+            sku = info["sku"]
             cust_id = order_info["user_id"]
-            #TODO finish once product_sku is added to schema
+            vendor_id = self.client.product(sku).get_info()["vendor_id"]
+            self.client.user(cust_id).create_chat(vendor_id, self.complaint_id)
 
         def set_status(self, is_accepted:bool):
             self.conn.update_row(self.table,self.complaint_id,{'is_accepted':is_accepted})

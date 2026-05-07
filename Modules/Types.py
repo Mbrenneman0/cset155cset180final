@@ -134,9 +134,17 @@ class ComplaintRow(TypedDict):
     complaint_id: int
     order_num: int
     content: str
+    sku: str
     comp_time: datetime
     type: ComplaintTypes
     is_accepted: bool
+
+class NewComplaint(TypedDict, total=False):
+    order_num: int
+    sku: str
+    order_num: int
+    type: ComplaintTypes
+    content: str
 
 class ChatRow(TypedDict, total=False):
     chat_id: int
