@@ -32,8 +32,25 @@ class Client:
         def update_profile(self, data:UserUpdate):
             self.conn.update_row(self.table, self.user_id, data)
 
+        def create_chat(self, to_user_id, complaint_id:int=None):
+            role = self.get_role()
+            if role == Role.ADMIN or role == Role.VENDOR:
+                support_id = self.user_id
+                customer_id = to_user_id
+            else:
+                support_id = to_user_id
+                customer_id = self.user_id
+
+            chat_data = ChatRow(complaint_id=self.complaint_id,
+                                customer_id=customer_id,
+                                support_id=support_id)
+            self.conn.create_row(TableNames.CHATS, chat_data)
+
         def get_chats(self) -> list[ChatRow]:
-            return self.conn.get_rows(TableNames.CHATS, condition=f"customer_id = :user_id OR support_id = :user_id", params={"user_id": self.user_id})
+            return self.conn.get_rows(TableNames.CHATS,
+                                      condition=f"customer_id = :user_id OR support_id = :user_id",
+                                      params={"user_id": self.user_id})
+
 
     class Customer(User):
         def __init__(self, client: "Client", user_id):
@@ -126,6 +143,13 @@ class Client:
                 self.conn.create_row(TableNames.REVIEWS, data)
             except Exception as e:
                 raise
+
+        def create_complaint(self, order_num:int, sku:int, content:str, type:ComplaintTypes=ComplaintTypes.REFUND):
+            data = NewComplaint(order_num=order_num,
+                                sku=sku,
+                                type=type,
+                                content=content)
+            self.conn.create_row(TableNames.COMPLAINTS, data)
 
         def create_order(self, items:list[CartItem]):
             order_data = {
@@ -323,6 +347,14 @@ class Client:
             self.conn = client.conn
             self.order_num = order_num
 
+        def get_info(self) -> OrderRow:
+            rslt = self.conn.get_row(TableNames.ORDERS, self.order_num)
+            order_row = OrderRow(order_num=self.order_num,
+                                 user_id=rslt['uer_id'],
+                                 order_time=rslt['order_time'],
+                                 status=rslt['status']
+                                 )
+
         def get_order_items(self) -> list[OrderItem]:
             rslt = self.conn.get_rows(TableNames.ORDERS,
                                       condition= f'{TableNames.ORDERS.value}.order_num = :order_num',
@@ -343,7 +375,7 @@ class Client:
             self.conn =client.conn
             self.table = TableNames.MESSAGES
 
-        def get_info(self):
+        def get_info(self) -> ChatMessageRow:
             rslt = self.conn.get_row(self.table,self.message_id)
             return rslt
 
@@ -363,7 +395,7 @@ class Client:
             rslt = self.conn.get_row(self.table,self.chat_id)
             return rslt
 
-        def get_messages(self) -> ChatMessageRow:
+        def get_messages(self) -> list[ChatMessageRow]:
             return self.conn.get_rows(TableNames.MESSAGES, condition=f'chat_id = :chat_id', params={"chat_id": self.chat_id})
 
         def get_participants(self) -> dict:
@@ -385,6 +417,7 @@ class Client:
     class Complaint(Message):
         def __init__(self, client: "Client", complaint_id):
             super().__init__(client, complaint_id)
+            self.client = client
             self.complaint_id = complaint_id
             self.table = "complaints"
 
@@ -403,15 +436,19 @@ class Client:
                 return rslt
             except ValueError:
                 raise ValueError (f'The complaint at id: {self.complaint_id} does not have a chat linked to it')
+            
+        def create_chat(self):
+            info = self.get_info()
+            order_info = self.client.order(info["order_num"]).get_info()
+            sku = info["sku"]
+            cust_id = order_info["user_id"]
+            vendor_id = self.client.product(sku).get_info()["vendor_id"]
+            self.client.user(cust_id).create_chat(vendor_id, self.complaint_id)
+            #TODO complaints should have chat between admin and customer.
+            #possibly create new chat between admin/cust on creation of complaint
 
         def set_status(self, is_accepted:bool):
             self.conn.update_row(self.table,self.complaint_id,{'is_accepted':is_accepted})
-
-        def create_chat(self, customer_id:int, support_id:int):
-            chat_date = ChatRow(complaint_id=self.complaint_id,
-                                customer_id=customer_id,
-                                support_id=support_id)
-            self.conn.create_row(TableNames.CHATS, chat_date)
 
     class Review(Message):
         def __init__(self, client: "Client",  review_id):
