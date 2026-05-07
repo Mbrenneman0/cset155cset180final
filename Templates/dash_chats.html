@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Product</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/dash.css') }}">
+</head>
+
+<body>
+{% include 'dash_sidebar.html' %}
+
+<main class="dash_main">
+    <div class="dash_header">
+        <div>
+            <h1>Messages</h1>
+            <p>View all chats connected to your account.</p>
+        </div>
+    </div>
+
+    {% if chats %}
+        <div class="dash_chats_list">
+            {% for chat in chats %}
+                <div class="dash_chat_card">
+                    <div class="dash_chat_info">
+                        <div class="dash_chat_title_row">
+                            <h2>Chat #{{ chat.chat_id }}</h2>
+
+                            {% if chat.complaint_id %}
+                                <span class="dash_chat_badge complaint">Complaint Chat</span>
+                            {% else %}
+                                <span class="dash_chat_badge general">General Chat</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="dash_chat_details">
+                            {% if chat.complaint_id %}
+                                <p><strong>Complaint ID:</strong> {{ chat.complaint_id }}</p>
+                            {% endif %}
+
+                            <p><strong>Customer ID:</strong> {{ chat.customer_id }}</p>
+                            <p><strong>Support ID:</strong> {{ chat.support_id }}</p>
+                        </div>
+                    </div>
+
+                    <div class="dash_chat_actions">
+                        <a href="{{ url_for('dashboard.view_chat', chat_id=chat.chat_id, role=role) }}"
+                           class="dash_small_btn edit">
+                            Open
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="dash_empty">
+            <h2>No chats found</h2>
+            <p>You do not have any active chats yet.</p>
+        </div>
+    {% endif %}
+</main>
+</body>

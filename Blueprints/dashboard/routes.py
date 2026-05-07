@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, Blu
 from Modules.Types import Role
 from Services.dash_service import get_dashboard_data, update_product_status, get_order_log, get_order
 from Services.product_service import get_products, get_product, update_product
+from Services.chat_services import *
 
 dash_bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
 
@@ -69,6 +70,15 @@ def edit_product(role, sku):
         role=role,
         active_page='products'
     )
+
+@dash_bp.route('/<string:role>/chats')
+def view_chats(role):
+    chats = get_chats(session['user_id'])
+    return render_template('dash_chats.html', chats=chats, role=role, active_page="messages")
+
+@dash_bp.route('<string:role>/chats/<chat_id>')
+def view_chat(role, chat_id):
+    return ''
     
 # ----- ORDERS -------
 @dash_bp.route('/<role>/orders', methods=['GET','POST'])
