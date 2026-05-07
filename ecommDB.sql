@@ -26,6 +26,7 @@ CREATE TABLE products(
 ) ENGINE = InnoDB;
 
 CREATE TABLE prod_imgs(
+    img_index INT PRIMARY KEY AUTO_INCREMENT,
 	sku VARCHAR(12) NOT NULL,
     img_url VARCHAR(1024),
     FOREIGN KEY (sku) REFERENCES products(sku) ON DELETE CASCADE
@@ -145,7 +146,7 @@ INSERT INTO products VALUES
 ('SKU010', 10, 15, 'Camera', 'Black', 'Std', 'Digital camera', 500.00, '2 years', FALSE),
 ('SKU011', 10, 2, 'RAM', 'Gold', '4GB', '4GBx1 RAM, extremely valuable and rare', 6000.00, '4 weeks', FALSE);
 
-INSERT INTO prod_imgs VALUES
+INSERT INTO prod_imgs (sku, img_url) VALUES
 ('SKU001', 'images/prod-imgs/vendor1/sku001-1.png'),
 ('SKU002', 'images/prod-imgs/vendor1/sku002-1.png'),
 ('SKU003', 'images/prod-imgs/vendor1/sku003-1.png'),
