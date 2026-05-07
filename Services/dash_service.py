@@ -174,13 +174,7 @@ def get_order_log(role: Role, action:str = None):
         customer = extensions.client.customer(session['user_id'])
         orders = customer.get_orders() if action is None else customer.get_orders_filtered(action)
 
-    order_log['order_details'] = [{'order_num': order['order_num'],
-                                   "name": extensions.client.user(order['user_id']).get_info()['name'],
-                                   "date": order['order_time'],
-                                   "status": order['status'],
-                                   "total": sum([float(item['unit_price'])*int(item['qty'])
-                                                       for item in extensions.client.order(order['order_num']).get_order_items()])}
-                                   for order in orders]
+    order_log['order_details'] = [get_order(order['order_num']) for order in orders]
     order_log['order_actions'] = {order['order_num']: _get_order_action(order.get('status')) for order in orders}
 
     return order_log
@@ -192,7 +186,9 @@ def get_order(order_num:int):
             "date": order['order_time'],
             "status": order['status'],
             "total": sum([float(item['unit_price'])*int(item['qty'])
-                                for item in extensions.client.order(order['order_num']).get_order_items()])}
+                                for item in extensions.client.order(order['order_num']).get_order_items()]),
+            "items": [item for item in extensions.client.order(order['order_num']).get_order_items()]}
+
 
 def update_product_status(order_details: dict):
     if order_details['action'] != 'Completed':

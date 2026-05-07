@@ -66,7 +66,8 @@ def edit_product(role, sku):
     return render_template(
         'dash_edit_product.html',
         product=product,
-        role=role
+        role=role,
+        active_page='products'
     )
     
 # ----- ORDERS -------
@@ -88,7 +89,7 @@ def view_orders(role):
         else:
             update_product_status(request.form)
     return render_template('dash_orders.html', role=role, 
-                                                order_log=get_order_log(session['role']), 
+                                                order_log=get_order_log(session['role']),
                                                 active_page='orders')
 
 @dash_bp.route('/<role>/orders/<action>', methods=['GET','POST'])
