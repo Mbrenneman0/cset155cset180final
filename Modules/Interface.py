@@ -444,6 +444,8 @@ class Client:
             cust_id = order_info["user_id"]
             vendor_id = self.client.product(sku).get_info()["vendor_id"]
             self.client.user(cust_id).create_chat(vendor_id, self.complaint_id)
+            #TODO complaints should have chat between admin and customer.
+            #possibly create new chat between admin/cust on creation of complaint
 
         def set_status(self, is_accepted:bool):
             self.conn.update_row(self.table,self.complaint_id,{'is_accepted':is_accepted})
