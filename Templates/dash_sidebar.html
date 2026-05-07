@@ -9,9 +9,9 @@
     href="{{ url_for('dashboard.' + role|lower + '_dash') }}">
     <i>Dashboard</i></a>
 
-    {% if role != 'Customer' %}
+    {% if role|lower != 'customer' %}
         <a {% if active_page == 'products'%}class="active"{% endif %}
-        href="{{ role }}/products">
+        href="{{ url_for('dashboard.view_products', role=role|lower) }}">
         <i></i>Products</a>
     {% endif %}
 
@@ -19,7 +19,7 @@
         href="{{ url_for('dashboard.view_orders',role=role|lower) }}">
         <i></i>Orders</a>
 
-    {% if role != 'Customer' %}
+    {% if role|lower != 'customer' %}
         <a {% if active_page == 'reviews'%}class="active"{% endif %}
         href="#">
         <i></i>Reviews</a>
@@ -29,7 +29,7 @@
         href="#">
         <i></i>Messages</a>
 
-    {% if role != 'Customer' %}
+    {% if role|lower != 'customer' %}
         <a {% if active_page == 'complaints'%}class="active"{% endif %}
         href="#">
         <i></i>Complaints</a>

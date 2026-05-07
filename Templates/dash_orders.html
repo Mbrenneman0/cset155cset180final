@@ -12,25 +12,18 @@
 {% include 'dash_sidebar.html' %}
 
 <div class="log_body">
-    <form class="topbar floating-wrapper flex">
-        <input class="searchbar" placeholder="Search orders..." name="search">
-        <div class="role"><strong>{{ role[0]|upper}}{{role[1:] }}</strong></div>
-        <form class="flex">
-            <input type="button" class="quick_sort card_col floating-wrapper" value="test">
-            <input type="button" class="quick_sort card_col floating-wrapper" value="test">
-            <input type="button" class="quick_sort card_col floating-wrapper" value="test">
-            <input type="button" class="quick_sort card_col floating-wrapper" value="test">
-        </form>
-    </form>
+    <div class="topbar floating-wrapper flex">
+        <input type="search" class="searchbar" placeholder="Search orders..." name="search">
+        <div class="role"><strong>{{ role[0]|upper }}{{ role[1:] }}</strong></div>
+    </div>
+    <button class="execute-btn" onclick="runActions()"><small>Execute</small></button>
     <div class="log-wrapper fixed">
         <div class="floating-wrapper fixed">
             <table class="orders_table fixed">
                 <thead>
                     <tr>
                         <td style="width: 2.5%;" class="row_check">
-                            <form>
-                                <input type="checkbox" name="check_all" onclick="checkAll()" class="checks" id="check_all">
-                            </form>
+                            <input type="{{ 'checkbox' if role != 'customer' else 'hidden'}}" name="check_all" onclick="checkAll()" class="checks_style" id="check_all">
                         </td>
                         <th>Order ID</th>
                         <th>Customer</th>
@@ -50,31 +43,57 @@
                     </tr>
                 </thead>
                 <tbody class="table-scroll">
+
+                    {% if action %}
+                        {% set form_bulk_action = url_for('dashboard.view_filtered_orders', role=role, action=action) %}
+                    {% else %}
+                        {% set form_bulk_action = url_for('dashboard.view_orders', role=role) %}
+                    {% endif %}
                     {% for order in order_log['order_details'] %}
-                    <tr class="row_{{ 'even' if loop.index0 % 2 == 1 else 'odd' }}">
-                        <td style="width: 2.5%;">
-                            <form>
-                                <input type="checkbox" name="checks" class="checks">
-                            </form>
-                        </td>
-                        <td>{{ order['order_num'] }} <button class="dropbtn">&#129123;</button></td>
-                        <td>{{ order['name'] }}</td>
-                        <td>${{ order['total'] }}</td>
-                        <td>{{ order['status'] }}</td>
-                        <td>
-                            <form action="" method="POST">
-                                <input type="hidden" name="order_num" value="{{ order['order_num'] }}">
-                                <input type="hidden" name="action" value="{{ order_log['order_actions'][order.get('order_num')] }}">
-                                <input type="submit" name="input-btn"
-                                    value="{{ order_log['order_actions'][order.get('order_num')] }}"
-                                    class="badge-{{ order_log['order_actions'][order.get('order_num')] }}">
-                            </form>
-                        </td>
-                    </tr>
-                    
+                        <tr class="row_{{ 'even' if loop.index0 % 2 == 1 else 'odd' }}">
+                            <td style="width: 2.5%;">
+                                {% set show_checkbox = (role != 'customer') and (order['status'] != 'Shipped') %}
+                                {% if show_checkbox %}
+                                    <input
+                                        type="checkbox"
+                                        value="{{ order['order_num'] }}"
+                                        name="checks"
+                                        class="checks_style checks">
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ order['order_num'] }}
+                                <button type="button" class="dropbtn">&#129123;</button>
+                            </td>
+                            <td>{{ order['name'] }}</td>
+                            <td>${{ order['total'] }}</td>
+                            <td>{{ order['status'] }}</td>
+                            <td>
+                                {% if action %}
+                                    {% set form_action = url_for('dashboard.view_filtered_orders', role=role, action=action) %}
+                                {% else %}
+                                    {% set form_action = url_for('dashboard.view_orders', role=role) %}
+                                {% endif %}
+                                <form action="{{ form_action }}" method="POST">
+                                    <input
+                                        type="hidden"
+                                        name="order_num"
+                                        value="{{ order['order_num'] }}">
+                                    <input
+                                        type="hidden"
+                                        name="action"
+                                        value="{{ order_log['order_actions'][order.get('order_num')] }}">
+                                    <input
+                                        type="submit"
+                                        name="input-btn"
+                                        value="{{ order_log['order_actions'][order.get('order_num')] }}"
+                                        class="badge-{{ order_log['order_actions'][order.get('order_num')] }}"
+                                        {% if role == 'customer' %}disabled{% endif %}>
+                                </form>
+                            </td>
+                        </tr>
                     {% endfor %}
                 </tbody>
-
             </table>
         </div>
     </div>
@@ -97,18 +116,41 @@
     }
 
     function filterFunction() {
-    const input = document.getElementById("myInput");
-    const filter = input.value.toUpperCase();
-    const div = document.getElementById("myDropdown");
-    const a = div.getElementsByTagName("a");
-    for (let i = 0; i < a.length; i++) {
-        txtValue = a[i].textContent || a[i].innerText;
-        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        a[i].style.display = "";
-        } else {
-        a[i].style.display = "none";
+        const input = document.getElementById("myInput");
+        const filter = input.value.toUpperCase();
+        const div = document.getElementById("myDropdown");
+        const a = div.getElementsByTagName("a");
+        for (let i = 0; i < a.length; i++) {
+            txtValue = a[i].textContent || a[i].innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            a[i].style.display = "";
+            } else {
+            a[i].style.display = "none";
+            }
         }
     }
+
+    const bulkUrl = "{{ form_bulk_action }}";
+
+    function runActions(){
+        const checks = document.querySelectorAll('.checks:checked');
+        const formData = new FormData();
+
+        checks.forEach(check => {
+            formData.append('orders', check.value);
+        });
+
+        formData.append('bulk_action', 'true');
+
+        fetch(bulkUrl, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (response.ok){
+                location.reload();
+            }
+        });
     }
 
 </script>

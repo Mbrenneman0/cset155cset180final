@@ -24,6 +24,7 @@ body{
     border-radius:16px;
     min-height: 12.5vh;
     max-height: fit-content;
+    gap: 1.5rem;
 }
 .searchbar{
     width: 70%;
@@ -249,6 +250,13 @@ tr.row_odd {
 }
 
 /* orders */
+.execute-btn{
+    position: absolute;
+    z-index: 99;
+    top: 16vh;
+    left: 17.5%;
+    padding: 0.25rem 1rem;
+}
 .orders_table thead {
     display: table;
     position: relative;
@@ -261,7 +269,7 @@ tr.row_odd {
 }
 .orders_table tbody {
     display: block;
-    max-height: 60vh;
+    max-height: 70vh;
     overflow-y: auto;
     width: 100%;
 }
@@ -282,7 +290,7 @@ tr.row_odd {
     margin-bottom: 0;
     line-height: 0;
 }
-.checks{
+.checks_style{
     width: 1rem;
 }
 .dropdown{

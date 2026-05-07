@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, Blueprint, session
 from Modules.Types import Role
-from Services.dash_service import get_dashboard_data, update_product_status, get_order_log
+from Services.dash_service import get_dashboard_data, update_product_status, get_order_log, get_order
 from Services.product_service import get_products, get_product, update_product
 
 dash_bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
@@ -55,20 +55,46 @@ def edit_product(role, sku):
         update_product(form, image)
         return redirect(url_for('dashboard.view_products', role=role))
     
-
-def test(role, id):
-    session['role'] = role
-    session['user_id'] = id
-
-    
 # ----- ORDERS -------
 @dash_bp.route('/<role>/orders', methods=['GET','POST'])
 def view_orders(role):
     if request.method == 'POST':
-        update_product_status(dict(request.form))
-    return render_template('dash_orders.html', role=role, order_log=get_order_log(session['role']))
+        if request.form.get('bulk_action'):
+            orders = request.form.getlist('orders')
+            STATUS_FLOW = {
+                'Pending': 'Confirmed',
+                'Confirmed': 'Picked Up',
+                'Picked Up': 'Shipped'
+            }
+            for order_num in orders:
+                order = get_order(order_num)
+                order['action'] = STATUS_FLOW.get(order['status'])
+                if order['action']:
+                    update_product_status(order) 
+        else:
+            update_product_status(request.form)
+    return render_template('dash_orders.html', role=role, 
+                                                order_log=get_order_log(session['role']), 
+                                                active_page='orders')
+
 @dash_bp.route('/<role>/orders/<action>', methods=['GET','POST'])
 def view_filtered_orders(role, action):
     if request.method == 'POST':
-        update_product_status(dict(request.form))
-    return render_template('dash_orders.html', role=role, order_log=get_order_log(session['role'], action))
+        if request.form.get('bulk_action'):
+            orders = request.form.getlist('orders')
+            STATUS_FLOW = {
+                'Pending': 'Confirmed',
+                'Confirmed': 'Picked Up',
+                'Picked Up': 'Shipped'
+            }
+            for order_num in orders:
+                order = get_order(order_num)
+                order['action'] = STATUS_FLOW.get(order['status'])
+                if order['action']:
+                    update_product_status(order)  
+        else:
+            update_product_status(request.form)
+    return render_template('dash_orders.html', role=role, 
+                                                order_log=get_order_log(session['role'], action), 
+                                                action=action, 
+                                                active_page='orders')
