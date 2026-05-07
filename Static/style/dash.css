@@ -23,6 +23,7 @@ body{
     border-radius:16px;
     min-height: 12.5vh;
     max-height: fit-content;
+    gap: 1.5rem;
 }
 .searchbar{
     width: 70%;
@@ -209,9 +210,6 @@ table, tr {
 table{
     width: 100%;
 }
-table tr{
-    margin-bottom: 0.5rem;
-}
 table th, table td{
     width: 21%;
     text-align: left;
@@ -220,10 +218,16 @@ table input{
     width: 8rem;
     margin: 5px 0;
 }
-tr.row_even{
+.row_even{
     background-color: #f5f5f5;
 }
-tr.row_odd {
+.row_odd {
+    background-color: #ffffff;
+}
+.row_even thead tr{
+    background-color: #f5f5f5;
+}
+.row_odd thead tr {
     background-color: #ffffff;
 }
 
@@ -248,6 +252,13 @@ tr.row_odd {
 } */
 
 /* orders */
+.execute-btn{
+    position: absolute;
+    z-index: 99;
+    top: 16vh;
+    left: 17.5%;
+    padding: 0.25rem 1rem;
+}
 .orders_table thead {
     display: table;
     position: relative;
@@ -260,14 +271,14 @@ tr.row_odd {
 }
 .orders_table tbody {
     display: block;
-    max-height: 60vh;
+    max-height: 70vh;
     overflow-y: auto;
     width: 100%;
 }
 .orders_table th{
     border-bottom: 2px solid #ccc;
 }
-.orders_table tbody tr {
+.first_row {
     display: table;
     width: 100%;
     table-layout: fixed;
@@ -281,7 +292,7 @@ tr.row_odd {
     margin-bottom: 0;
     line-height: 0;
 }
-.checks{
+.checks_style{
     width: 1rem;
 }
 .dropdown{
@@ -312,8 +323,27 @@ tr.row_odd {
     width: fit-content;
     height: fit-content;
 }
+.order_details_wrapper{
+    display: none;
+}
+.order_details{
+    width: 80%;
+    margin-left: 10%;
+    margin-bottom: 1rem;
+}
 .show{
-    display: block;
+    display: table-row;
+}
+.complaint_btn{
+    padding: 0.25rem 1rem;
+    border-radius: 5px;
+    color: white;
+    background-color: #b00020;
+}
+.complaint_btn:hover{
+    cursor: pointer;
+    color: white;
+    background-color: #ca0025;
 }
 
 /************ Products Page ***************/
@@ -647,4 +677,8 @@ tr.row_odd {
 .dash_chat_actions {
     display: flex;
     align-items: center;
+}
+
+::-webkit-scrollbar {
+    display: none;
 }
