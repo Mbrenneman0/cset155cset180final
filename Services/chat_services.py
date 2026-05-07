@@ -13,5 +13,5 @@ def get_chats(user_id):
     chats = user.get_chats()
     return chats
 
-def new_chat(user_id, support_id, message:NewChatMessage):
-    return
+def new_chat(user_id:int, support_id:int, complaint_id:int=None):
+    extensions.client.user(user_id).create_chat(support_id, complaint_id)
