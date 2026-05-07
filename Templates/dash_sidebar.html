@@ -6,7 +6,7 @@
     <h4>TradeHive</h4></a>
 
     <a {% if active_page == 'dashboard'%}class="active"{% endif %}
-    href="{{ url_for('dashboard.' + role|lower + '_dash') }}">
+    href="{{ url_for('dashboard.dashboard') }}">
     <i>Dashboard</i></a>
 
     {% if role != 'Customer' %}
@@ -26,7 +26,7 @@
     {% endif %}
 
         <a {% if active_page == 'messages'%}class="active"{% endif %}
-        href="#">
+        href="{{ url_for('dashboard.view_chats', role=role) }}">
         <i></i>Messages</a>
 
     {% if role != 'Customer' %}
