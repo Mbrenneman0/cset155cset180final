@@ -42,18 +42,32 @@ def view_products(role):
         products = [product for product in products if product['vendor_id'] == session['user_id']]
     return render_template('dash_products.html', products= products, role= role, active_page = 'products')
 
-@dash_bp.route('/<role>/products/edit/<sku>', methods=['GET', 'POST'])
+
+@dash_bp.route('/<string:role>/products/<string:sku>/edit', methods=['GET', 'POST'])
 def edit_product(role, sku):
-    if request.method == 'GET':
-        product = get_product(sku, with_imgs=True)
-        return render_template('dash_edit_product.html', product = product, role = role, active_page = 'products')
-    elif request.method == 'POST':
-        form = request.form
-        image = request.files.get('image')
-        if not image:
-            image=None
-        update_product(form, image)
+    if 'user_id' not in session:
+        return redirect(url_for('authenticate.login_username'))
+
+    product = get_product(sku, with_imgs=True)
+
+    if role == Role.VENDOR.value and product['vendor_id'] != session['user_id']:
+        flash("You cannot edit another vendor's product.", "error")
         return redirect(url_for('dashboard.view_products', role=role))
+
+    if request.method == 'POST':
+        update_product(
+            request.form,
+            new_images=request.files.getlist('images'),
+            delete_images=request.form.getlist('delete_images')
+        )
+        flash('Product updated successfully.', 'info')
+        return redirect(url_for('dashboard.view_products', role=role))
+
+    return render_template(
+        'dash_edit_product.html',
+        product=product,
+        role=role
+    )
     
 
 def test(role, id):

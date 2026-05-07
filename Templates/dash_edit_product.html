@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Product</title>
-
     <link rel="stylesheet" href="{{ url_for('static', filename='style/base.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style/dash.css') }}">
 </head>
@@ -13,6 +12,7 @@
 {% include 'dash_sidebar.html' %}
 
 <main class="dash_main">
+
     <div class="dash_header">
         <div>
             <h1>Edit Product</h1>
@@ -31,7 +31,9 @@
             method="POST"
             enctype="multipart/form-data"
         >
+
             <div class="edit_form_grid">
+
                 <div class="form_group">
                     <label for="sku">SKU</label>
                     <input
@@ -134,14 +136,17 @@
                 </div>
 
                 <div class="form_group">
-                    <label for="image">Upload New Image</label>
+                    <label for="images">Add Product Images</label>
                     <input
                         type="file"
-                        id="image"
-                        name="image"
+                        id="images"
+                        name="images"
                         accept=".png"
+                        multiple
                     >
+                    <small>Images will be saved as {{ product.sku }}-#.png</small>
                 </div>
+
             </div>
 
             <div class="form_group full_width">
@@ -154,23 +159,54 @@
             </div>
 
             {% if product.images and product.images|length > 0 %}
-            <div class="current_image_preview">
-                <p>Current image:</p>
-                <img
-                    src="{{ url_for('static', filename=product.images[0]['img_url']) }}"
-                    alt="{{ product.title }}"
-                >
+
+            <div class="current_image_preview full_width">
+                <p>Current images:</p>
+
+                <div class="current_images_grid">
+                    {% for image in product.images %}
+                        <div class="current_image_card">
+                            <img
+                                src="{{ url_for('static', filename=image['img_url']) }}"
+                                alt="{{ product.title }}"
+                            >
+
+                            <p class="current_image_name">
+                                {{ image['img_url'].split('/')[-1] }}
+                            </p>
+
+                            {% if product.images|length > 1 %}
+                                <label class="delete_image_check">
+                                    <input
+                                        type="checkbox"
+                                        name="delete_images"
+                                        value="{{ image['img_url'] }}"
+                                    >
+                                    Delete image
+                                </label>
+                            {% else %}
+                                <p class="image_delete_note">
+                                    At least one image is required.
+                                </p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
+
             {% endif %}
 
             <div class="edit_form_actions">
                 <input type="submit" value="Save Changes">
+
                 <a href="{{ url_for('dashboard.view_products', role=role) }}" class="dash_cancel_btn">
                     Cancel
                 </a>
             </div>
+
         </form>
     </section>
+
 </main>
 
 </body>
