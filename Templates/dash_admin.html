@@ -71,22 +71,22 @@
             <table>
                 <thead><tr><th>Order ID</th><th>Customer</th><th style="width: 16%;">Total</th><th>Status</th><th>Action</td></tr></thead>
                 <tbody>
-                    {% for order in order_log['order_details'] %}
-                    <tr class="row_{{ 'even' if loop.index0 % 2 == 1 else 'odd' }}">
-                        <td>{{ order['order_num'] }}</td>
-                        <td>{{ order['name'] }}</td>
-                        <td style="width: 16%;">{{ order['total'] }}</td>
-                        <td>{{ order['status'] }}</td>
-                        <td>
-                            <form action="{{ url_for(request.endpoint) }}" method="POST">
-                                <input type="hidden" name="order_num" value="{{ order['order_num'] }}">
-                                <input type="hidden" name="action" value="{{ order_log['order_actions'][order.get('order_num')] }}">
-                                <input type="submit" name="input-btn"
-                                    value="{{ order_log['order_actions'][order.get('order_num')] }}"
-                                    class="badge-{{ order_log['order_actions'][order.get('order_num')] }}">
-                            </form>
-                        </td>
-                    </tr>
+                    {% for order in order_log['order_details'][:10] %}
+                        <tr class="row_{{ 'even' if loop.index0 % 2 == 1 else 'odd' }}">
+                            <td>{{ order['order_num'] }}</td>
+                            <td>{{ order['name'] }}</td>
+                            <td style="width: 16%;">${{ order['total'] }}</td>
+                            <td>{{ order['status'] }}</td>
+                            <td>
+                                <form action="{{ url_for(request.endpoint) }}" method="POST">
+                                    <input type="hidden" name="order_num" value="{{ order['order_num'] }}">
+                                    <input type="hidden" name="action" value="{{ order_log['order_actions'][order.get('order_num')] }}">
+                                    <input type="submit" name="input-btn"
+                                        value="{{ order_log['order_actions'][order.get('order_num')] }}"
+                                        class="badge-{{ order_log['order_actions'][order.get('order_num')] }}">
+                                </form>
+                            </td>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>

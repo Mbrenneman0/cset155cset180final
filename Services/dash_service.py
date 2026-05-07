@@ -22,11 +22,13 @@ def _get_product_quantity(role: Role) -> int:
 
 def _get_complaint_quantity(role: Role) -> int:
     if role == Role.VENDOR:
-        condition = f'products.vendor_id = {session["user_id"]} AND complaints.is_accepted = True'
+        condition = f'products.vendor_id = {session["user_id"]}'
+    elif role == Role.CUSTOMER:
+        condition = f'orders.user_id = {session["user_id"]}'
     else:
-        condition = f'complaints.is_accepted = True'
+        condition = f''
     complaints = extensions.client.conn.get_rows(TableNames.PRODUCTS.value,
-                                                join_tables=[TableNames.COMPLAINTS.value],
+                                                join_tables=[TableNames.COMPLAINTS.value, TableNames.ORDERS.value],
                                                 condition=condition)
     return len(complaints)
 

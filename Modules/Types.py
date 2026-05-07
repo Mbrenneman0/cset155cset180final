@@ -133,6 +133,7 @@ class ReviewUpdate(TypedDict, total=False):
 class ComplaintRow(TypedDict):
     complaint_id: int
     order_num: int
+    sku: str
     content: str
     sku: str
     comp_time: datetime
@@ -207,7 +208,7 @@ class WarrantyPeriod:
         return end_date
     
     def is_active(self, start_date:datetime) -> bool:
-        return datetime.now().date() >= self.get_end_date(start_date).date()
+        return datetime.now().date() <= self.get_end_date(start_date).date()
     
 class Discount:
     def __init__(self, amount:str, start_date:datetime = None, end_date:datetime= None):

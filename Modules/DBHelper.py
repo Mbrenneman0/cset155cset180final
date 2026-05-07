@@ -333,31 +333,52 @@ class Conn:
                 print(e)
         engine.dispose()
 
-    def _create_tables(self, conn:Connection):
+    def _create_tables(self, conn: Connection):
         if not Path(self.schema_path).is_file():
             raise FileNotFoundError(f".sql file not found at: {self.schema_path}")
-        else:
-            with open(self.schema_path, "r", encoding="utf-8") as f:
-                sql = f.read()
-            statements = [statement.strip() for statement in sql.split(';') if statement.strip()]
-            with conn.begin():
-                for statement in statements:
-                    conditions = [
-                        "CREATE DATABASE" not in statement.upper(),
-                        "USE " not in statement.upper(),
-                        "DROP DATABASE" not in statement.upper()
-                    ]
-                    print('\n\nTESTING',conditions,'\n\n')
-                    print('\n\nTESTING',statement,'\n\n')
-                    if all(conditions):
-                        try:
-                            if self._is_insert_users_statement(statement):
-                                statement = self._hash_passwords_in_insert(statement)
-                            conn.execute(text(statement))
-                        except Exception as e:
-                            print(f"ERROR executing statement: {statement[:100]}")
-                            print(f"Exception: {e}")
-                            raise  # Re-raise to see the actual error
+
+        with open(self.schema_path, "r", encoding="utf-8") as f:
+            sql = f.read()
+
+        statements = []
+        current_statement = []
+        for line in sql.splitlines():
+            stripped = line.strip()
+            if not stripped:
+                continue
+            if stripped.startswith("--"):
+                continue
+            current_statement.append(line)
+
+            if stripped.endswith(";"):
+                statement = "\n".join(current_statement).strip()
+                statement = statement[:-1]
+                statements.append(statement)
+                current_statement = []
+
+        with conn.begin():
+            for statement in statements:
+                upper = statement.upper()
+                conditions = [
+                    "CREATE DATABASE" not in upper,
+                    not upper.startswith("USE "),
+                    "DROP DATABASE" not in upper
+                ]
+
+                print("\n\nTESTING", conditions, "\n\n")
+                print("\n\nTESTING", statement[:120], "\n\n")
+
+                if all(conditions):
+                    try:
+                        if self._is_insert_users_statement(statement):
+                            statement = self._hash_passwords_in_insert(statement)
+                        conn.execute(text(statement))
+
+                    except Exception as e:
+                        print(f"ERROR executing statement:")
+                        print(statement[:300])
+                        print(f"\nException: {e}")
+                        raise
 
     def _get_table(self, table_name:str) -> Table:
                 return self.tables.get(table_name)

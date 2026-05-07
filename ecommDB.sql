@@ -111,24 +111,23 @@ CREATE TABLE messages(
 	chat_id INT NOT NULL,
     user_id INT NOT NULL,
     content VARCHAR(2048) NOT NULL,
-    msg_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    msg_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (chat_id) REFERENCES chats(chat_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
 -- example data:
 
 INSERT INTO users (name, username, password, email, role) VALUES
--- Admins
 ('Admin One', 'admin1', 'pass', 'admin1@mail.com', 'Admin'),
 ('Admin Two', 'admin2', 'pass', 'admin2@mail.com', 'Admin'),
 
--- Customers
 ('Alice Smith', 'cust1', 'pass', 'alice@mail.com', 'Customer'),
 ('Bob Jones', 'cust2', 'pass', 'bob@mail.com', 'Customer'),
 ('Charlie Brown', 'cust3', 'pass', 'charlie@mail.com', 'Customer'),
 ('Diana Prince', 'cust4', 'pass', 'diana@mail.com', 'Customer'),
 ('Ethan Hunt', 'cust5', 'pass', 'ethan@mail.com', 'Customer'),
 
--- Vendors
 ('Vendor A', 'vendor1', 'pass', 'vendor1@mail.com', 'Vendor'),
 ('Vendor B', 'vendor2', 'pass', 'vendor2@mail.com', 'Vendor'),
 ('Vendor C', 'vendor3', 'pass', 'vendor3@mail.com', 'Vendor');
@@ -179,58 +178,152 @@ INSERT INTO carts VALUES
 
 (5, 'SKU006', 3);
 
-INSERT INTO orders (user_id, status) VALUES
-(3, 'Shipped'), -- order 1
-(3, 'Pending'), -- order 2
-(4, 'Confirmed'), -- order 3
-(5, 'Picked Up'), -- order 4
-(6, 'Picked Up'), -- order 5
-(7, 'Shipped'), -- order 6
-(3, 'Confirmed'); -- order 7
+
+-- Additional Orders Across Several Months
+INSERT INTO orders (user_id, order_time, status) VALUES
+(3, NOW(), 'Shipped'),
+(3, NOW(), 'Pending'),
+(4, NOW(), 'Confirmed'),
+(5, NOW(), 'Picked Up'),
+(6, NOW(), 'Picked Up'),
+(7, NOW(), 'Shipped'),
+(3, NOW(), 'Confirmed'),
+
+(3, '2026-01-04 10:15:00', 'Shipped'),
+(4, '2026-01-08 12:30:00', 'Shipped'),
+(5, '2026-01-10 09:45:00', 'Picked Up'),
+(6, '2026-01-15 18:20:00', 'Confirmed'),
+(7, '2026-01-22 14:00:00', 'Pending'),
+
+(3, '2026-02-02 11:10:00', 'Shipped'),
+(4, '2026-02-05 15:22:00', 'Shipped'),
+(5, '2026-02-09 17:40:00', 'Picked Up'),
+(6, '2026-02-14 20:00:00', 'Confirmed'),
+(7, '2026-02-20 13:12:00', 'Shipped'),
+
+(3, '2026-03-03 08:15:00', 'Shipped'),
+(4, '2026-03-07 16:42:00', 'Confirmed'),
+(5, '2026-03-11 12:55:00', 'Picked Up'),
+(6, '2026-03-16 19:30:00', 'Shipped'),
+(7, '2026-03-21 09:20:00', 'Pending'),
+
+(3, '2026-04-01 10:05:00', 'Shipped'),
+(4, '2026-04-06 11:15:00', 'Confirmed'),
+(5, '2026-04-12 13:00:00', 'Picked Up'),
+(6, '2026-04-18 18:10:00', 'Shipped'),
+(7, '2026-04-24 20:30:00', 'Confirmed'),
+
+(3, '2026-05-02 09:00:00', 'Shipped'),
+(4, '2026-05-05 14:45:00', 'Confirmed'),
+(5, '2026-05-10 12:20:00', 'Picked Up'),
+(6, '2026-05-15 17:35:00', 'Pending'),
+(7, '2026-05-20 21:10:00', 'Shipped');
+
+
 
 INSERT INTO order_items VALUES
--- Order 1 (shipped)
 (1, 'SKU001', 1, 1200.00, '1 year'),
 
--- Order 2 (pending)
 (2, 'SKU002', 2, 800.00, '1 year'),
 
--- Order 3 (confirmed)
 (3, 'SKU003', 1, 400.00, '6 months'),
 
--- Order 4 (Picked Up)
 (4, 'SKU004', 1, 150.00, NULL),
 
--- Order 5 (Picked Up)
 (5, 'SKU005', 2, 100.00, NULL),
 
--- Order 6 (shipped)
 (6, 'SKU006', 1, 50.00, NULL),
 
--- Order 7 (confirmed)
-(7, 'SKU007', 1, 200.00, '1 year');
+(7, 'SKU007', 1, 200.00, '1 year'),
+
+(8, 'SKU001', 1, 1200.00, '1 year'),
+(8, 'SKU004', 2, 150.00, NULL),
+
+(9, 'SKU002', 1, 800.00, '1 year'),
+
+(10, 'SKU005', 1, 100.00, NULL),
+(10, 'SKU006', 2, 50.00, NULL),
+
+(11, 'SKU003', 1, 400.00, '6 months'),
+
+(12, 'SKU007', 1, 200.00, '1 year'),
+
+(13, 'SKU001', 1, 1200.00, '1 year'),
+(13, 'SKU009', 3, 20.00, NULL),
+
+(14, 'SKU010', 1, 500.00, '2 years'),
+
+(15, 'SKU005', 2, 100.00, NULL),
+
+(16, 'SKU006', 1, 50.00, NULL),
+(16, 'SKU004', 1, 150.00, NULL),
+
+(17, 'SKU011', 1, 6000.00, '4 weeks'),
+
+(18, 'SKU002', 1, 800.00, '1 year'),
+
+(19, 'SKU003', 2, 400.00, '6 months'),
+
+(20, 'SKU005', 1, 100.00, NULL),
+
+(21, 'SKU001', 1, 1200.00, '1 year'),
+(21, 'SKU007', 2, 200.00, '1 year'),
+
+(22, 'SKU008', 1, 300.00, '1 year'),
+
+(23, 'SKU004', 3, 150.00, NULL),
+
+(24, 'SKU002', 1, 800.00, '1 year'),
+
+(25, 'SKU009', 5, 20.00, NULL),
+
+(26, 'SKU010', 1, 500.00, '2 years'),
+
+(27, 'SKU006', 2, 50.00, NULL),
+
+(28, 'SKU001', 1, 1200.00, '1 year'),
+
+(29, 'SKU011', 1, 6000.00, '4 weeks'),
+
+(30, 'SKU005', 3, 100.00, NULL),
+
+(31, 'SKU003', 1, 400.00, '6 months'),
+
+(32, 'SKU007', 1, 200.00, '1 year');
+
 
 INSERT INTO reviews (user_id, sku, rating, content, rvw_time) VALUES
-(3, 'SKU001', 5, 'Great laptop!', NOW()),
-(6, 'SKU001', 5, 'It runs Oregon Trail at 7000 frames per second!', NOW()),
-(3, 'SKU002', 4, 'Nice phone for the price.', NOW()),
-(4, 'SKU002', 3, 'Battery life is terrible.', NOW()),
-(4, 'SKU003', 4, 'Pretty good tablet', NOW()),
-(5, 'SKU011', 3, "I couldn't find it anywhere else!", NOW()),
-(6, 'SKU011', 3, "It's a little overpriced.", NOW()),
-(7, 'SKU011', 2, "Thanks Elon, for making RAM so expensive :(", NOW()),
-(3, 'SKU011', 5, "I'm pretty sure the diamonds make it faster", NOW());
+(4, 'SKU004', 5, 'Very comfortable headphones.', '2026-01-10 12:00:00'),
+(5, 'SKU005', 4, 'Keyboard feels great.', '2026-01-16 15:30:00'),
+(6, 'SKU006', 5, 'Mouse battery lasts forever.', '2026-02-02 18:20:00'),
+(7, 'SKU010', 4, 'Camera quality is solid.', '2026-02-22 10:10:00'),
+(3, 'SKU009', 5, 'Cheap and useful.', '2026-03-05 08:50:00'),
+(4, 'SKU008', 3, 'Printer setup was annoying.', '2026-03-28 17:10:00'),
+(5, 'SKU007', 5, 'Monitor looks amazing.', '2026-04-11 14:25:00'),
+(6, 'SKU003', 4, 'Tablet is good for school.', '2026-04-25 11:40:00'),
+(7, 'SKU004', 2, 'Stopped working after a month.', '2026-05-03 09:15:00');
+
 
 INSERT INTO complaints (order_num, sku, content, comp_time, type, is_accepted) VALUES
-(1, "SKU001", "Product lowkey exploded", NOW(), 'Warranty', TRUE),
-(4, "SKU004", "Product arrived late", NOW(), 'Refund', NULL),
-(5, "SKU005", "RAM didnt work at all", NOW(), 'Return', FALSE);
+(14, 'SKU010', 'Lens arrived scratched.', '2026-02-25 13:00:00', 'Refund', TRUE),
+
+(21, 'SKU001', 'Laptop overheats while gaming.', '2026-03-20 19:45:00', 'Warranty', NULL),
+
+(27, 'SKU006', 'Mouse disconnects randomly.', '2026-05-04 10:30:00', 'Return', FALSE);
+
 
 INSERT INTO chats (complaint_id, customer_id, support_id) VALUES
-(1, 3, 1),
-(2, 4, 2);
+(1, 7, 1),
+(2, 6, 2),
+(3, 7, 1);
+
 
 INSERT INTO messages (chat_id, user_id, content, msg_time) VALUES
-(1, 3, 'My product arrived damaged', NOW()),
-(1, 1, 'We are reviewing your complaint', NOW()),
-(2, 4, 'Order is late', NOW());
+(1, 7, 'The camera lens was scratched on arrival.', '2026-02-25 13:10:00'),
+(1, 1, 'We are reviewing your refund request.', '2026-02-25 14:00:00'),
+
+(2, 6, 'Laptop gets extremely hot during use.', '2026-03-20 20:00:00'),
+(2, 2, 'Can you upload photos of the issue?', '2026-03-20 20:15:00'),
+
+(3, 7, 'Mouse disconnects every few minutes.', '2026-05-04 11:00:00'),
+(3, 1, 'Return request has been denied.', '2026-05-04 12:30:00');

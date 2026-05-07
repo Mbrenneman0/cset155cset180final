@@ -76,11 +76,11 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for order in order_log['order_details'] %}
+                    {% for order in order_log['order_details'][:10] %}
                     <tr class="row_{{ 'even' if loop.index0 % 2 == 1 else 'odd' }}">
                         <td>{{ order['order_num'] }}</td>
                         <td>{{ order['name'] }}</td>
-                        <td style="width: 16%;">{{ order['total'] }}</td>
+                        <td style="width: 16%;">${{ order['total'] }}</td>
                         <td>{{ order['status'] }}</td>
                         <td>
                             <form action="{{ url_for(request.endpoint) }}" method="POST">
