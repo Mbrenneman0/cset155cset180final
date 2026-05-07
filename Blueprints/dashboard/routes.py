@@ -71,9 +71,14 @@ def edit_product(role, sku):
         active_page='products'
     )
 
+# ----- CHATS -------
+
 @dash_bp.route('/<string:role>/chats')
 def view_chats(role):
     chats = get_chats(session['user_id'])
+    for chat in chats:
+        chat['customer'] = extensions.client.user(chat['customer_id']).get_info()['name']
+        chat['support'] = extensions.client.user(chat['support_id']).get_info()['username']
     return render_template('dash_chats.html', chats=chats, role=role, active_page="messages")
 
 @dash_bp.route('<string:role>/chats/<chat_id>')
