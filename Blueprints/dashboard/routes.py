@@ -83,7 +83,15 @@ def view_chats(role):
 
 @dash_bp.route('<string:role>/chats/<chat_id>')
 def view_chat(role, chat_id):
-    return ''
+    chat = extensions.client.chat(chat_id)
+    messages = chat.get_messages()
+    return render_template(
+                            "dash_view_chat.html",
+                            chat=chat.get_info(),
+                            messages=messages,
+                            role=role,
+                            active_page="messages"
+                        )
     
 # ----- ORDERS -------
 @dash_bp.route('/<role>/orders', methods=['GET','POST'])

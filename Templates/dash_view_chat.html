@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Product</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/dash.css') }}">
+</head>
+
+<body>
+{% include 'dash_sidebar.html' %}
+
+<main class="dash_main">
+    <div class="dash_header">
+        <div>
+            <h1>Chat #{{ chat.chat_id }}</h1>
+            <p>
+                Complaint ID: {{ chat.complaint_id }}
+            </p>
+        </div>
+
+        <a class="dash_cancel_btn" href="{{ url_for('dashboard.view_chats', role=role) }}">
+            Back to Chats
+        </a>
+    </div>
+
+    <section class="chat_wrap">
+        <div class="chat_info_bar">
+            <p>
+                <strong>Customer ID:</strong> {{ chat.customer_id }}
+            </p>
+
+            <p>
+                <strong>Support ID:</strong>
+                {% if chat.support_id %}
+                    {{ chat.support_id }}
+                {% else %}
+                    Not assigned
+                {% endif %}
+            </p>
+        </div>
+
+        <div class="chat_messages">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="chat_message_row
+                        {% if message.user_id == session['user_id'] %}
+                            chat_message_self
+                        {% else %}
+                            chat_message_other
+                        {% endif %}
+                    ">
+                        <div class="chat_message_bubble">
+                            <div class="chat_message_meta">
+                                <span>User #{{ message.user_id }}</span>
+
+                                {% if message.msg_time %}
+                                    <span>
+                                        {{ message.msg_time.strftime('%b %d, %Y %I:%M %p') }}
+                                    </span>
+                                {% endif %}
+                            </div>
+
+                            <p>{{ message.content }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="dash_empty">
+                    <h2>No messages yet</h2>
+                    <p>Start the conversation by sending a message below.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <form class="chat_form" method="POST" action="{{ url_for('dashboard.view_chat', role=role, chat_id=chat.chat_id) }}">
+            <div class="form_group">
+                <label for="content">New Message</label>
+                <textarea
+                    id="content"
+                    name="content"
+                    placeholder="Type your message..."
+                    required
+                ></textarea>
+            </div>
+
+            <div class="edit_form_actions">
+                <input type="submit" value="Send Message">
+            </div>
+        </form>
+    </section>
+</main>
+</body>
