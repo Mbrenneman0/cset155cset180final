@@ -7,7 +7,6 @@ body{
     display: flex;
     flex-wrap: wrap;
     background:#f8fafc;
-    overflow-y: hidden;
 }
 
 /* -------- LOG BODY ------------ */
@@ -245,9 +244,9 @@ tr.row_odd {
 }
 
 
-::-webkit-scrollbar {
+/* ::-webkit-scrollbar {
     display: none;
-}
+} */
 
 /* orders */
 .execute-btn{
@@ -324,11 +323,16 @@ tr.row_odd {
 .show{
     display: block;
 }
+
 /************ Products Page ***************/
 
 .dash_main {
     width: var(--dash-width);
+    margin-left: auto;
+    margin-right: 0;
+    height: 100vh;
     padding: 2rem;
+    overflow-y: scroll;
 }
 
 .dash_header {
@@ -521,9 +525,6 @@ tr.row_odd {
         padding: 1rem;
     }
 }
-
-
-
 /* ---------- SHARED ----------- */
 .floating-wrapper{
     background:#fff;

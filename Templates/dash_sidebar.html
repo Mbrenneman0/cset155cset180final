@@ -11,12 +11,12 @@
 
     {% if role|lower != 'customer' %}
         <a {% if active_page == 'products'%}class="active"{% endif %}
-        href="{{ url_for('dashboard.view_products', role=role|lower) }}">
+        href="{{ url_for('dashboard.view_products',role=role) }}">
         <i></i>Products</a>
     {% endif %}
 
         <a {% if active_page == 'orders'%}class="active"{% endif %}
-        href="{{ url_for('dashboard.view_orders',role=role|lower) }}">
+        href="{{ url_for('dashboard.view_orders',role=role) }}">
         <i></i>Orders</a>
 
     {% if role|lower != 'customer' %}
