@@ -3,6 +3,7 @@ import extensions
 from flask import Flask, current_app, url_for, request
 from werkzeug.datastructures import ImmutableMultiDict, FileStorage
 from Modules.Types import *
+import re
 
 def get_products(with_imgs = False, with_reviews = False, with_rating = False):
     products = extensions.client.get_all_products()
@@ -67,6 +68,42 @@ def update_product(
     for image in new_images:
         if image and image.filename:
             save_product_image(sku, image)
+
+
+def add_new_product(
+    form: ImmutableMultiDict[str, str],
+    image: FileStorage = None):
+
+    sku = form.get('sku')
+    vendor_id = int(form.get('vendor_id'))
+
+    data = NewProduct(
+        sku=sku,
+        qty=int(form.get('qty')),
+        title=form.get('title'),
+        color=form.get('color'),
+        size=form.get('size'),
+        description=form.get('description'),
+        unit_price=float(form.get('unit_price')),
+        warranty_period=form.get('warranty_period'),
+        is_removed=form.get('is_removed') == 'True'
+    )
+
+    extensions.client.vendor(vendor_id).create_product(data)
+    if image and image.filename:
+        save_product_image(sku, image)
+
+def new_sku() -> str:
+    skus = [item['sku'] for item in extensions.client.get_all_products()]
+    sku_nums = []
+
+    for sku_str in skus:
+        match = re.search(r"\d+", sku_str)
+        if match:
+            sku_nums.append(int(match.group(0)))
+
+    new_num = max(sku_nums, default=0) + 1
+    return f'SKU{new_num:03d}'
 
 def get_vendor_img_folder(sku: str) -> tuple[str, str]:
     product = extensions.client.product(sku)

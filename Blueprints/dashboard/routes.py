@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, Blueprint, session
 from Modules.Types import Role
 from Services.dash_service import get_dashboard_data, update_product_status, get_order_log, get_order
-from Services.product_service import get_products, get_product, update_product
+from Services.product_service import get_products, get_product, update_product, new_sku, add_new_product
 from Services.chat_services import *
 
 dash_bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
@@ -64,9 +64,28 @@ def edit_product(role, sku):
         flash('Product updated successfully.', 'info')
         return redirect(url_for('dashboard.view_products', role=role))
 
+@dash_bp.route('/<string:role>/products/new', methods=['GET', 'POST'])
+def add_product(role):
+    if 'user_id' not in session:
+        return redirect(url_for('authenticate.login_username'))
+
+    sku = new_sku()
+    user_id = session['user_id']
+    vendor_ids = [user['user_id'] for user in extensions.client.admin(1).get_vendors()]
+
+    if request.method == 'POST':
+        add_new_product(
+            request.form,
+            image=request.files.getlist('images')[0]
+        )
+        flash('Product added successfully.', 'info')
+        return redirect(url_for('dashboard.view_products', role=role))
+
     return render_template(
-        'dash_edit_product.html',
-        product=product,
+        'dash_add_product.html',
+        user_id=user_id,
+        vendors = vendor_ids,
+        sku=sku,
         role=role,
         active_page='products'
     )
