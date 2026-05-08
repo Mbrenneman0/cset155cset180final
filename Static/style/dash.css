@@ -374,6 +374,7 @@ table input{
 .dash_product_card {
     background-color: var(--text-light);
     border: 1px solid var(--border-color-light);
+    max-width: 350px;
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
@@ -427,7 +428,16 @@ table input{
     margin-top: 1rem;
 }
 
-.dash_action_btn,
+.dash_action_btn{
+    text-decoration: none;
+    text-align: center;
+    width: 150px;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    background-color: var(--accent-secondary);
+    color: white;
+}
+
 .dash_small_btn {
     text-decoration: none;
     text-align: center;
