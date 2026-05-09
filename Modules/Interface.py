@@ -211,13 +211,13 @@ class Client:
             return self.conn.get_rows(TableNames.REVIEWS, condition=f"products.vendor_id = :user_id", join_tables=["products"], params={"user_id": self.user_id})
         
         def get_product_complaints(self) -> list:
-            return self.conn.get_rows(TableNames.COMPLAINTS, condition=f"products.vendor_id = :user_id", join_tables=["products"], params={"user_id": self.user_id})
+            return self.conn.get_rows(TableNames.PRODUCTS, condition=f"products.vendor_id = :user_id", join_tables=["complaints"], params={"user_id": self.user_id})
         
         def get_unresolved_complaints(self) -> list:
-            return self.conn.get_rows(TableNames.COMPLAINTS, condition=f"products.vendor_id = :user_id AND complaints.is_accepted is NULL", join_tables=["products"], params={"user_id": self.user_id})
+            return self.conn.get_rows(TableNames.PRODUCTS, condition=f"products.vendor_id = :user_id AND complaints.is_accepted is NULL", join_tables=["complaints"], params={"user_id": self.user_id})
         
         def get_complaints_type(self, type='refund'):
-            return self.conn.get_rows(TableNames.COMPLAINTS, condition=f"products.vendor_id = :user_id AND complaints.type = :type", join_tables=["products"], params={"user_id": self.user_id, "type": type})
+            return self.conn.get_rows(TableNames.PRODUCTS, condition=f"products.vendor_id = :user_id AND complaints.type = :type", join_tables=["complaints"], params={"user_id": self.user_id, "type": type})
         
         def get_orders(self) -> list[OrderRow]:
             rslt = self.conn.get_rows(

@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, Blueprint, session
 from Modules.Types import Role
-from Services.dash_service import get_dashboard_data, update_product_status, get_order_log, get_order, get_complaint_data
+from Services.dash_service import get_dashboard_data, update_product_status, get_order_log, get_order, get_complaint_data, update_complaint_status
 from Services.product_service import get_products, get_product, update_product, new_sku, add_new_product
 from Services.chat_services import *
 from Services.auth_service import role_required
@@ -176,25 +176,15 @@ def view_complaints(role):
     if request.method == 'POST':
         return
     return get_complaint_data(role)
-# @dash_bp.post("/<role>/complaints/<int:cid>/refund/accept")
-# def accept_refund(cid):
-#     conn.update(
-#         "complaints",
-#         {"status": "Accepted", "is_accepted": True},
-#         "id = :id",
-#         {"id": cid}
-#     )
-#     return redirect("/complaints")
+@dash_bp.post("/<role>/complaints/<int:cid>/accept")
+def accept_comp(cid, role):
+    update_complaint_status(cid, True)
+    return redirect(f"/dashboard/{role}/complaints")
 
-# @dash_bp.post("/<role>/complaints/<int:cid>/refund/reject")
-# def reject_refund(cid):
-#     conn.update(
-#         "complaints",
-#         {"status": "Rejected", "is_accepted": False},
-#         "id = :id",
-#         {"id": cid}
-#     )
-#     return redirect("/complaints")
+@dash_bp.post("/<role>/complaints/<int:cid>/reject")
+def reject_comp(cid, role):
+    update_complaint_status(cid, False)
+    return redirect(f"/dashboard/{role}/complaints")
 
 # @dash_bp.post("/<role>/complaints/<int:cid>/resolve")
 # def resolve_complaint(cid):
