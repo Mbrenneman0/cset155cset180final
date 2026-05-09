@@ -1,5 +1,5 @@
 :root{
-    --dash-width: calc(100% - 260px);
+    --dash-width: 85%;
     --dash_height: 100vh;
 }
 
@@ -778,6 +778,47 @@ table input{
         max-width: 90%;
     }
 }
+
+/********** COMPLAINTS ***********/
+.thin_card{
+    height: 12.5vh;
+}
+
+.complaint-details-row {
+    display: none;
+    background: #f8fafc;
+}
+
+.complaint-details-row.show {
+    display: table-row;
+}
+
+.complaint-details {
+    margin: 1rem;
+    padding: 1rem;
+    border-radius: 12px;
+}
+
+.badge-Pending{
+    background-color:#1CB2F6 !important;
+}
+
+.badge-Accepted{
+    background:#3b82f6 !important;
+}
+
+.badge-Rejected{
+    background:#16a34a !important;
+    
+}
+
+.badge{
+    border-radius: 5px;
+    padding: 2px 3px;
+    text-align: center;
+    width: 12.5vh;
+}
+
 
 ::-webkit-scrollbar {
     display: none;

@@ -1,8 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, Blueprint, session
 from Modules.Types import Role
-from Services.dash_service import get_dashboard_data, update_product_status, get_order_log, get_order
+from Services.dash_service import get_dashboard_data, update_product_status, get_order_log, get_order, get_complaint_data
 from Services.product_service import get_products, get_product, update_product
 from Services.chat_services import *
+from Services.auth_service import role_required
 
 dash_bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
 
@@ -19,24 +20,28 @@ def dashboard():
 
 # ------------ MAIN DASH ----------------
 @dash_bp.route('/vendor', methods=['GET','POST'])
+@role_required(Role.VENDOR)
 def vendor_dash():
     if request.method == 'POST':
         update_product_status(dict(request.form))
     return get_dashboard_data(Role.VENDOR)
 
 @dash_bp.route('/admin', methods=['GET','POST'])
+@role_required(Role.ADMIN)
 def admin_dash():
     if request.method == 'POST':
         update_product_status(dict(request.form))
     return get_dashboard_data(Role.ADMIN)
 
 @dash_bp.route('/account')
+@role_required(Role.CUSTOMER)
 def customer_dash():
     return get_dashboard_data(Role.CUSTOMER)
 
 
 # ----- PRODUCTS ------
 @dash_bp.route('/<role>/products')
+@role_required(Role.VENDOR, Role.ADMIN)
 def view_products(role):
     products = get_products(with_imgs=True)
     if role == Role.VENDOR.value:
@@ -45,6 +50,7 @@ def view_products(role):
 
 
 @dash_bp.route('/<string:role>/products/<string:sku>/edit', methods=['GET', 'POST'])
+@role_required(Role.VENDOR, Role.ADMIN)
 def edit_product(role, sku):
     if 'user_id' not in session:
         return redirect(url_for('authenticate.login_username'))
@@ -136,3 +142,39 @@ def view_filtered_orders(role, action):
                                                 order_log=get_order_log(session['role'], action), 
                                                 action=action, 
                                                 active_page='orders')
+
+# ------ COMPLAINTS --------
+@dash_bp.route('/<role>/complaints', methods=['GET','POST'])
+def view_complaints(role):
+    if request.method == 'POST':
+        return
+    return get_complaint_data(role)
+# @dash_bp.post("/<role>/complaints/<int:cid>/refund/accept")
+# def accept_refund(cid):
+#     conn.update(
+#         "complaints",
+#         {"status": "Accepted", "is_accepted": True},
+#         "id = :id",
+#         {"id": cid}
+#     )
+#     return redirect("/complaints")
+
+# @dash_bp.post("/<role>/complaints/<int:cid>/refund/reject")
+# def reject_refund(cid):
+#     conn.update(
+#         "complaints",
+#         {"status": "Rejected", "is_accepted": False},
+#         "id = :id",
+#         {"id": cid}
+#     )
+#     return redirect("/complaints")
+
+# @dash_bp.post("/<role>/complaints/<int:cid>/resolve")
+# def resolve_complaint(cid):
+#     conn.update(
+#         "complaints",
+#         {"status": "Resolved"},
+#         "id = :id",
+#         {"id": cid}
+#     )
+#     return redirect("/complaints")

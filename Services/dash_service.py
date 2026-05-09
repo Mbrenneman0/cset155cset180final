@@ -1,9 +1,8 @@
 from flask import flash, session, request, render_template, redirect, url_for
 import extensions
-from .auth_service import check_credentials
+from .auth_service import page_gate
 from Modules.Types import *
 from datetime import datetime
-
 
 def _get_order_quantity(order_items: list) -> int:
     unique_orders = set(row['order_num'] for row in order_items)
@@ -100,9 +99,7 @@ def _get_order_action(status: str) -> str:
     return action[action.index(status)+1] if action.index(status) < 3 else 'Completed'
 
 def get_dashboard_data(role: Role) -> str:
-    if not check_credentials(role, session.get('user_id')):
-        flash('You do not have the necessary credentials', 'error')
-        return redirect(url_for('index.index'))
+    page_gate(role)
 
     quick_log = get_quick_log(role)
     graph_log = get_graph_log(role)
@@ -195,3 +192,88 @@ def get_order(order_num:int):
 def update_product_status(order_details: dict):
     if order_details['action'] != 'Completed':
         extensions.client.conn.update_row(TableNames.ORDERS, pk_value=int(order_details['order_num']), data={'status': order_details['action']})
+
+def get_complaint_data(role: Role):
+    page_gate(role)
+
+    complaints = _get_complaints(role)
+    customers = [
+        extensions.client.conn.get_rows(
+            TableNames.USERS,
+            condition='orders.order_num = :order_num AND orders.user_id = users.user_id',
+            join_tables=[TableNames.ORDERS],
+            cols=['name'],
+            params={'order_num': complaint['order_num']}
+        )[0]
+        for complaint in complaints
+    ]
+    print(customers)
+    if role != 'Customer':
+        pending_count = _get_pending_count(role)
+        refund_count = _get_refund_count(role)
+        resolved_count = _get_resolved_count(role)
+
+        return render_template('dash_complaints.html', role=role,
+                                                        complaints=complaints,
+                                                        customers=customers,
+                                                        pending_count=pending_count,
+                                                        refund_count=refund_count,
+                                                        resolved_count=resolved_count,
+                                                        active_page='complaints')
+    
+    return render_template('dash_complaints.html', role=role,
+                                                    complaints=complaints,
+                                                    customers=customers,
+                                                    active_page='complaints')
+
+def _get_complaints(role: Role):
+    complaints = []
+    if role == Role.ADMIN:
+        admin = extensions.client.admin(session['user_id'])
+        complaints = admin.get_all_complaints()
+
+    elif role == Role.VENDOR:
+        vendor = extensions.client.vendor(session['user_id'])
+        complaints = vendor.get_product_complaints()
+
+    elif role == Role.CUSTOMER:
+        customer = extensions.client.customer(session['user_id'])
+        complaints = customer.get_all_complaints()
+
+    return complaints
+
+def _get_pending_count(role: Role):
+    pending_count = None
+    if role == Role.ADMIN:
+        admin = extensions.client.admin(session['user_id'])
+        pending_count = len(admin.get_unresolved_complaints())
+
+    elif role == Role.VENDOR:
+        vendor = extensions.client.vendor(session['user_id'])
+        pending_count = len(vendor.get_unresolved_complaints())
+
+    return pending_count
+
+def _get_refund_count(role: Role):
+    refund_count = None
+    if role == Role.ADMIN:
+        admin = extensions.client.admin(session['user_id'])
+        refund_count = len(admin.get_complaints_type())
+
+    elif role == Role.VENDOR:
+        vendor = extensions.client.vendor(session['user_id'])
+        refund_count = len(vendor.get_complaints_type())
+
+    return refund_count
+
+def _get_resolved_count(role: Role):
+    resolved_count = None
+    if role == Role.ADMIN:
+        admin = extensions.client.admin(session['user_id'])
+        resolved_count = len(admin.get_all_complaints())-len(admin.get_unresolved_complaints())
+
+    elif role == Role.VENDOR:
+        vendor = extensions.client.vendor(session['user_id'])
+        resolved_count = len(vendor.get_product_complaints())-len(vendor.get_unresolved_complaints())
+
+    return resolved_count

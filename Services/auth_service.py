@@ -102,6 +102,38 @@ def check_credentials(role_type:Role, user_id:int=None) -> bool:
         print(KeyError(f'User {session['user_id']} does not have {role_type.value} access'))
     return check
 
+def page_gate(role:Role):
+    if not check_credentials(role, session.get('user_id')):
+        flash('You do not have the necessary credentials', 'error')
+        return redirect(url_for('index.index'))
+
 def create_session(user_id:str=None, role:str=None):
     session['user_id'] = user_id
     session['role'] = role
+
+
+from functools import wraps
+from flask import session, redirect, abort
+
+
+def login_required(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        if "user_id" not in session:
+            return redirect("/login")
+        return f(*args, **kwargs)
+    return wrapper
+
+
+def role_required(*allowed_roles):
+    def decorator(f):
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            if "user_id" not in session:
+                return redirect("/login")
+            role = session.get("role")
+            if role not in allowed_roles:
+                return abort(403)
+            return f(*args, **kwargs)
+        return wrapper
+    return decorator
