@@ -15,9 +15,7 @@
     <div class="dash_header">
         <h1>Products</h1>
 
-        {% if role == 'Vendor' %}
-            <a class="dash_action_btn" href="#">Add Product</a>
-        {% endif %}
+        <a class="dash_action_btn" href="{{ url_for('dashboard.add_product', role=role)}}">Add Product</a>
     </div>
 
     {% if products %}
