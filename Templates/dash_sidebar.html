@@ -31,7 +31,7 @@
 
     {% if role|lower != 'customer' %}
         <a {% if active_page == 'complaints'%}class="active"{% endif %}
-        href="#">
+        href="{{ url_for('dashboard.view_complaints', role=role) }}">
         <i></i>Complaints</a>
     {% endif %}
 

@@ -16,7 +16,9 @@
         <input type="search" class="searchbar" placeholder="Search orders..." name="search">
         <div class="role"><strong>{{ role[0]|upper }}{{ role[1:] }}</strong></div>
     </div>
-    <button class="execute-btn" onclick="runActions()"><small>Execute</small></button>
+    {% if role != 'Customer' %}
+        <button class="execute-btn" onclick="runActions()"><small>Execute</small></button>
+    {% endif %}
     <div class="log-wrapper fixed">
         <div class="floating-wrapper fixed">
             <table class="orders_table fixed">
@@ -66,7 +68,7 @@
                                 {{ order['order_num'] }}
                                 <button onclick="dropdown({{ loop.index0+1 }})" class="dropbtn">🡪</button>
                             </td>
-                            <td style="width: 22%;">{{ order['date'] }}</td>
+                            <td style="width: 22%;">{{ order['date'].strftime('%b %d, %Y %I:%M %p') }}</td>
                             <td>{{ order['name'] }}</td>
                             <td>${{ order['total'] }}</td>
                             <td>{{ order['status'] }}</td>

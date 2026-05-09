@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/dash.css') }}">
+    <title>Document</title>
+</head>
+<body>
+
+{% include 'dash_sidebar.html' %}
+
+<div class="log_body fixed">
+    <div class="log-wrapper fixed" style="height: 100vh;">
+        <div class="quick_log flex">
+            <div class="card_col floating-wrapper thin_card">
+                <small>Total</small>
+                <h3>{{ complaints|length }}</h3>
+            </div>
+            <div class="card_col floating-wrapper thin_card">
+                <small>Pending Review</small>
+                <h3>{{ pending_count }}</h3>
+            </div>
+            <div class="card_col floating-wrapper thin_card">
+                <small>Refund Requests</small>
+                <h3>{{ refund_count }}</h3>
+            </div>
+            <div class="card_col floating-wrapper thin_card">
+                <small>Resolved</small>
+                <h3>{{ resolved_count }}</h3>
+            </div>
+            
+        </div>
+
+        <div class="floating-wrapper" style="height: 77.5vh;">
+            <table class="orders_table complaints_table">
+                <thead>
+                    <tr>
+                        <th style="width: 10%;">ID</th>
+                        <th style="width: 10%;">Order ID</th>
+                        <th style="width: 16%;">Customer</th>
+                        <th style="width: 14%;">Type</th>
+                        <th style="width: 16%;">Product SKU</th>
+                        <th style="width: 14%;">Status</th>
+                        <th style="width: 20%;">Submitted</th>
+                        <div class="dropdown order_filter">
+                            <button onclick="dropdown(0)" class="dropbtn">&#9778;</button>
+                            <div class="dropdown-content card_col floating-wrapper myDropdown">
+                                <a href="{{ url_for('dashboard.view_orders',role=role) }}">All</a>
+                                <a href="{{ url_for('dashboard.view_filtered_orders',role=role,action='Pending') }}">Pending</a>
+                                <a href="{{ url_for('dashboard.view_filtered_orders',role=role,action='Confirmed') }}">Confirmed</a>
+                                <a href="{{ url_for('dashboard.view_filtered_orders',role=role,action='Picked Up') }}">Picked Up</a>
+                                <a href="{{ url_for('dashboard.view_filtered_orders',role=role,action='Shipped') }}">Shipped</a>
+                            </div>
+                        </div>
+                    </tr>
+                </thead>
+                <tbody class="table-scroll">
+                    {% for complaint in complaints %}
+                        <tr class="row_{{ 'even' if loop.index0 % 2 == 1 else 'odd' }} first_row">
+                            <td style="width: 10%;">
+                                {{ complaint.complaint_id }}
+                                <button onclick="toggleComplaint({{ complaint.complaint_id }})" class="dropbtn" id="dB-{{ complaint.complaint_id }}">🡪</button>
+                            </td>
+                            <td style="width: 10%;">{{ complaint.order_num }}</td>
+                            <td style="width: 16%;">{{ customers[loop.index0]['name'] }}</td>
+                            <td style="width: 14%;">{{ complaint.type }}</td>
+                            <td style="width: 16%;">{{ complaint.sku }}</td>
+                            <td style="width: 14%;">
+                                {% if complaint.is_accepted == 0 %}
+                                    {% set status = 'Rejected' %}
+                                {% elif complaint.is_accepted == 1  %}
+                                    {% set status = 'Accepted' %}
+                                {% else %}
+                                    {% set status = 'Pending' %}
+                                {% endif %}
+                                <div class="badge-{{ status }} badge" >
+                                    {{ status }}
+                                </div>
+                            </td>
+                            <td style="width: 20%;">{{ complaint.comp_time.strftime('%b %d, %Y %I:%M %p') }}</td>
+                        </tr>
+                        <tr class="complaint-details-row myDropdown row_{{ 'even' if loop.index0 % 2 == 1 else 'odd' }}" id="details-{{ complaint.complaint_id }}">
+                            <td colspan="8">
+                                <div class="complaint-details floating-wrapper">
+                                    <div class="flex">
+                                        <h3>Complaint Details</h3>
+                                        <span class="badge-{{ status }} badge">
+                                            {{ status }}
+                                        </span>
+                                    </div>
+                                    <p><strong>Description:</strong> {{ complaint.content }}</p>
+                                    <p><strong>Type:</strong> {{ complaint.type }}</p>
+                                    <p><strong>Order:</strong> {{ complaint.order_num }}</p>
+                                    <p><strong>SKU:</strong> {{ complaint.sku }}</p>
+                                    <div class="flex" style="margin-top:1rem; gap:0.5rem;">
+                                        {% if complaint.type == 'Refund' and status == 'Pending' %}
+                                            <form method="POST"
+                                                action="/complaints/{{ complaint.complaint_id }}/refund/accept">
+                                                <button class="dash_small_btn"
+                                                        style="background:#16a34a;">
+                                                    Accept Refund
+                                                </button>
+                                            </form>
+                                            <form method="POST"
+                                                action="/complaints/{{ complaint.complaint_id }}/refund/reject">
+                                                <button class="dash_small_btn danger">
+                                                    Reject Refund
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll(".dropbtn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const menu = btn.nextElementSibling;
+            menu.style.display = menu.style.display === "block" ? "none" : "block";
+        });
+    });
+
+    document.addEventListener("click", (e) => {
+        if (!e.target.matches(".dropbtn")) {
+            document.querySelectorAll(".dropdown-content").forEach(el => {
+                el.style.display = "none";
+            });
+        }
+    });
+
+    function toggleComplaint(id) {
+        const row = document.getElementById(`details-${id}`);
+        const icon = document.getElementById(`dB-${id}`)
+
+        icon.innerHTML = icon.innerHTML !== "🡪" ? "🡪" : "🡫";
+        if (row.classList.contains("show")) {
+            row.classList.remove("show");
+        } else {
+            row.classList.add("show");
+        }
+    }
+</script>
+
+
+</body>
+</html>

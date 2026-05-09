@@ -71,7 +71,7 @@
             <table>
                 <thead><tr><th>Order ID</th><th>Customer</th><th style="width: 16%;">Total</th><th>Status</th><th>Action</td></tr></thead>
                 <tbody>
-                    {% for order in order_log['order_details'][:10] %}
+                    {% for order in order_log['order_details'][order_log['order_details']|count-10:] %}
                         <tr class="row_{{ 'even' if loop.index0 % 2 == 1 else 'odd' }}">
                             <td>{{ order['order_num'] }}</td>
                             <td>{{ order['name'] }}</td>

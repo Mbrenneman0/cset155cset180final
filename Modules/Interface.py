@@ -144,12 +144,18 @@ class Client:
             except Exception as e:
                 raise
 
+        def get_all_reviews(self):
+            return self.conn.get_rows(TableNames.REVIEWS, condition=f"user_id = :user_id", params={"user_id": self.user_id})
+
         def create_complaint(self, order_num:int, sku:int, content:str, type:ComplaintTypes=ComplaintTypes.REFUND):
             data = NewComplaint(order_num=order_num,
                                 sku=sku,
                                 type=type,
                                 content=content)
             self.conn.create_row(TableNames.COMPLAINTS, data)
+
+        def get_all_complaints(self):
+            return self.conn.get_rows(TableNames.COMPLAINTS, condition=f"orders.user_id = :user_id", join_tables=["orders"], params={"user_id": self.user_id})
 
         def create_order(self, items:list[CartItem]):
             order_data = {
@@ -203,6 +209,15 @@ class Client:
 
         def get_product_reviews(self) -> list[ReviewRow]:
             return self.conn.get_rows(TableNames.REVIEWS, condition=f"products.vendor_id = :user_id", join_tables=["products"], params={"user_id": self.user_id})
+        
+        def get_product_complaints(self) -> list:
+            return self.conn.get_rows(TableNames.COMPLAINTS, condition=f"products.vendor_id = :user_id", join_tables=["products"], params={"user_id": self.user_id})
+        
+        def get_unresolved_complaints(self) -> list:
+            return self.conn.get_rows(TableNames.COMPLAINTS, condition=f"products.vendor_id = :user_id AND complaints.is_accepted is NULL", join_tables=["products"], params={"user_id": self.user_id})
+        
+        def get_complaints_type(self, type='refund'):
+            return self.conn.get_rows(TableNames.COMPLAINTS, condition=f"products.vendor_id = :user_id AND complaints.type = :type", join_tables=["products"], params={"user_id": self.user_id, "type": type})
         
         def get_orders(self) -> list[OrderRow]:
             rslt = self.conn.get_rows(
@@ -273,6 +288,9 @@ class Client:
         
         def get_unresolved_complaints(self) -> list[ComplaintRow]:
             return self.conn.get_rows(TableNames.COMPLAINTS, condition="is_accepted is NULL")
+
+        def get_complaints_type(self, type='refund'):
+            return self.conn.get_rows(TableNames.COMPLAINTS, condition=f"type = :type", params={"type": type})
 
         def get_all_orders(self) -> list[OrderRow]:
             return self.conn.get_rows(TableNames.ORDERS)
