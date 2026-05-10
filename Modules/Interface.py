@@ -41,7 +41,7 @@ class Client:
                 support_id = to_user_id
                 customer_id = self.user_id
 
-            chat_data = ChatRow(complaint_id=self.complaint_id,
+            chat_data = ChatRow(complaint_id=complaint_id,
                                 customer_id=customer_id,
                                 support_id=support_id)
             self.conn.create_row(TableNames.CHATS, chat_data)
