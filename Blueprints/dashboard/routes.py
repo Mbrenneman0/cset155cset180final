@@ -217,16 +217,6 @@ def reject_comp(cid, role):
     update_complaint_status(cid, False)
     return redirect(f"/dashboard/{role}/complaints")
 
-# @dash_bp.post("/<role>/complaints/<int:cid>/resolve")
-# def resolve_complaint(cid):
-#     conn.update(
-#         "complaints",
-#         {"status": "Resolved"},
-#         "id = :id",
-#         {"id": cid}
-#     )
-#     return redirect("/complaints")
-
 @dash_bp.route("/<role>/complaints/new", methods=["GET", "POST"])
 def create_complaint(role, product_id, order_num):
     if request.method == "GET":

@@ -184,8 +184,8 @@ def get_order(order_num:int):
             "name": extensions.client.user(order['user_id']).get_info()['name'],
             "date": order['order_time'],
             "status": order['status'],
-            "total": sum([float(item['unit_price'])*int(item['qty'])
-                                for item in extensions.client.order(order['order_num']).get_order_items()]),
+            "total": round(sum([float(item['unit_price'])*int(item['qty'])
+                                for item in extensions.client.order(order['order_num']).get_order_items()]),2),
             "items": [item for item in extensions.client.order(order['order_num']).get_order_items()]}
 
 
