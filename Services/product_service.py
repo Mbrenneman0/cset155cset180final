@@ -4,12 +4,73 @@ from flask import Flask, current_app, url_for, request
 from werkzeug.datastructures import ImmutableMultiDict, FileStorage
 from Modules.Types import *
 import re
+from difflib import SequenceMatcher
 
-def get_products(with_imgs = False, with_reviews = False, with_rating = False, category:ProdCategories = None):
+def _clean_search_text(value) -> str:
+    value = str(value or "").lower()
+    value = re.sub(r"[^a-z0-9\s]", " ", value)
+    value = re.sub(r"\s+", " ", value).strip()
+    return value
+
+def _product_search_score(product, search: str) -> float:
+    query = _clean_search_text(search)
+
+    if not query:
+        return 1.0
+
+    title = _clean_search_text(product.get("title", ""))
+    description = _clean_search_text(product.get("description", ""))
+    searchable_text = f"{title} {description}".strip()
+
+    if not searchable_text:
+        return 0.0
+
+    if query in title:
+        return 1.0
+
+    if query in description:
+        return 0.9
+    title_score = SequenceMatcher(None, query, title).ratio()
+    desc_score = SequenceMatcher(None, query, description).ratio()
+    query_words = query.split()
+    product_words = searchable_text.split()
+
+    word_scores = []
+    for query_word in query_words:
+        best_word_score = max(
+            SequenceMatcher(None, query_word, product_word).ratio()
+            for product_word in product_words
+        )
+        word_scores.append(best_word_score)
+
+    token_score = sum(word_scores) / len(word_scores) if word_scores else 0
+    return max(title_score, desc_score, token_score)
+
+def _fuzzy_filter_products(products, search: str, threshold: float = 0.55):
+    if not search:
+        return products
+
+    scored_products = []
+    for product in products:
+        score = _product_search_score(product, search)
+        if score >= threshold:
+            scored_products.append((score, product))
+
+    scored_products.sort(key=lambda item: item[0], reverse=True)
+    return [product for score, product in scored_products]
+
+def get_products(with_imgs = False,
+                 with_reviews = False,
+                 with_rating = False,
+                 category:ProdCategories = None,
+                 search:str = None):
     products = extensions.client.get_all_products()
     if category:
         products = [product for product in products
                     if product.get('category') == category.value]
+        
+    products = _fuzzy_filter_products(products, search)
+    
     if with_imgs:
         for product in products:
             try:
