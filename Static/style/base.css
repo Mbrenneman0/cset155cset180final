@@ -377,3 +377,27 @@ label{
     padding-right: 2rem;
     margin-top: 3rem;
 }
+
+.category_filter {
+    display: flex;
+    flex-direction: row !important;
+    width: 85%;
+    align-items: center;
+    justify-content: right;
+    gap: 0.75rem;
+    margin: 1rem 0 2rem;
+}
+
+.category_filter select {
+    padding: 0.5rem 0.75rem;
+    width: fit-content;
+    border: 1px solid var(--border-color-light);
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.clear_filter {
+    text-decoration: none;
+    color: var(--text-dark);
+    font-weight: 600;
+}

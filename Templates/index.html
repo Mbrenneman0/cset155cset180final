@@ -8,6 +8,24 @@
         <p>We make buying and selling a breeze!</p>
     <h2>Featured Products</h2>
     </div>
+    <form class="category_filter" method="GET" action="{{ url_for('index.index') }}">
+        <label for="category">Filter by category:</label>
+
+        <select name="category" id="category" onchange="this.form.submit()">
+            <option value="">All Categories</option>
+
+            {% for category in categories %}
+                <option 
+                    value="{{ category.value }}"
+                    {% if selected_category == category.value %}selected{% endif %}
+                >
+                    {{ category.value }}
+                </option>
+            {% endfor %}
+        </select>
+        <a href="{{ url_for('index.index') }}" class="clear_filter">Clear</a>
+    </form>
+
     <div class="products_grid">
         {% for product in products %}
         {% with sku=product.sku, title=product.title, images=product.get('images', []), price=product.unit_price, rating=product.rating %}
