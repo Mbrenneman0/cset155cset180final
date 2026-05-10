@@ -207,7 +207,7 @@ def get_complaint_data(role: Role):
         )[0]
         for complaint in complaints
     ]
-    print(customers)
+    
     if role != 'Customer':
         pending_count = _get_pending_count(role)
         refund_count = _get_refund_count(role)
@@ -277,3 +277,8 @@ def _get_resolved_count(role: Role):
         resolved_count = len(vendor.get_product_complaints())-len(vendor.get_unresolved_complaints())
 
     return resolved_count
+
+def update_complaint_status(id: int, status):
+    extensions.client.conn.update_row(TableNames.COMPLAINTS,
+                                      pk_value=id,
+                                      data={'is_accepted': status})

@@ -223,7 +223,6 @@ class Conn:
             if cols:
                 select_cols = ", ".join(cols)
             if join_tables is None:
-                print('HHHHHHHHHHHHHHHHHHHHHHHH')
                 query = f"SELECT {select_cols} FROM {self.table_name}"
             else:
                 join_sql = self._build_joins(join_tables)
