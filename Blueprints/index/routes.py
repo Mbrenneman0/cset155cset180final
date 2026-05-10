@@ -6,6 +6,7 @@ index_bp = Blueprint('index',__name__, url_prefix='/')
 
 @index_bp.route('/', methods=['GET'])
 def index():
+    search_query = request.args.get('q', '').strip()
     category_value = request.args.get('category','').strip()
     selected_category = None
 
@@ -17,10 +18,14 @@ def index():
             return redirect(url_for(index.index))
         
         
-    products = get_products(with_imgs=True, with_rating=True, category=selected_category)
+    products = get_products(with_imgs=True,
+                            with_rating=True,
+                            category=selected_category,
+                            search=search_query)
 
     return render_template('index.html',
                            products=products,
                            categories=ProdCategories,
-                           selected_category=category_value)
+                           selected_category=category_value,
+                           search_query=search_query)
 

@@ -4,9 +4,19 @@
     </span>
     
     <div class="searchbar">
-        <form action="" method="get" class="search_form">
-            <input type="text" name="q" placeholder="Search products..." class="search_input">
-            <button type="submit" class="search_btn">Search</button>
+        <form action="{{ url_for('index.index') }}" method="GET" class="search_form">
+            <input
+                type="text"
+                name="q"
+                placeholder="Search"
+                value="{{ search_query|default('') }}"
+            >
+        
+            {% if selected_category|default('') %}
+                <input type="hidden" name="category" value="{{ selected_category }}">
+            {% endif %}
+        
+            <button type="submit">Search</button>
         </form>
     </div>
     <div class="navlinks">
