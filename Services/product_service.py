@@ -96,6 +96,9 @@ def get_product(sku, with_imgs = False, with_reviews = False, with_rating = Fals
             product['images'] = []
     if with_reviews:
         product['reviews'] = extensions.client.product(sku).get_reviews()
+        for review in product['reviews']:
+            username = extensions.client.user(review.get('user_id')).get_info().get('name')
+            review.update(username=username)
     if with_rating:
         product['rating'] = get_rating(sku)
     return product
@@ -275,3 +278,29 @@ def save_review(user_id, sku, rating, comment):
             raise Exception("You have already submitted a review for this product")
         else:
             raise
+
+def filter_reviews(reviews:list[ReviewRow], filter):
+    if filter == 'one':
+        reviews = [review for review in reviews if review['rating'] == 1]
+    elif filter == 'two':
+        reviews = [review for review in reviews if review['rating'] == 2]
+    elif filter == 'three':
+        reviews = [review for review in reviews if review['rating'] == 3]
+    elif filter == 'four':
+        reviews = [review for review in reviews if review['rating'] == 4]
+    elif filter == 'five':
+        reviews = [review for review in reviews if review['rating'] == 5]
+    return reviews
+
+def sort_reviews(reviews, sort):
+    if sort == 'old':
+        reviews.sort(key=lambda review: review['rvw_time'])
+    elif sort == 'high':
+        reviews.sort(key=lambda review: review['rating'], reverse=True)
+    elif sort == 'low':
+        reviews.sort(key=lambda review: review['rating'])
+    else:
+        sort = 'new'
+        reviews.sort(key=lambda review: review['rvw_time'], reverse=True)
+
+    return reviews
