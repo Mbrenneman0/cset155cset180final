@@ -48,6 +48,10 @@
                             {{ product.description }}
                         </p>
 
+                        <p>
+                            Category: {{ product.category }}
+                        </p>
+
                         <div class="dash_product_details">
                             <span>Price: ${{ "%.2f"|format(product.unit_price|float) }}</span>
                             <span>Stock: {{ product.qty }}</span>

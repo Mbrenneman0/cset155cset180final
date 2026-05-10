@@ -69,6 +69,14 @@ def edit_product(role, sku):
         )
         flash('Product updated successfully.', 'info')
         return redirect(url_for('dashboard.view_products', role=role))
+    
+    return render_template(
+        'dash_edit_product.html',
+        role=role,
+        product=product,
+        categories=ProdCategories,
+        active_page = 'products'
+        )
 
 @dash_bp.route('/<string:role>/products/new', methods=['GET', 'POST'])
 def add_product(role):
@@ -91,6 +99,7 @@ def add_product(role):
         'dash_add_product.html',
         user_id=user_id,
         vendors = vendor_ids,
+        categories = ProdCategories,
         sku=sku,
         role=role,
         active_page='products'

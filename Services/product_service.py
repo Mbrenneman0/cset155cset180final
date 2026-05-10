@@ -5,8 +5,11 @@ from werkzeug.datastructures import ImmutableMultiDict, FileStorage
 from Modules.Types import *
 import re
 
-def get_products(with_imgs = False, with_reviews = False, with_rating = False):
+def get_products(with_imgs = False, with_reviews = False, with_rating = False, category:ProdCategories = None):
     products = extensions.client.get_all_products()
+    if category:
+        products = [product for product in products
+                    if product.get('category') == category]
     if with_imgs:
         for product in products:
             try:
@@ -47,6 +50,7 @@ def update_product(
     data = ProductUpdate(
         qty=int(form.get('qty')),
         title=form.get('title'),
+        category=form.get('category'),
         color=form.get('color'),
         size=form.get('size'),
         description=form.get('description'),
@@ -81,6 +85,7 @@ def add_new_product(
         sku=sku,
         qty=int(form.get('qty')),
         title=form.get('title'),
+        category=form.get('category'),
         color=form.get('color'),
         size=form.get('size'),
         description=form.get('description'),
