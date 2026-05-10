@@ -38,6 +38,34 @@
     <div class="reviews_section">
         <div>
             <h2>Customer Reviews</h2>
+            <div class="options_row">
+            <form class= "review-sort" action="{{ url_for('products.view_product', sku=product.sku) }}" method="GET">
+                {% if review_sort == none %}
+                    {% set review_sort = "new" %}
+                {% endif %}
+                <label for="review_sort">Sort</label>
+                <select name="review_sort" id="review_sort" onchange="this.form.submit()">
+                    <option value="new" {%if review_sort == 'new' %} selected {% endif %}>Newest</option>
+                    <option value="old" {%if review_sort == 'old' %} selected {% endif %}>Oldest</option>
+                    <option value="high" {%if review_sort == 'high' %} selected {% endif %}>Highest</option>
+                    <option value="low" {%if review_sort == 'low' %} selected {% endif %}>Lowest</option>
+                </select>
+                </form>
+            <form class= "review-filter" action="{{ url_for('products.view_product', sku=product.sku) }}" method="GET">
+                {% if review_filter == none %}
+                    {% set review_filter = "all" %}
+                {% endif %}
+                <label for="review_filter">Filter</label>
+                <select name="review_filter" id="review_filter" onchange="this.form.submit()">
+                    <option value="all" {%if review_filter == 'all' %} selected {% endif %}>All</option>
+                    <option value="five" {%if review_filter == 'five' %} selected {% endif %}>5 Star</option>
+                    <option value="four" {%if review_filter == 'four' %} selected {% endif %}>4 Star</option>
+                    <option value="three" {%if review_filter == 'three' %} selected {% endif %}>3 Star</option>
+                    <option value="two" {%if review_filter == 'two' %} selected {% endif %}>2 Star</option>
+                    <option value="one" {%if review_filter == 'one' %} selected {% endif %}>1 Star</option>
+                </select>
+                </form>
+            </div>
             <div class="rvw-btn-row">
                 <a href="{{ url_for('products.add_review', sku=product.sku) }}" class="link-btn atc_btn">Add Review</a>
             </div>

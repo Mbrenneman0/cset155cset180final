@@ -157,6 +157,30 @@
     margin-bottom: 0;
 }
 
+form {
+    width: 45%;
+    display: flex;
+    flex-direction: row !important;
+    align-items: center;
+}
+
+label {
+    margin-bottom: 5px;
+    width:fit-content;
+
+}
+
+select {
+    flex-grow: 1;
+}
+
+.options_row {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+}
+
 @media (max-width: 768px) {
     .prod_content {
         grid-template-columns: 1fr;
