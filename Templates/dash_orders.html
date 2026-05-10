@@ -110,17 +110,19 @@
                                     <tbody>
                                         {% for item in order['items'] %}
                                             <tr class="first_row">
-                                                <td>{{ item['sku'] }}</td>
+                                                <td style="position: relative;">
+                                                    {{ item['sku'] }}
+                                                    {% if order['status'] == 'Shipped' %}
+                                                        <a class="complaint_btn" title="Make a complaint on this item here">!</a>
+                                                    {% endif %}
+                                                </td>
                                                 <td>{{ item['qty'] }}</td>
                                                 <td>{{ item['unit_price'] }}</td>
                                                 <td>{{ item['warranty_period'] }}</td>
                                             </tr>
                                         {% endfor %}
                                     </tbody>
-                                </table>   
-                            </td>
-                            <td style="width: 2.5%;">
-                                <a class="complaint_btn">Complaint</a> {# TODO: add routing for complaint page #}
+                                </table>  
                             </td>
                         </tr>
                     {% endfor %}

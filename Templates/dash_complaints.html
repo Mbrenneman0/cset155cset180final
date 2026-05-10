@@ -95,7 +95,7 @@
                                     <p><strong>Order:</strong> {{ complaint.order_num }}</p>
                                     <p><strong>SKU:</strong> {{ complaint.sku }}</p>
                                     <div class="flex" style="margin-top:1rem; gap:0.5rem;">
-                                        {% if status == 'Pending' %}
+                                        {% if status == 'Pending' and role == 'Admin' %}
                                             <form method="POST"
                                                 action="{{ url_for('dashboard.accept_comp', role=role, cid=complaint.complaint_id) }}">
                                                 <button class="dash_small_btn"
