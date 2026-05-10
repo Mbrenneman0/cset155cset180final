@@ -227,3 +227,28 @@ def view_complaints(role):
 #         {"id": cid}
 #     )
 #     return redirect("/complaints")
+
+@dash_bp.route("/<role>/complaints/new", methods=["GET", "POST"])
+def create_complaint(role, product_id, order_num):
+    if request.method == "GET":
+        #TODO: 
+        # form with:
+        # product and order_num as readonly fields,
+        # complaint message for complaint chat
+        # and complaint type dropdown
+        return #
+    if request.method == "POST":
+        form = request.form
+        user_id = session['user_id']
+        # code to generate complaint here:
+
+        complaint_id = 1
+        #---- after complaint object is generated, get the complaint_id and store it in variable named complaint_id
+        message = form.get('message')
+        support_id = 1 #admin_id
+        create_new_chat(user_id, support_id)
+        chat_id = get_last_chat(user_id)['chat_id']
+        message = NewChatMessage(chat_id=chat_id,
+                                 user_id=user_id,
+                                 content=message)
+        send_message(message)
