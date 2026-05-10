@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Chat</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/dash.css') }}">
+</head>
+<body>
+
+{% include 'dash_sidebar.html' %}
+
+<main class="dash_main">
+    <div class="dash_header">
+        <h1>Start a New Chat</h1>
+        <p>Select a vendor and send your first message.</p>
+    </div>
+
+    <form 
+        class="dash_form" 
+        method="POST" 
+        action="{{ url_for('dashboard.new_chat', role=role) }}"
+    >
+        <div class="form_group">
+            <label for="vendor_id">Vendor</label>
+
+            <select id="vendor_id" name="vendor_id" required>
+                <option value="" disabled selected>Select a vendor</option>
+
+                {% for vendor in vendors %}
+                    <option value="{{ vendor['user_id'] }}">
+                        {{ vendor['name'] }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form_group">
+            <label for="message">Message</label>
+
+            <textarea 
+                id="message" 
+                name="message" 
+                rows="6" 
+                placeholder="Type your message here..."
+                required
+            ></textarea>
+        </div>
+
+        <div class="form_actions">
+            <a href="{{ url_for('dashboard.view_chats', role=role) }}" class="btn secondary_btn">
+                Cancel
+            </a>
+
+            <button type="submit" class="btn primary_btn">
+                Start Chat
+            </button>
+        </div>
+    </form>
+</main>
+
+</body>
+</html>

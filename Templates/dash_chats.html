@@ -17,6 +17,9 @@
             <h1>Messages</h1>
             <p>View all chats connected to your account.</p>
         </div>
+            {% if role == "Customer"%}
+            <a class="dash_action_btn" href="{{ url_for('dashboard.new_chat', role=role)}}">New Chat</a>
+            {% endif %}
     </div>
 
     {% if chats %}
