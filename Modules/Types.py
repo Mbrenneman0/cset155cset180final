@@ -30,6 +30,15 @@ class Role(str, Enum):
     CUSTOMER = "Customer"
     VENDOR = "Vendor"
 
+class ProdCategories(str, Enum):
+    ELECTRONICS ='Electronics'
+    FOOD = 'Food and Beverage'
+    DECOR = 'Decor'
+    TOOLS = 'Tools'
+    SPORTS = 'Sports'
+    FURNITURE = 'Furniture'
+    TOYS = 'Toys'
+
 class ComplaintTypes(str, Enum):
     RETURN = 'Return'
     REFUND ='Refund'
@@ -76,6 +85,7 @@ class ProductRow(TypedDict):
     vendor_id: int
     qty: int
     title: str
+    category: ProdCategories
     color: str
     size: str
     description: str
@@ -87,6 +97,7 @@ class NewProduct(TypedDict):
     sku: str
     qty: int
     title: str
+    category: ProdCategories
     color: str
     size: str
     description: str
@@ -101,6 +112,7 @@ class ProductUpdate(TypedDict, total=False):
     sku: str
     qty: int
     title: str
+    category: ProdCategories
     color: str
     size: str
     description: str

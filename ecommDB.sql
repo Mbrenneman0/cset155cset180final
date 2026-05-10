@@ -16,13 +16,24 @@ CREATE TABLE products(
     vendor_id INT NOT NULL,
     qty INT NOT NULL,
     title VARCHAR(255) NOT NULL,
+    category VARCHAR(255) NOT NULL,
     color VARCHAR(255) NOT NULL,
     size VARCHAR(50) NOT NULL,
     description VARCHAR(2048) NOT NULL,
     unit_price DECIMAL(12,2) NOT NULL,
     warranty_period VARCHAR(255),
     is_removed BOOLEAN NOT NULL DEFAULT FALSE,
-    FOREIGN KEY (vendor_id) REFERENCES users(user_id) ON DELETE CASCADE
+    FOREIGN KEY (vendor_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    CONSTRAINT category_values 
+        CHECK(category IN (
+            'Electronics',
+            'Food and Beverage',
+            'Decor',
+            'Tools',
+            'Sports',
+            'Furniture',
+            'Toys'
+            ))
 ) ENGINE = InnoDB;
 
 CREATE TABLE prod_imgs(
@@ -133,17 +144,17 @@ INSERT INTO users (name, username, password, email, role) VALUES
 ('Vendor C', 'vendor3', 'pass', 'vendor3@mail.com', 'Vendor');
 
 INSERT INTO products VALUES
-('SKU001', 8, 50, 'Laptop', 'Black', '15in', 'Gaming laptop', 1200.00, '1 year', FALSE),
-('SKU002', 8, 30, 'Phone', 'White', '6in', 'Smartphone', 800.00, '1 year', FALSE),
-('SKU003', 8, 20, 'Tablet', 'Gray', '10in', 'Android tablet', 400.00, '6 months', FALSE),
-('SKU004', 8, 100, 'Headphones', 'Black', 'Std', 'Wireless', 150.00, NULL, FALSE),
-('SKU005', 9, 75, 'Keyboard', 'Black', 'Full', 'Mechanical', 100.00, NULL, FALSE),
-('SKU006', 9, 60, 'Mouse', 'White', 'Std', 'Wireless mouse', 50.00, NULL, FALSE),
-('SKU007', 9, 40, 'Monitor', 'Black', '24in', 'LED monitor', 200.00, '1 year', FALSE),
-('SKU008', 10, 25, 'Printer', 'White', 'Std', 'Laser printer', 300.00, '1 year', FALSE),
-('SKU009', 10, 80, 'USB Drive', 'Blue', '32GB', 'Flash storage', 20.00, NULL, FALSE),
-('SKU010', 10, 15, 'Camera', 'Black', 'Std', 'Digital camera', 500.00, '2 years', FALSE),
-('SKU011', 10, 2, 'RAM', 'Gold', '4GB', '4GBx1 RAM, extremely valuable and rare', 6000.00, '4 weeks', FALSE);
+('SKU001', 8, 50, 'Laptop', 'Electronics', 'Black', '15in', 'Gaming laptop', 1200.00, '1 year', FALSE),
+('SKU002', 8, 30, 'Phone', 'Electronics', 'White', '6in', 'Smartphone', 800.00, '1 year', FALSE),
+('SKU003', 8, 20, 'Tablet', 'Electronics', 'Gray', '10in', 'Android tablet', 400.00, '6 months', FALSE),
+('SKU004', 8, 100, 'Headphones', 'Electronics', 'Black', 'Std', 'Wireless', 150.00, NULL, FALSE),
+('SKU005', 9, 75, 'Keyboard', 'Electronics', 'Black', 'Full', 'Mechanical', 100.00, NULL, FALSE),
+('SKU006', 9, 60, 'Mouse', 'Electronics', 'White', 'Std', 'Wireless mouse', 50.00, NULL, FALSE),
+('SKU007', 9, 40, 'Monitor', 'Electronics', 'Black', '24in', 'LED monitor', 200.00, '1 year', FALSE),
+('SKU008', 10, 25, 'Printer', 'Electronics', 'White', 'Std', 'Laser printer', 300.00, '1 year', FALSE),
+('SKU009', 10, 80, 'USB Drive', 'Electronics', 'Blue', '32GB', 'Flash storage', 20.00, NULL, FALSE),
+('SKU010', 10, 15, 'Camera', 'Electronics', 'Black', 'Std', 'Digital camera', 500.00, '2 years', FALSE),
+('SKU011', 10, 2, 'RAM', 'Electronics', 'Gold', '4GB', '4GBx1 RAM, extremely valuable and rare', 6000.00, '4 weeks', FALSE);
 
 INSERT INTO prod_imgs (sku, img_url) VALUES
 ('SKU001', 'images/prod-imgs/vendor1/sku001-1.png'),

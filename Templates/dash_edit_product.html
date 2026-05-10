@@ -68,6 +68,23 @@
                 </div>
 
                 <div class="form_group">
+                    <label for="category">Category</label>
+
+                    <select id="category" name="category" required>
+                        <option value="" disabled selected>Select a category</option>
+
+                        {% for category in categories %}
+                            <option value="{{ category.value }}"
+                                {% if category.value == product.category %}
+                                selected
+                                {% endif %}>
+                                {{ category.value }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form_group">
                     <label for="qty">Quantity</label>
                     <input
                         type="number"
