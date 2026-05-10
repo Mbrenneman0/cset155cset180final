@@ -155,7 +155,7 @@ class Client:
             self.conn.create_row(TableNames.COMPLAINTS, data)
 
         def get_all_complaints(self):
-            return self.conn.get_rows(TableNames.COMPLAINTS, condition=f"orders.user_id = :user_id", join_tables=["orders"], params={"user_id": self.user_id})
+            return self.conn.get_rows(TableNames.ORDERS, condition=f"orders.user_id = :user_id", join_tables=["complaints"], params={"user_id": self.user_id})
 
         def create_order(self, items:list[CartItem]):
             order_data = {
@@ -376,7 +376,7 @@ class Client:
         def get_order_items(self) -> list[OrderItem]:
             rslt = self.conn.get_rows(TableNames.ORDERS,
                                       condition= f'{TableNames.ORDERS.value}.order_num = :order_num',
-                                      join_tables=['order_items'],
+                                      join_tables=['order_items','products'],
                                       params={'order_num': self.order_num})
             order_items = []
             for item in rslt:

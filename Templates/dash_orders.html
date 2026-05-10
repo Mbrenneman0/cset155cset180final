@@ -113,11 +113,14 @@
                                                 <td style="position: relative;">
                                                     {{ item['sku'] }}
                                                     {% if order['status'] == 'Shipped' %}
-                                                        <a class="complaint_btn" title="Make a complaint on this item here">!</a>
+                                                        <button class="complaint_btn open_popup_btn" 
+                                                                title="Make a complaint on this item here"
+                                                                data-order="{{ order['order_num'] }}"
+                                                                data-sku="{{ item['sku'] }}">!</button>
                                                     {% endif %}
                                                 </td>
                                                 <td>{{ item['qty'] }}</td>
-                                                <td>{{ item['unit_price'] }}</td>
+                                                <td>${{ item['unit_price'] }}</td>
                                                 <td>{{ item['warranty_period'] }}</td>
                                             </tr>
                                         {% endfor %}
@@ -132,6 +135,48 @@
     </div>
     
 </div>
+
+<!-- Popup -->
+<div class="pop_up_overlay hidden" id="complaint_popup">
+    <div class="pop_up">
+        <button class="close_btn" type="button">
+            &times;
+        </button>
+        <h2>Submit Complaint</h2>
+        <form action="{{ url_for('dashboard.create_complaint', role=role)}}" class="complaint_form" method="POST">
+            <input name="order_num" id="popup_order_num" hidden>
+            <label>Product SKU</label>
+            <input
+                name="sku"
+                id="popup_sku"
+                readonly
+            >
+            <label>Complaint Type</label>
+            <select name="type" class="types">
+                <option value="Return">Return</option>
+                <option value="Refund">Refund</option>
+                <option value="Warranty">Warranty</option>
+            </select>
+            <label>Describe Your Issue</label>
+            <textarea
+                name="content"
+                placeholder="Explain the issue..."
+                required
+            ></textarea>
+            <div class="popup_buttons">
+                <input type="submit" name="submit_type" value="Submit Complaint">
+                <input
+                    type="submit"
+                    name="submit_type"
+                    value="Submit & Go to Chat"
+                    class="chat_btn"
+                >
+            </div>
+        </form>
+    </div>
+</div>
+
+
 
 <script>
     const master_check = document.getElementById('check_all')
@@ -189,6 +234,37 @@
             }
         });
     }
+
+    const popup = document.getElementById("complaint_popup");
+    const orderInput = document.getElementById("popup_order_num");
+    const skuInput = document.getElementById("popup_sku");
+
+    document.querySelectorAll(".open_popup_btn")
+        .forEach(button => {
+            button.addEventListener("click", () => {
+                const orderNum = button.dataset.order;
+                console.log(button.dataset.order)
+                const sku = button.dataset.sku;
+
+                orderInput.value = orderNum;
+                skuInput.value = sku;
+
+                popup.classList.remove("hidden");
+            });
+        });
+
+    document.querySelector(".close_btn")
+        .addEventListener("click", () => {
+            popup.classList.add("hidden");
+        });
+
+    popup.addEventListener("click", (e) => {
+
+        if(e.target === popup){
+            popup.classList.add("hidden");
+        }
+
+    });
 
 </script>
 

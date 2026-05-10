@@ -184,8 +184,8 @@ def get_order(order_num:int):
             "name": extensions.client.user(order['user_id']).get_info()['name'],
             "date": order['order_time'],
             "status": order['status'],
-            "total": sum([float(item['unit_price'])*int(item['qty'])
-                                for item in extensions.client.order(order['order_num']).get_order_items()]),
+            "total": round(sum([float(item['unit_price'])*int(item['qty'])
+                                for item in extensions.client.order(order['order_num']).get_order_items()]),2),
             "items": [item for item in extensions.client.order(order['order_num']).get_order_items()]}
 
 
@@ -235,10 +235,6 @@ def _get_complaints(role: Role):
     elif role == Role.VENDOR:
         vendor = extensions.client.vendor(session['user_id'])
         complaints = vendor.get_product_complaints()
-
-    elif role == Role.CUSTOMER:
-        customer = extensions.client.customer(session['user_id'])
-        complaints = customer.get_all_complaints()
 
     return complaints
 

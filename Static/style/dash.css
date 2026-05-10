@@ -844,16 +844,24 @@ table input{
     border-radius: 12px;
 }
 
+.pop_up{
+    position: absolute;
+    height: 100vh;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
 .badge-Pending{
     background-color:#1CB2F6 !important;
 }
 
 .badge-Accepted{
-    background:#3b82f6 !important;
+    background:#349c4f !important;
 }
 
 .badge-Rejected{
-    background:#16a34a !important;
+    background:#a33c16 !important;
     
 }
 
@@ -864,6 +872,94 @@ table input{
     width: 12.5vh;
 }
 
+/* pop up */
+.pop_up_overlay{
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0,0,0,.55);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    z-index: 1000;
+}
+
+.hidden{
+    display: none;
+}
+
+.pop_up{
+    position: relative;
+
+    width: 420px;
+    max-width: 90%;
+
+    background: white;
+    padding: 28px;
+
+    border-radius: 14px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.complaint_form{
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.complaint_form input,
+.complaint_form select,
+.complaint_form textarea{
+    width: 100%;
+    padding: 10px 12px;
+
+    border: 1px solid #ccc;
+    border-radius: 8px;
+
+    box-sizing: border-box;
+}
+
+.complaint_form textarea{
+    min-height: 120px;
+    resize: vertical;
+}
+
+.popup_buttons{
+    display: flex;
+    gap: 10px;
+}
+
+.popup_buttons input{
+    cursor: pointer;
+    border: none;
+    font-weight: 600;
+}
+
+.popup_buttons input:first-child{
+    background: #222;
+    color: white;
+}
+
+.chat_btn{
+    background: #ececec;
+}
+
+.close_btn{
+    position: absolute;
+    top: 10px;
+    right: 12px;
+
+    border: none;
+    background: none;
+
+    font-size: 1.5rem;
+    cursor: pointer;
+}
 
 ::-webkit-scrollbar {
     display: none;

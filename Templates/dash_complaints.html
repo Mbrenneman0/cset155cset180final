@@ -58,7 +58,7 @@
                 </thead>
                 <tbody class="table-scroll">
                     {% for complaint in complaints %}
-                        <tr class="row_{{ 'even' if loop.index0 % 2 == 1 else 'odd' }} first_row">
+                        <tr class="row_{{ 'even' if loop.index0 % 2 == 1 else 'odd' }} first_row" style="height: 8.5vh;">
                             <td style="width: 10%;">
                                 {{ complaint.complaint_id }}
                                 <button onclick="toggleComplaint({{ complaint.complaint_id }})" class="dropbtn" id="dB-{{ complaint.complaint_id }}">🡪</button>
@@ -140,6 +140,7 @@
             row.classList.add("show");
         }
     }
+
 </script>
 
 

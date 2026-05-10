@@ -217,33 +217,18 @@ def reject_comp(cid, role):
     update_complaint_status(cid, False)
     return redirect(f"/dashboard/{role}/complaints")
 
-# @dash_bp.post("/<role>/complaints/<int:cid>/resolve")
-# def resolve_complaint(cid):
-#     conn.update(
-#         "complaints",
-#         {"status": "Resolved"},
-#         "id = :id",
-#         {"id": cid}
-#     )
-#     return redirect("/complaints")
-
 @dash_bp.route("/<role>/complaints/new", methods=["GET", "POST"])
-def create_complaint(role, product_id, order_num):
-    if request.method == "GET":
-        #TODO: 
-        # form with:
-        # product and order_num as readonly fields,
-        # complaint message for complaint chat
-        # and complaint type dropdown
-        return #
+def create_complaint(role):
     if request.method == "POST":
         form = request.form
         user_id = session['user_id']
-        # code to generate complaint here:
+        
+        customer = extensions.client.customer(user_id)
+        customer.create_complaint(form['order_num'], form['sku'], form['content'], form['type'])
 
-        complaint_id = 1
+        complaint_id = customer.get_all_complaints()[0]['complaint_id']
         #---- after complaint object is generated, get the complaint_id and store it in variable named complaint_id
-        message = form.get('message')
+        message = form.get('content')
         support_id = 1 #admin_id
         create_new_chat(user_id, support_id)
         chat_id = get_last_chat(user_id)['chat_id']
@@ -251,3 +236,16 @@ def create_complaint(role, product_id, order_num):
                                  user_id=user_id,
                                  content=message)
         send_message(message)
+
+        if form['submit_type'] == 'Submit Complaint':
+            return redirect(url_for(
+                'dashboard.view_orders',
+                role=role
+            ))
+
+        else:
+            return redirect(url_for(
+                'dashboard.view_chat',
+                role=role,
+                chat_id=chat_id
+            ))
