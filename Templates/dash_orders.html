@@ -113,7 +113,10 @@
                                                 <td style="position: relative;">
                                                     {{ item['sku'] }}
                                                     {% if order['status'] == 'Shipped' %}
-                                                        <button class="complaint_btn open_popup_btn" title="Make a complaint on this item here">!</button>
+                                                        <button class="complaint_btn open_popup_btn" 
+                                                                title="Make a complaint on this item here"
+                                                                data-order="{{ order['order_num'] }}"
+                                                                data-sku="{{ item['sku'] }}">!</button>
                                                     {% endif %}
                                                 </td>
                                                 <td>{{ item['qty'] }}</td>
@@ -136,35 +139,35 @@
 <!-- Popup -->
 <div class="pop_up_overlay hidden" id="complaint_popup">
     <div class="pop_up">
-        <button class="close_btn" type="button">&times;</button>
+        <button class="close_btn" type="button">
+            &times;
+        </button>
         <h2>Submit Complaint</h2>
-        <p class="popup_desc">
-            Describe the issue with your order item below.
-        </p>
-        <form class="complaint_form">
-            <input name="order_num" value="10231" hidden>
+        <form action="{{ url_for('dashboard.create_complaint', role=role)}}" class="complaint_form" method="POST">
+            <input name="order_num" id="popup_order_num" hidden>
             <label>Product SKU</label>
-            <input 
+            <input
                 name="sku"
-                value="SKU-48291"
+                id="popup_sku"
                 readonly
             >
             <label>Complaint Type</label>
-            <select name="role" class="types" id="type">
+            <select name="type" class="types">
                 <option value="Return">Return</option>
                 <option value="Refund">Refund</option>
                 <option value="Warranty">Warranty</option>
             </select>
             <label>Describe Your Issue</label>
-            <textarea 
+            <textarea
                 name="content"
-                placeholder="Explain the problem with the item..."
+                placeholder="Explain the issue..."
                 required
             ></textarea>
             <div class="popup_buttons">
-                <input type="submit" value="Submit Complaint">
-                <input 
+                <input type="submit" name="submit_type" value="Submit Complaint">
+                <input
                     type="submit"
+                    name="submit_type"
                     value="Submit & Go to Chat"
                     class="chat_btn"
                 >
@@ -233,10 +236,21 @@
     }
 
     const popup = document.getElementById("complaint_popup");
+    const orderInput = document.getElementById("popup_order_num");
+    const skuInput = document.getElementById("popup_sku");
 
-    document.querySelector(".open_popup_btn")
-        .addEventListener("click", () => {
-            popup.classList.remove("hidden");
+    document.querySelectorAll(".open_popup_btn")
+        .forEach(button => {
+            button.addEventListener("click", () => {
+                const orderNum = button.dataset.order;
+                console.log(button.dataset.order)
+                const sku = button.dataset.sku;
+
+                orderInput.value = orderNum;
+                skuInput.value = sku;
+
+                popup.classList.remove("hidden");
+            });
         });
 
     document.querySelector(".close_btn")

@@ -236,10 +236,6 @@ def _get_complaints(role: Role):
         vendor = extensions.client.vendor(session['user_id'])
         complaints = vendor.get_product_complaints()
 
-    elif role == Role.CUSTOMER:
-        customer = extensions.client.customer(session['user_id'])
-        complaints = customer.get_all_complaints()
-
     return complaints
 
 def _get_pending_count(role: Role):

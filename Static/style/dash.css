@@ -876,6 +876,7 @@ table input{
 .pop_up_overlay{
     position: fixed;
     inset: 0;
+
     background: rgba(0,0,0,.55);
 
     display: flex;
@@ -899,32 +900,16 @@ table input{
     padding: 28px;
 
     border-radius: 14px;
-    box-shadow: 0 10px 30px rgba(0,0,0,.2);
 
     display: flex;
     flex-direction: column;
     gap: 12px;
 }
 
-.pop_up h2{
-    margin: 0;
-}
-
-.popup_desc{
-    margin-top: -4px;
-    color: #666;
-    font-size: .95rem;
-}
-
 .complaint_form{
     display: flex;
     flex-direction: column;
     gap: 14px;
-}
-
-.complaint_form label{
-    font-weight: 600;
-    font-size: .92rem;
 }
 
 .complaint_form input,
@@ -936,13 +921,12 @@ table input{
     border: 1px solid #ccc;
     border-radius: 8px;
 
-    font-size: .95rem;
     box-sizing: border-box;
 }
 
 .complaint_form textarea{
-    resize: vertical;
     min-height: 120px;
+    resize: vertical;
 }
 
 .popup_buttons{
@@ -966,12 +950,13 @@ table input{
 }
 
 .close_btn{
-    color: #000;
     position: absolute;
     top: 10px;
     right: 12px;
+
     border: none;
     background: none;
+
     font-size: 1.5rem;
     cursor: pointer;
 }
