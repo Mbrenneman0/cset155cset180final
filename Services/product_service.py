@@ -5,6 +5,8 @@ from werkzeug.datastructures import ImmutableMultiDict, FileStorage
 from Modules.Types import *
 import re
 from difflib import SequenceMatcher
+from datetime import datetime
+from decimal import Decimal, ROUND_HALF_UP
 
 def _clean_search_text(value) -> str:
     value = str(value or "").lower()
@@ -59,10 +61,58 @@ def _fuzzy_filter_products(products, search: str, threshold: float = 0.55):
     scored_products.sort(key=lambda item: item[0], reverse=True)
     return [product for score, product in scored_products]
 
+def round_money(value) -> float:
+    return float(Decimal(str(value)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP))
+
+
+def get_active_discount(sku: str):
+    discounts = extensions.client.product(sku).get_discounts()
+
+    for discount_row in discounts:
+        discount = Discount(
+            discount_row["amount"],
+            discount_row["start_date"],
+            discount_row["end_date"]
+        )
+
+        if discount.is_active():
+            return {
+                "amount": discount_row["amount"],
+                "start_date": discount_row["start_date"],
+                "end_date": discount_row["end_date"],
+                "discount_obj": discount
+            }
+
+    return None
+
+
+def attach_discount_data(product: ProductRow) -> ProductRow:
+    original_price = float(product["unit_price"])
+    active_discount = get_active_discount(product["sku"])
+
+    product["original_price"] = round_money(original_price)
+    product["sale_price"] = round_money(original_price)
+    product["has_discount"] = False
+    product["discount"] = None
+    product["discount_amount"] = 0.00
+
+    if active_discount:
+        discount = active_discount["discount_obj"]
+        sale_price = discount.apply_discount(original_price)
+        discount_amount = discount.get_discount_amount(original_price)
+
+        product["sale_price"] = round_money(sale_price)
+        product["has_discount"] = True
+        product["discount"] = active_discount["amount"]
+        product["discount_amount"] = round_money(discount_amount)
+
+    return product
+
 def get_products(with_imgs = False,
                  with_reviews = False,
                  with_rating = False,
                  category:ProdCategories = None,
+                 with_discounts=True,
                  search:str = None):
     products = extensions.client.get_all_products()
     if category:
@@ -84,9 +134,16 @@ def get_products(with_imgs = False,
     if with_rating:
         for product in products:
             product['rating'] = get_rating(product['sku'])
+
+    if with_discounts:
+        for product in products:
+            attach_discount_data(product)
     return products
 
-def get_product(sku, with_imgs = False, with_reviews = False, with_rating = False):
+def get_product(sku, with_imgs = False,
+                with_reviews = False,
+                with_rating = False,
+                with_discounts = True):
     product = extensions.client.product(sku).get_info()
     if with_imgs:
         try:
@@ -101,6 +158,9 @@ def get_product(sku, with_imgs = False, with_reviews = False, with_rating = Fals
             review.update(username=username)
     if with_rating:
         product['rating'] = get_rating(sku)
+
+    if with_discounts:
+        attach_discount_data(product)
     return product
 
 def update_product(

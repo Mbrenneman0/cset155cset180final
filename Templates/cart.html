@@ -24,12 +24,19 @@
 
             <tbody>
                 {% for item in items %}
-                {% set item_total = item.product.unit_price * item.qty %}
+                {% set item_total = item.product.sale_price * item.qty %}
                 {% set ns.cart_total = ns.cart_total + item_total %}
 
                 <tr>
                     <td>{{ item.product.title }}</td>
-                    <td>${{ "%.2f"|format(item.product.unit_price) }}</td>
+                    <td>
+                        {% if item.product.has_discount %}
+                            <span class="old_price">${{ "%.2f"|format(item.product.original_price) }}</span>
+                            <span class="sale_price">${{ "%.2f"|format(item.product.sale_price) }}</span>
+                        {% else %}
+                            ${{ "%.2f"|format(item.product.sale_price) }}
+                        {% endif %}
+                    </td>
                     <td class="qty-td">
                         <form class="qty_form" action="{{ url_for('cart.update_cart_qty') }}" method="POST">
                             <input type="hidden" name="sku" value="{{ item.product.sku }}">
