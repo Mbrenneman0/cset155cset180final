@@ -28,7 +28,16 @@
     <div class="prod_details">
         <h1>{{ product.title }}</h1>
         <p>{{ product.description }}</p>
-        <p>Price: ${{ product.unit_price }}</p>
+        {% if product.has_discount %}
+            <p class="prod_price">
+                Price:
+                <span class="old_price">${{ "%.2f"|format(product.original_price) }}</span>
+                <span class="sale_price">${{ "%.2f"|format(product.sale_price) }}</span>
+                <span class="discount_badge">{{ product.discount }} off</span>
+            </p>
+        {% else %}
+            <p class="prod_price">Price: ${{ "%.2f"|format(product.sale_price) }}</p>
+        {% endif %}
         <form action="{{ url_for('cart.add_to_cart') }}" method="post" class="atc_form">
             <input type="hidden" name="sku" value="{{ product.sku }}">
             <button type="submit" class="atc_btn">Add to Cart</button>

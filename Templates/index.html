@@ -28,9 +28,18 @@
 
     <div class="products_grid">
         {% for product in products %}
-        {% with sku=product.sku, title=product.title, images=product.get('images', []), price=product.unit_price, rating=product.rating %}
-            {% include "product_card.html" %}
-        {% endwith %}
+            {% with 
+                sku=product.sku,
+                title=product.title,
+                images=product.get('images', []),
+                price=product.sale_price,
+                original_price=product.original_price,
+                has_discount=product.has_discount,
+                discount=product.discount,
+                rating=product.rating
+            %}
+                {% include "product_card.html" %}
+            {% endwith %}
         {% endfor %}
     </div>
 {% endblock %}

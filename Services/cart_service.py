@@ -1,5 +1,6 @@
 from flask import session
 import extensions
+from Services.product_service import get_product
 from Modules.Types import *
 
 def add_item_to_cart(sku):
@@ -52,7 +53,7 @@ def get_cart_items():
                 raise Exception("Only customers can have a cart")
             cart = extensions.client.customer(user_id).get_cart()
             for item in cart:
-                item['product'] = extensions.client.product(item['sku']).get_info()
+                item['product'] = get_product(item['sku'], with_imgs=False, with_discounts=True)
             return cart
         except Exception as e:
             raise
@@ -93,14 +94,14 @@ def checkout():
             user = extensions.client.user(user_id)
             if not user.is_customer():
                 raise Exception("Only customers can checkout")
-            cart_items = extensions.client.customer(user_id).get_cart()
+            cart_items = get_cart_items()
             if not cart_items:
                 raise Exception("Your cart is empty")
-            for item in cart_items:
-                product = extensions.client.product(item['sku']).get_info()
-                if item['qty'] > product['qty']:
-                    raise Exception(f"Not enough stock for SKU:{item['sku']} {product['title']}. Available: {product['qty']}")
+            for item in items:
+                product = item.get("product") or self.client.product(item["sku"]).get_info()
 
+                unit_price = product.get("sale_price", product["unit_price"])
+                warranty_period = product["warranty_period"]
             extensions.client.customer(user_id).create_order(cart_items)
             clear_cart()
         except Exception as e:

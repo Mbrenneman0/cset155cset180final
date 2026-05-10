@@ -37,7 +37,15 @@
         </div>
         <div class="prod_info">
             <a href="{{ url_for('products.view_product', sku=sku) }}" class="product_card_link">
-                <p class="prod_price">Price: ${{ price }}</p>
+                {% if has_discount %}
+                    <p class="prod_price">
+                        <span class="old_price">${{ "%.2f"|format(original_price) }}</span>
+                        <span class="sale_price">${{ "%.2f"|format(price) }}</span>
+                        <span class="discount_badge">{{ discount }} off</span>
+                    </p>
+                {% else %}
+                    <p class="prod_price">${{ "%.2f"|format(price) }}</p>
+                {% endif %}
                 {{ rating_stars.rating_stars(rating) }}
             </a>
             <form action="{{ url_for('cart.add_to_cart') }}" method="post" class="atc_form">
