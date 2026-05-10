@@ -120,6 +120,28 @@ def view_chat(role, chat_id):
         send_message(chat_msg)
         return redirect(url_for('dashboard.view_chat', role=role, chat_id=chat_id))
     
+@dash_bp.route('<string:role>/chats/new', methods=["GET", "POST"])
+def new_chat(role:Role):
+    if request.method == "GET":
+        vendors = [{'user_id': user['user_id'], 'name':user['name']}
+                   for user in extensions.client.admin(1).get_vendors()]
+        return render_template('dash_new_chat.html',
+                               vendors=vendors,
+                               role=session.get('role')
+        )
+    if request.method == "POST":
+        form = request.form
+        user_id = session['user_id']
+        support_id = form.get('vendor_id')
+        create_new_chat(user_id, support_id)
+        chat_id = get_last_chat(user_id)['chat_id']
+        message = NewChatMessage(chat_id=chat_id,
+                                 user_id=user_id,
+                                 content=form.get('message'))
+        send_message(message)
+        return redirect(url_for('dashboard.view_chat', role=role, chat_id=chat_id))
+
+    
 # ----- ORDERS -------
 @dash_bp.route('/<role>/orders', methods=['GET','POST'])
 def view_orders(role):
