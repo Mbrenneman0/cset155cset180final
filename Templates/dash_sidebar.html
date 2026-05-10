@@ -42,13 +42,13 @@
     <a href="{{ url_for('authenticate.logout') }}">
     <i></i>Logout</a>
 </div>
-
+{# 
 <style>
     /* ------- SIDEBAR -------------- */
     .sidebar{
         display: inline-block;
         min-height:100vh;
-        width: 250px;
+        width: var(--sidebar-width);
         background:#0f172a;
         color:#fff;
     }
@@ -69,4 +69,4 @@
         background:#2563eb;
         color:#fff
     }
-</style>
+</style> #}
