@@ -9,7 +9,7 @@ def get_products(with_imgs = False, with_reviews = False, with_rating = False, c
     products = extensions.client.get_all_products()
     if category:
         products = [product for product in products
-                    if product.get('category') == category]
+                    if product.get('category') == category.value]
     if with_imgs:
         for product in products:
             try:
