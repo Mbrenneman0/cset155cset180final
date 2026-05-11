@@ -131,6 +131,34 @@ def add_product(role):
         active_page='products'
     )
 
+@dash_bp.route('/<string:role>/products/<string:sku>/remove')
+def remove_product(role, sku):
+    if 'user_id' not in session:
+        return redirect(url_for('authenticate.login_username'))
+
+    if session.get('role') != Role.VENDOR.value:
+        flash('Only vendors can remove products.', 'error')
+        return redirect(url_for('dashboard.view_products', role=role))
+
+    vendor = extensions.client.vendor(session['user_id'])
+
+    product = extensions.client.product(sku).get_info()
+
+    if not product:
+        flash('Product not found.', 'error')
+        return redirect(url_for('dashboard.view_products', role=role))
+
+    if product['vendor_id'] != session['user_id']:
+        flash('You cannot remove a product that does not belong to you.', 'error')
+        return redirect(url_for('dashboard.view_products', role=role))
+
+    vendor.update_product(sku, {
+        'is_removed': True
+    })
+
+    flash('Product removed successfully.', 'success')
+    return redirect(url_for('dashboard.view_products', role=role))
+
 # ----- CHATS -------
 
 @dash_bp.route('/<string:role>/chats')

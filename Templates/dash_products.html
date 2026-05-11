@@ -67,7 +67,8 @@
                         <div class="dash_product_actions">
                             <a href="{{ url_for('dashboard.edit_product', role=role, sku = product.sku) }}"
                                 class="dash_small_btn edit">Edit</a>
-                            <a href="#" class="dash_small_btn danger">Remove</a>
+                            <a href="{{ url_for('dashboard.remove_product', role=role, sku=product.sku) }}"
+                                class="dash_small_btn danger">Remove</a>
                         </div>
                     </div>
 
