@@ -175,7 +175,7 @@ INSERT INTO products (sku, vendor_id, qty, title, category, color, size, descrip
 ('SKU007', 35, 3, '4K Monitor', 'Electronics', 'Black', '27in', 'Crisp 4K monitor for work and gaming', 340.36, '1 year', TRUE),
 ('SKU008', 29, 75, 'USB-C Hub', 'Electronics', 'Gray', 'Compact', 'Multi-port USB-C hub for laptops', 36.22, NULL, FALSE),
 ('SKU009', 30, 81, 'Webcam', 'Electronics', 'Black', 'Std', '1080p webcam with built-in microphone', 60.69, '90 days', FALSE),
-('SKU010', 31, 138, 'Laptop Plus 1', 'Electronics', 'Black', '15in', 'Lightweight laptop with fast storage', 933.49, '1 year', FALSE),
+('SKU010', 31, 138, 'Camera', 'Electronics', 'Black', 'Std', 'A high quality digital camera', 933.49, '1 year', FALSE),
 ('SKU011', 32, 35, 'Coffee Beans', 'Food and Beverage', 'Brown', '32oz', 'Whole bean medium roast coffee', 20.58, NULL, FALSE),
 ('SKU012', 33, 195, 'Green Tea Pack', 'Food and Beverage', 'Green', 'Medium', 'Organic green tea bags', 14.08, NULL, FALSE),
 ('SKU013', 34, 142, 'Trail Mix', 'Food and Beverage', 'Beige', 'Large', 'Sweet and salty nut and fruit trail mix', 11.75, NULL, FALSE),
