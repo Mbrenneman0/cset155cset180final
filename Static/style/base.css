@@ -401,3 +401,69 @@ label{
     color: var(--text-dark);
     font-weight: 600;
 }
+
+/* ------------- FOOTER ------------- */
+
+.site_footer {
+    margin-top: var(--footer-margin-top);
+    padding: 2rem;
+    background-color: var(--neutral-dark);
+    color: var(--text-light);
+}
+
+.footer_content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+}
+
+.footer_brand h2 {
+    color: var(--text-light);
+    margin-bottom: 0.25rem;
+}
+
+.footer_brand p {
+    color: var(--neutral-highlight);
+}
+
+.footer_links {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.footer_links a {
+    color: var(--text-light);
+    font-weight: 600;
+}
+
+.footer_links a:hover {
+    color: var(--accent-primary);
+}
+
+.footer_bottom {
+    max-width: 1200px;
+    margin: 1.5rem auto 0;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color-dark);
+    text-align: center;
+}
+
+.footer_bottom p {
+    color: var(--neutral-highlight);
+    font-size: 0.9rem;
+}
+
+@media (max-width: 700px) {
+    .footer_content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .footer_links {
+        justify-content: center;
+    }
+}
