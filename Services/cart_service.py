@@ -83,25 +83,50 @@ def clear_cart():
             extensions.client.customer(user_id).clear_cart()
         except Exception as e:
             raise
-
 def checkout():
     # Note: No checkout page. Customer's payment info is assumed to be good according to project specs.
     user_id = session.get('user_id')
     if not user_id:
         raise Exception("Not logged in")
-    else:
-        try:
-            user = extensions.client.user(user_id)
-            if not user.is_customer():
-                raise Exception("Only customers can checkout")
-            cart_items = get_cart_items()
-            if not cart_items:
-                raise Exception("Your cart is empty")
-            for item in cart_items:
-                product = extensions.client.product(item["sku"]).get_info()
-                unit_price = product.get("sale_price", product["unit_price"])
-                warranty_period = product["warranty_period"]
-            extensions.client.customer(user_id).create_order(cart_items)
-            clear_cart()
-        except Exception as e:
-            raise
+
+    try:
+        user = extensions.client.user(user_id)
+        if not user.is_customer():
+            raise Exception("Only customers can checkout")
+        
+        cart_items = extensions.client.customer(user_id).get_cart()
+        if not cart_items:
+            raise Exception("Your cart is empty")
+
+        order_items = []
+
+        for cart_item in cart_items:
+            sku = cart_item["sku"]
+            cart_qty = int(cart_item["qty"])
+
+            product = get_product(sku, with_discounts=True)
+            stock_qty = int(product["qty"])
+
+            if cart_qty > stock_qty:
+                raise Exception(
+                    f"Not enough stock for SKU:{sku} {product['title']}. "
+                    f"Available: {stock_qty}"
+                )
+            order_items.append({
+                "sku": sku,
+                "qty": cart_qty,
+                "unit_price": product['sale_price'],
+                "warranty_period": product["warranty_period"]
+            })
+
+        customer = extensions.client.customer(user_id)
+        order_num = customer.create_order(order_items)
+
+        for order_item in order_items:
+            extensions.client.product(order_item["sku"]).update_inventory(order_item["qty"])
+
+        clear_cart()
+        return order_num
+
+    except Exception:
+        raise
