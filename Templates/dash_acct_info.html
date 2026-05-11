@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Account Info</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/dash.css') }}">
+</head>
+<body>
+
+{% include 'dash_sidebar.html' %}
+
+<main class="dash_main">
+    <div class="dash_header">
+        <h1>Account Info</h1>
+        <p>Basic information for your {{ role|lower }} account.</p>
+    </div>
+
+    <section class="dash_card">
+        <div class="dash_card_header">
+            <h2>{{ account.name }}</h2>
+            <p>{{ account.role }}</p>
+        </div>
+
+        <div class="dash_info_grid">
+            {% for key, value in account.items() %}
+                <div class="dash_info_item">
+                    <span class="dash_info_label">
+                        {{ key.replace('_', ' ')|title }}:
+                    </span>
+
+                    <span class="dash_info_value">
+                        {{ value }}
+                    </span>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+</main>
+
+</body>
+</html>

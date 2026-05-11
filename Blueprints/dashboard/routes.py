@@ -38,6 +38,32 @@ def admin_dash():
 def customer_dash():
     return get_dashboard_data(Role.CUSTOMER)
 
+@dash_bp.route('/<string:role>/account-info')
+def account_info(role):
+    if 'user_id' not in session:
+        return redirect(url_for('authenticate.login_username'))
+
+    user_id = session['user_id']
+    role_lower = role.lower()
+
+    if role_lower == Role.CUSTOMER.value.lower():
+        account = extensions.client.customer(user_id).get_info()
+    elif role_lower == Role.VENDOR.value.lower():
+        account = extensions.client.vendor(user_id).get_info()
+    elif role_lower == Role.ADMIN.value.lower():
+        account = extensions.client.admin(user_id).get_info()
+    else:
+        flash('Invalid dashboard role.', 'error')
+        return redirect(url_for('dashboard.dashboard'))
+
+    account.pop('password', None)
+
+    return render_template(
+        'dash_acct_info.html',
+        role=role,
+        account=account,
+        active_page='info'
+    )
 
 # ----- PRODUCTS ------
 @dash_bp.route('/<role>/products')
@@ -278,7 +304,7 @@ def create_complaint(role):
         #---- after complaint object is generated, get the complaint_id and store it in variable named complaint_id
         message = form.get('content')
         support_id = 1 #admin_id
-        create_new_chat(user_id, support_id)
+        create_new_chat(user_id, support_id, complaint_id=complaint_id)
         chat_id = get_last_chat(user_id)['chat_id']
         message = NewChatMessage(chat_id=chat_id,
                                  user_id=user_id,

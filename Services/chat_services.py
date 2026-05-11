@@ -9,7 +9,11 @@ def send_message(message:NewChatMessage):
 
 def get_chats(user_id) -> list[ChatRow]:
     user = extensions.client.user(user_id)
-    chats = user.get_chats()
+    if user.is_admin():
+        user = extensions.client.admin(user_id)
+        chats = user.get_complaint_chats()
+    else:
+        chats = user.get_chats()
     return chats
 
 def create_new_chat(user_id:int, support_id:int, complaint_id:int=None):
