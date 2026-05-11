@@ -50,7 +50,7 @@ def remove_item():
         flash(str(e), 'error')
     return redirect(request.referrer)
 
-@cart_bp.route('/checkout', methods=['GET'])
+@cart_bp.route('/checkout', methods=['POST'])
 def checkout():
     try:
         Cart_Service.checkout()

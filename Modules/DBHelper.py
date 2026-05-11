@@ -237,8 +237,9 @@ class Conn:
             placeholders = ', '.join([f":{key}" for key in data.keys()])
             query = f"INSERT INTO {self.table_name} ({columns}) VALUES ({placeholders})"
             try:
-                self.conn.execute(text(query), data)
+                result = self.conn.execute(text(query), data)
                 self.conn.commit()
+                return result.lastrowid
             except Exception as e:
                 print(f"Error executing query: {query} with data: {data}")
                 print(e)
@@ -396,7 +397,7 @@ class Conn:
     def create_row(self, table_name:str, data:dict):
         table = self._get_table(table_name)
         try:
-            table.create_row(data)
+            return table.create_row(data)
         except Exception as e:
             raise
 

@@ -157,28 +157,51 @@ class Client:
         def get_all_complaints(self):
             return self.conn.get_rows(TableNames.ORDERS, condition=f"orders.user_id = :user_id", join_tables=["complaints"], params={"user_id": self.user_id})
 
-        def create_order(self, items:list[CartItem]):
+        def create_order(self, items: list[CartItem]):
             order_data = {
                 "user_id": self.user_id
             }
+        
+            order_num = None
+        
             try:
-                self.conn.create_row(TableNames.ORDERS, order_data)
-                condition="user_id = :user_id ORDER BY order_time DESC LIMIT 1"
-                params={"user_id": self.user_id}
-                order_num = self.conn.get_rows(TableNames.ORDERS, condition=condition, params=params)[0]["order_num"]
+                order_num = self.conn.create_row(TableNames.ORDERS, order_data)
+        
                 for item in items:
-                    product = self.client.product(item["sku"]).get_info()
-                    unit_price = product["unit_price"]
-                    warranty_period = product["warranty_period"]
+                    sku = item["sku"]
+                    cart_qty = item["qty"]  # customer cart quantity
+        
+                    product = self.client.product(sku).get_info()
+                    stock_qty = product["qty"]  # product inventory quantity
+        
+                    if cart_qty > stock_qty:
+                        raise ValueError(
+                            f"Not enough stock for SKU:{sku} {product['title']}. "
+                            f"Available: {stock_qty}"
+                        )
+        
                     item_data = {
                         "order_num": order_num,
-                        "sku": item["sku"],
-                        "qty": item["qty"],
-                        "unit_price": unit_price,
-                        "warranty_period": warranty_period
+                        "sku": sku,
+                        "qty": cart_qty,  # IMPORTANT: cart qty, not product qty
+                        "unit_price": product["unit_price"],
+                        "warranty_period": product["warranty_period"]
                     }
+        
                     self.conn.create_row(TableNames.ORDER_ITEMS, item_data)
-            except Exception as e:
+        
+                    # Optional but recommended: reduce inventory by the amount bought
+                    self.client.product(sku).update_inventory(cart_qty)
+        
+                return order_num
+        
+            except Exception:
+                if order_num is not None:
+                    try:
+                        self.conn.delete_row(TableNames.ORDERS, order_num)
+                    except Exception:
+                        pass
+                    
                 raise
 
     class Vendor(User):

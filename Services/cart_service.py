@@ -99,7 +99,6 @@ def checkout():
                 raise Exception("Your cart is empty")
             for item in cart_items:
                 product = extensions.client.product(item["sku"]).get_info()
-
                 unit_price = product.get("sale_price", product["unit_price"])
                 warranty_period = product["warranty_period"]
             extensions.client.customer(user_id).create_order(cart_items)
