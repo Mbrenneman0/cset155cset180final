@@ -157,44 +157,29 @@ class Client:
         def get_all_complaints(self):
             return self.conn.get_rows(TableNames.ORDERS, condition=f"orders.user_id = :user_id", join_tables=["complaints"], params={"user_id": self.user_id})
 
-        def create_order(self, items: list[CartItem]):
+        def create_order(self, items: list[OrderItem]):
             order_data = {
                 "user_id": self.user_id
             }
-        
+
             order_num = None
-        
+
             try:
                 order_num = self.conn.create_row(TableNames.ORDERS, order_data)
-        
+
                 for item in items:
-                    sku = item["sku"]
-                    cart_qty = item["qty"]  # customer cart quantity
-        
-                    product = self.client.product(sku).get_info()
-                    stock_qty = product["qty"]  # product inventory quantity
-        
-                    if cart_qty > stock_qty:
-                        raise ValueError(
-                            f"Not enough stock for SKU:{sku} {product['title']}. "
-                            f"Available: {stock_qty}"
-                        )
-        
                     item_data = {
                         "order_num": order_num,
-                        "sku": sku,
-                        "qty": cart_qty,  # IMPORTANT: cart qty, not product qty
-                        "unit_price": product["unit_price"],
-                        "warranty_period": product["warranty_period"]
+                        "sku": item["sku"],
+                        "qty": int(item["qty"]),
+                        "unit_price": item["unit_price"],
+                        "warranty_period": item["warranty_period"]
                     }
-        
+
                     self.conn.create_row(TableNames.ORDER_ITEMS, item_data)
-        
-                    # Optional but recommended: reduce inventory by the amount bought
-                    self.client.product(sku).update_inventory(cart_qty)
-        
+
                 return order_num
-        
+
             except Exception:
                 if order_num is not None:
                     try:
@@ -397,17 +382,31 @@ class Client:
                                  )
 
         def get_order_items(self) -> list[OrderItem]:
-            rslt = self.conn.get_rows(TableNames.ORDERS,
-                                      condition= f'{TableNames.ORDERS.value}.order_num = :order_num',
-                                      join_tables=['order_items','products'],
-                                      params={'order_num': self.order_num})
+            rslt = self.conn.get_rows(
+                TableNames.ORDERS,
+                condition=f'{TableNames.ORDERS.value}.order_num = :order_num',
+                join_tables=[TableNames.ORDER_ITEMS.value, TableNames.PRODUCTS.value],
+                cols=[
+                    "order_items.order_num AS order_num",
+                    "order_items.sku AS sku",
+                    "order_items.qty AS order_qty",
+                    "order_items.unit_price AS order_unit_price",
+                    "order_items.warranty_period AS order_warranty_period"
+                ],
+                params={"order_num": self.order_num}
+            )
+        
             order_items = []
+        
             for item in rslt:
-                order_items.append(OrderItem(order_num=self.order_num,
-                                             sku=item['sku'],
-                                             qty=item['qty'],
-                                             unit_price=item['unit_price'],
-                                             warranty_period=item['warranty_period']))
+                order_items.append(OrderItem(
+                    order_num=item["order_num"],
+                    sku=item["sku"],
+                    qty=item["order_qty"],
+                    unit_price=item["order_unit_price"],
+                    warranty_period=item["order_warranty_period"]
+                ))
+        
             return order_items
 
     class Message:
