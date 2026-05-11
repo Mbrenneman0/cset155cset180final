@@ -53,12 +53,9 @@
                     ">
                         <div class="chat_message_bubble">
                             <div class="chat_message_meta">
-                                <span>User #{{ message.user_id }}</span>
-
-                                {% if message.msg_time %}
-                                    <span>
-                                        {{ message.msg_time.strftime('%b %d, %Y %I:%M %p') }}
-                                    </span>
+                                {{ message.author }}
+                                {% if message.msg_time %} 
+                                    {{ message.msg_time.strftime('%b %d, %Y %I:%M %p') }} 
                                 {% endif %}
                             </div>
 
