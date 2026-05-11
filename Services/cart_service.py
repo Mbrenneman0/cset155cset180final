@@ -97,8 +97,8 @@ def checkout():
             cart_items = get_cart_items()
             if not cart_items:
                 raise Exception("Your cart is empty")
-            for item in items:
-                product = item.get("product") or self.client.product(item["sku"]).get_info()
+            for item in cart_items:
+                product = extensions.client.product(item["sku"]).get_info()
 
                 unit_price = product.get("sale_price", product["unit_price"])
                 warranty_period = product["warranty_period"]

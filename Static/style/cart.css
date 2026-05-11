@@ -161,6 +161,27 @@
     color: var(--accent-secondary);
 }
 
+.old_price {
+    text-decoration: line-through;
+    opacity: 0.65;
+    margin-right: 0.5rem;
+}
+
+.sale_price {
+    font-weight: 700;
+}
+
+.discount_badge {
+    display: inline-block;
+    margin-left: 0.5rem;
+    padding: 0.15rem 0.45rem;
+    border-radius: 999px;
+    background: #f3d56b;
+    color: #222;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
 @media (max-width: 700px) {
     .cart_container {
         padding: 0 1rem;
