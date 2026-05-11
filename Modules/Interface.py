@@ -299,6 +299,10 @@ class Client:
 
         def get_complaints_type(self, type='refund'):
             return self.conn.get_rows(TableNames.COMPLAINTS, condition=f"type = :type", params={"type": type})
+        
+        def get_complaint_chats(self) -> list[ChatRow]:
+            return self.conn.get_rows(TableNames.CHATS,
+                                      condition=f"complaint_id IS NOT NULL")
 
         def get_all_orders(self) -> list[OrderRow]:
             return self.conn.get_rows(TableNames.ORDERS)
@@ -395,9 +399,9 @@ class Client:
                 ],
                 params={"order_num": self.order_num}
             )
-        
+
             order_items = []
-        
+
             for item in rslt:
                 order_items.append(OrderItem(
                     order_num=item["order_num"],
@@ -406,7 +410,7 @@ class Client:
                     unit_price=item["order_unit_price"],
                     warranty_period=item["order_warranty_period"]
                 ))
-        
+
             return order_items
 
     class Message:

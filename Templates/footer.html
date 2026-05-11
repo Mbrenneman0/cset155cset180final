@@ -1,3 +1,18 @@
-<footer>
+<footer class="site_footer">
+    <div class="footer_content">
+        <div class="footer_brand">
+            <h2>Trade<span class="span-gold">Hive</span></h2>
+            <p>Simple shopping for everyday products.</p>
+        </div>
 
+        <div class="footer_links">
+            <a href="{{ url_for('index.index') }}">Home</a>
+            <a href="{{ url_for('cart.view_cart') }}">Cart</a>
+            <a href="{{ url_for('dashboard.dashboard') }}">Dashboard</a>
+        </div>
+    </div>
+
+    <div class="footer_bottom">
+        <p>&copy; 2026 TradeHive. All rights reserved.</p>
+    </div>
 </footer>

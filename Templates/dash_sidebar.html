@@ -1,5 +1,5 @@
 <div class="sidebar">
-    {%if active_page is none or active_page not in ['dashboard', 'products', 'orders', 'reviews', 'messages', 'complaints', 'settings'] %}
+    {%if active_page is none or active_page not in ['dashboard', 'products', 'orders', 'reviews', 'messages', 'complaints', 'info'] %}
         {% set active_page = 'dashboard' %}
     {% endif %}
     <a href="{{ url_for('index.index') }}">
@@ -35,9 +35,9 @@
         <i></i>Complaints</a>
     {% endif %}
 
-        <a {% if active_page == 'settings'%}class="active"{% endif %}
-        href="#">
-        <i></i>Settings</a>
+        <a {% if active_page == 'info'%}class="active"{% endif %}
+        href="{{ url_for('dashboard.account_info', role=role) }}">
+        <i></i>Account Info</a>
 
     <a href="{{ url_for('authenticate.logout') }}">
     <i></i>Logout</a>
