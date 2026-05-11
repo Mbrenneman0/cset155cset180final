@@ -115,25 +115,73 @@ def view_chats(role):
         chat['support'] = extensions.client.user(chat['support_id']).get_info()['username']
     return render_template('dash_chats.html', chats=chats, role=role, active_page="messages")
 
-@dash_bp.route('<string:role>/chats/<chat_id>', methods=["GET","POST"])
+@dash_bp.route('/<string:role>/chats/<int:chat_id>', methods=['GET', 'POST'])
 def view_chat(role, chat_id):
-    if request.method=="GET":
-        chat = extensions.client.chat(chat_id)
-        messages = chat.get_messages()
-        return render_template(
-                                "dash_view_chat.html",
-                                chat=chat.get_info(),
-                                messages=messages,
-                                role=role,
-                                active_page="messages"
-                            )
-    if request.method=="POST":
-        form = request.form
-        chat_msg = NewChatMessage(chat_id=chat_id,
-                                  user_id=session['user_id'],
-                                  content=form.get("content"))
-        send_message(chat_msg)
-        return redirect(url_for('dashboard.view_chat', role=role, chat_id=chat_id))
+    if 'user_id' not in session:
+        return redirect(url_for('authenticate.login_username'))
+
+    chat_obj = extensions.client.chat(chat_id)
+    chat = chat_obj.get_info()
+
+    current_user_id = session['user_id']
+    current_role = session.get('role')
+
+    is_participant = current_user_id in [
+        chat['customer_id'],
+        chat['support_id']
+    ]
+
+    if current_role != Role.ADMIN.value and not is_participant:
+        flash("You do not have permission to view this chat.", "error")
+        return redirect(url_for('dashboard.view_chats', role=role))
+
+    if request.method == 'POST':
+        content = request.form.get('content', '').strip()
+
+        if content:
+            send_message({
+                'chat_id': chat_id,
+                'user_id': current_user_id,
+                'content': content
+            })
+
+        return redirect(url_for(
+            'dashboard.view_chat',
+            role=role,
+            chat_id=chat_id
+        ))
+
+    messages = chat_obj.get_messages()
+
+    customer = extensions.client.user(chat['customer_id']).get_info()
+
+    support = None
+    if chat.get('support_id'):
+        support = extensions.client.user(chat['support_id']).get_info()
+
+    chat['customer_name'] = customer['name']
+    chat['support_username'] = support['username'] if support else 'Not assigned'
+
+    user_display_names = {
+        chat['customer_id']: customer['name']
+    }
+
+    if support:
+        user_display_names[chat['support_id']] = support['name']
+
+    for message in messages:
+        message['author'] = user_display_names.get(
+            message['user_id'],
+            f"User #{message['user_id']}"
+        )
+
+    return render_template(
+        'dash_view_chat.html',
+        chat=chat,
+        messages=messages,
+        role=role,
+        active_page='messages'
+    )
     
 @dash_bp.route('<string:role>/chats/new', methods=["GET", "POST"])
 def new_chat(role:Role):
